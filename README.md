@@ -1,4 +1,4 @@
-# Nikita Shcherbakov
+# Portfolio
 
 Сайт-визитка Никиты Щербакова: журнал о рок-группах, плеер в стиле iPod на YouTube и резюме.
 

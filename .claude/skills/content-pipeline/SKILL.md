@@ -53,7 +53,7 @@ change: say so to the user):
   refetches. A run that dies halfway resumes where it stopped.
 - **MusicBrainz** (`https://musicbrainz.org/ws/2/…?fmt=json`): at most **1 request per second** (a request
   queue, not `Promise.all`), and a User-Agent that names the app and a contact, e.g.
-  `NikitaShcherbakovPortfolio/0.1.0 ( https://github.com/NikitaShcherbakov/nikita-shcherbakov )`. Use the repository URL as the contact; never
+  `Portfolio/0.1.0 ( https://github.com/NikitaShcherbakov/portfolio )`. Use the repository URL as the contact; never
   put the user's email into the User-Agent without asking. On `503` back off and retry later.
 - **TheAudioDB** (`https://www.theaudiodb.com/api/v1/json/123/…`): the free key `123`, up to 30 requests per
   minute.
