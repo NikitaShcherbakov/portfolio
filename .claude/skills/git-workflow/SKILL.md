@@ -36,7 +36,7 @@ the index: an unstaged broken file still blocks the commit. Tests and the build 
 
 There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on every push to `main` and `develop` and on
 every pull request: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`, `build`, then Playwright on
-desktop and mobile. On a pull request it also runs commitlint over the pull request's commits, which catches
+desktop and mobile. It also runs commitlint over the pushed commits (or the pull request's), which catches
 commits made on github.com where husky never ran. A failed e2e run uploads `playwright-report` as an
 artifact for 7 days.
 
@@ -90,7 +90,10 @@ a byte-order mark that commitlint rejects as `header-trim` / `type-empty`.
   `main` changes only through a pull request `develop → main` that the user merges.
 - After that merge, fast-forward `develop` to `origin/main` (`git merge --ff-only origin/main`) and push, so
   the next pull request shows only new commits.
-- Pull request descriptions follow `.github/pull_request_template.md`, in English.
+- `.github/workflows/open-pull-request.yml` opens the pull request on a branch's first push (`develop` into
+  `main`, other branches into `develop`) with the commit headers, type boxes and labels from
+  `.github/labels.json`. After every push run the **pr-description** skill: it writes the summary and test
+  plan, in English, through the personal account's token.
 - For a larger piece (a component of the MVP plan), the user may prefer a branch
   `<type>/<kebab-slug>` (`feat/magazine-page-flip`) off `develop`, the type from the commitlint enum. Ask
   once; create it with `git switch -c <branch>` (`git checkout` asks for permission, as it can overwrite

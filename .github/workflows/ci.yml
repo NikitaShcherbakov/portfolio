@@ -15,7 +15,6 @@ concurrency:
 jobs:
   commits:
     name: Commit messages
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -28,10 +27,31 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Also on push: a pull request opened by the open-pull-request workflow
+      # (GITHUB_TOKEN) starts no pull_request run for its first commits
       - env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            from=$PR_BASE
+            to=$PR_HEAD
+          elif [ "$PUSH_BEFORE" = 0000000000000000000000000000000000000000 ]; then
+            from=$(git merge-base origin/main "$PUSH_AFTER")
+            to=$PUSH_AFTER
+          else
+            from=$PUSH_BEFORE
+            to=$PUSH_AFTER
+          fi
+          # commitlint exits 9 on an empty range (a branch pushed with no commits of its own)
+          if [ "$(git rev-parse "$from")" = "$(git rev-parse "$to")" ]; then
+            echo "No commits to lint"
+            exit 0
+          fi
+          pnpm exec commitlint --from "$from" --to "$to" --verbose
 
   checks:
     name: Format, lint, types, dead code, tests, build
