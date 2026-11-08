@@ -64,14 +64,18 @@ jobs:
             echo "$BRANCH is ahead of $base by merge commits only"
             exit 0
           fi
-          types=$(grep -oE '^[a-z]+' <<<"$headers" | sort -u || true)
+          # A plain `git revert` header is `Revert "feat: x"`
+          types=$({ grep -oE '^[a-z]+' <<<"$headers" || true; grep -q '^Revert ' <<<"$headers" && echo revert || true; } | sort -u)
+          messages=$(jq -r '.commits[] | select((.parents | length) == 1) | .commit.message' <<<"$compare")
 
           labels=()
           for type in $types; do
             label=$(jq -r --arg type "$type" 'first(.[] | select(any(.types[]?; . == $type)) | .name) // empty' .github/labels.json)
             if [ -n "$label" ]; then labels+=("$label"); fi
           done
-          if grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$headers"; then labels+=("breaking change"); fi
+          if grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$headers" || grep -qE '^BREAKING[ -]CHANGE:' <<<"$messages"; then
+            labels+=("breaking change")
+          fi
 
           number=$(gh pr list --head "$BRANCH" --base "$base" --state open --json number --jq '.[0].number // empty')
 
@@ -79,10 +83,19 @@ jobs:
             count=$(grep -c . <<<"$headers" || true)
             if [ "$count" = 1 ]; then
               title=$headers
-            elif [ "$BRANCH" = develop ]; then
-              title="chore: release develop into main"
             else
-              title="chore: merge ${BRANCH//\// } into develop"
+              # The most significant type of the commits, so a squash merge keeps it
+              type=chore
+              for candidate in feat fix perf refactor; do
+                if grep -qx "$candidate" <<<"$types"; then type=$candidate; break; fi
+              done
+              if [ "$BRANCH" = develop ]; then
+                subject="release develop into main"
+              else
+                # commitlint's subject-case rejects upper case: feat/Magazine-Flip -> magazine flip
+                subject=$(printf '%s' "${BRANCH#*/}" | tr '/_-' '   ' | tr '[:upper:]' '[:lower:]' | sed 's/  */ /g; s/^ //; s/ $//')
+              fi
+              title="$type: ${subject:-update}"
             fi
             title=${title:0:100}
 

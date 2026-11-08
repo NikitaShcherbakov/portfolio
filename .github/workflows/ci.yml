@@ -1,8 +1,12 @@
 name: CI
 
 on:
+  # Every branch: a pull request opened by the open-pull-request workflow
+  # (GITHUB_TOKEN) starts no pull_request run, so its first head is checked
+  # only by this push run
   push:
-    branches: [main, develop]
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
 
 permissions:
@@ -27,10 +31,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Also on push: a pull request opened by the open-pull-request workflow
-      # (GITHUB_TOKEN) starts no pull_request run for its first commits
       - env:
           EVENT: ${{ github.event_name }}
+          BRANCH: ${{ github.ref_name }}
           PR_BASE: ${{ github.event.pull_request.base.sha }}
           PR_HEAD: ${{ github.event.pull_request.head.sha }}
           PUSH_BEFORE: ${{ github.event.before }}
@@ -41,7 +44,11 @@ jobs:
             to=$PR_HEAD
           # A new branch has no "before"; after a force push it is gone from history
           elif ! git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
-            from=$(git merge-base origin/main "$PUSH_AFTER")
+            case $BRANCH in
+              main | develop) base=origin/main ;;
+              *) base=origin/develop ;;
+            esac
+            from=$(git merge-base "$base" "$PUSH_AFTER")
             to=$PUSH_AFTER
           else
             from=$PUSH_BEFORE

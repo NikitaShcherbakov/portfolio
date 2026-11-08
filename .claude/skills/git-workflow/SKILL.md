@@ -34,15 +34,19 @@ re-stage** files, so a commit can contain fixes you never typed. Then `tsc -b` o
 the index: an unstaged broken file still blocks the commit. Tests and the build do not run here: run
 `/check` first.
 
-There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on every push to `main` and `develop` and on
-every pull request: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`, `build`, then Playwright on
-desktop and mobile. It also runs commitlint over the pushed commits (or the pull request's), which catches
-commits made on github.com where husky never ran. A failed e2e run uploads `playwright-report` as an
-artifact for 7 days.
+There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on a push to any branch except
+`dependabot/**`, and on pull requests: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`,
+`build`, then Playwright on desktop and mobile. The push run matters: a pull request opened by the
+open-pull-request workflow starts no `pull_request` run, so its first head is checked only by the push run
+(the check names are the same, so they satisfy the `main` ruleset). It also runs commitlint over the pushed
+commits (or the pull request's), which catches commits made on github.com where husky never ran. A failed
+e2e run uploads `playwright-report` as an artifact for 7 days.
 
 ## 2. Commit messages
 
-`commitlint.config.ts` extends `@commitlint/config-conventional` with no overrides. The errors:
+`commitlint.config.ts` extends `@commitlint/config-conventional`; its only override skips Dependabot's
+commits (their bodies carry release-note links over the line limit; `dependabot.yml` gives their headers a
+`chore(deps)` / `ci(deps)` prefix). The errors:
 
 | Rule                                             | Meaning                                                                           |
 | ------------------------------------------------ | --------------------------------------------------------------------------------- |
