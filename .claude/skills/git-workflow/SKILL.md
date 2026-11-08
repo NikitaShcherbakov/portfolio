@@ -1,7 +1,7 @@
 ---
 name: git-workflow
 description:
-  The commit-to-deploy path in Rock Wall — what the two husky hooks run, the commitlint rules that apply
+  The commit-to-deploy path in the portfolio — what the two husky hooks run, the commitlint rules that apply
   (plain `@commitlint/config-conventional`), the house commit style, what CI runs, and how to recover a
   rejected message. Use when writing a commit message, preparing a commit or a branch, or when facing
   "subject may not be empty", "type may not be empty", "subject must not be sentence-case", "header must not

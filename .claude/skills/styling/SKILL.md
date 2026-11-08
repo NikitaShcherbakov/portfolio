@@ -1,7 +1,7 @@
 ---
 name: styling
 description: >-
-  How styling works in Rock Wall — Tailwind CSS 4 utilities, project tokens and shared classes in a
+  How styling works in the portfolio — Tailwind CSS 4 utilities, project tokens and shared classes in a
   stylesheet imported by `src/styles/index.css`, `cn()` for conditional classes, Prettier sorting the
   classes, inline `style` only for runtime values (band theme colors), the magazine's `cqw` sizing inside a
   `container-type: inline-size` spread, and porting the design the user sent as is. Use when writing or

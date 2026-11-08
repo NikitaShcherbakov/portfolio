@@ -1,7 +1,7 @@
 ---
 name: accessibility
 description:
-  What `jsx-a11y-x` strict and the axe e2e check already catch in Rock Wall, and the gaps they cannot see —
+  What `jsx-a11y-x` strict and the axe e2e check already catch in the portfolio, and the gaps they cannot see —
   a focus ring removed by a Tailwind class, hit areas under 44px, contrast over duotone photos and aged
   paper, motion without a reduced-motion path, a page flip or click wheel that works only with a mouse or a
   swipe, a YouTube iframe without a title. Use when adding an interactive element (the sticker tabs, the

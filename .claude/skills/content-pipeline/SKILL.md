@@ -1,7 +1,7 @@
 ---
 name: content-pipeline
 description: >-
-  How Rock Wall's band content is collected and written — the `scripts/` stages from the YouTube playlist to
+  How the portfolio's band content is collected and written — the `scripts/` stages from the YouTube playlist to
   `src/content/*.json`, the rules for MusicBrainz (1 request per second, an identifying User-Agent),
   TheAudioDB and Wikipedia, per-stage caching in `.cache/`, matching artists without guessing, writing the
   Russian copy only from collected facts, and the one-time setup the first script needs so lint, typecheck
@@ -53,7 +53,7 @@ change: say so to the user):
   refetches. A run that dies halfway resumes where it stopped.
 - **MusicBrainz** (`https://musicbrainz.org/ws/2/…?fmt=json`): at most **1 request per second** (a request
   queue, not `Promise.all`), and a User-Agent that names the app and a contact, e.g.
-  `RockWall/0.1.0 ( https://github.com/<owner>/rock-wall )`. Use the repository URL as the contact; never
+  `NikitaShcherbakovPortfolio/0.1.0 ( https://github.com/NikitaShcherbakov/nikita-shcherbakov )`. Use the repository URL as the contact; never
   put the user's email into the User-Agent without asking. On `503` back off and retry later.
 - **TheAudioDB** (`https://www.theaudiodb.com/api/v1/json/123/…`): the free key `123`, up to 30 requests per
   minute.

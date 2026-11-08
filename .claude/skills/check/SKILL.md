@@ -1,7 +1,7 @@
 ---
 name: check
 description:
-  Runs Rock Wall's real verification gate before a "done" claim or a commit — `pnpm check`, which is
+  Runs the portfolio's real verification gate before a "done" claim or a commit — `pnpm check`, which is
   `format:check` → `lint` → `typecheck` → `knip` → `test` → `build`, plus `pnpm test:e2e` when the change is visible
   in a browser — and says how to unstick each gate. The same steps CI runs (`.github/workflows/ci.yml`,
   with `test:coverage` and the Playwright job). Run it as `/check` before saying a task is complete, before a

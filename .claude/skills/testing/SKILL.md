@@ -1,7 +1,7 @@
 ---
 name: testing
 description: >-
-  How tests are written in Rock Wall — Vitest's two projects (the file extension picks node or jsdom),
+  How tests are written in the portfolio — Vitest's two projects (the file extension picks node or jsdom),
   Testing Library queries by role and `userEvent.setup()`, what jsdom cannot do (no `matchMedia`,
   `IntersectionObserver`, `ResizeObserver`, `scrollIntoView`, Web Animations, layout, or `transitionend`) and
   how to test around it, faking the YouTube IFrame API, resetting Zustand stores, and Playwright e2e with axe,

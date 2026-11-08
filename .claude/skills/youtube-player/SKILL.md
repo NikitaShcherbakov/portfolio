@@ -1,7 +1,7 @@
 ---
 name: youtube-player
 description: >-
-  How Rock Wall plays music through the official YouTube IFrame Player API without breaking its rules — one
+  How the portfolio plays music through the official YouTube IFrame Player API without breaking its rules — one
   player created once and never unmounted, kept visible at 200×200 or more, moved between the «смотрим клип»
   block and the floating window by CSS only, first play from a user gesture, unplayable videos skipped. Covers
   loading the API script once, React StrictMode's double effects, the player states and error codes, progress

@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description:
-  Reviews a diff, branch or path against Rock Wall's actual rules — CLAUDE.md and the "Must not" section of
+  Reviews a diff, branch or path against the portfolio's actual rules — CLAUDE.md and the "Must not" section of
   every project skill whose area the change touches — instead of generic React/TS taste. Spends its effort on
   what `pnpm lint` cannot see (the YouTube player constraints, the magazine's `cqw` sizing, invented band
   facts, a dependency nobody decided on, comments). Use before a commit or PR, after finishing a component, or

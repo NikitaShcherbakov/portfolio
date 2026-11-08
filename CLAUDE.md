@@ -1,6 +1,6 @@
-# Rock Wall
+# nikita-shcherbakov
 
-Personal portfolio site of Nikita Shcherbakov styled as a 2000s rock bedroom: Union Jack header, fairy lights, a rock magazine with 3D page flips, an iPod-style player driven by YouTube, a chart. Tabs: Home (`/`), CV (`/cv`), Games (`/games`).
+Personal portfolio site of Nikita Shcherbakov for recruiters (CV plus interactive features), styled as a 2000s rock bedroom: Union Jack header, fairy lights, a rock magazine with 3D page flips, an iPod-style player driven by YouTube, a chart. Tabs: Home (`/`), CV (`/cv`), Games (`/games`).
 
 Talk to the user in Russian. Code, comments and commit messages stay in English. UI copy is Russian.
 
