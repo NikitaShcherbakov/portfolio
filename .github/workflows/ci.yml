@@ -39,7 +39,8 @@ jobs:
           if [ "$EVENT" = pull_request ]; then
             from=$PR_BASE
             to=$PR_HEAD
-          elif [ "$PUSH_BEFORE" = 0000000000000000000000000000000000000000 ]; then
+          # A new branch has no "before"; after a force push it is gone from history
+          elif ! git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
             from=$(git merge-base origin/main "$PUSH_AFTER")
             to=$PUSH_AFTER
           else

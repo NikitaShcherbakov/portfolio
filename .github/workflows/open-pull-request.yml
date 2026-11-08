@@ -60,6 +60,10 @@ jobs:
 
           # Merge commits are skipped: after a release, develop holds main's merge commit
           headers=$(jq -r '.commits[] | select((.parents | length) == 1) | .commit.message | split("\n")[0]' <<<"$compare")
+          if [ -z "$headers" ]; then
+            echo "$BRANCH is ahead of $base by merge commits only"
+            exit 0
+          fi
           types=$(grep -oE '^[a-z]+' <<<"$headers" | sort -u || true)
 
           labels=()
