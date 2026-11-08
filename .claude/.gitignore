@@ -1,0 +1,4 @@
+# Personal Claude Code settings, isolated-session worktrees, qa screenshots and logs
+settings.local.json
+worktrees/
+qa-artifacts/
