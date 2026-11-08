@@ -8,6 +8,10 @@ updates:
       include: scope
     schedule:
       interval: weekly
+    # pnpm refuses versions younger than its minimumReleaseAge
+    # (ERR_PNPM_NO_MATURE_MATCHING_VERSION), so propose only week-old releases
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     groups:
       # One PR for all minor/patch updates; majors come one by one.
