@@ -34,9 +34,11 @@ re-stage** files, so a commit can contain fixes you never typed. Then `tsc -b` o
 the index: an unstaged broken file still blocks the commit. Tests and the build do not run here: run
 `/check` first.
 
-There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on every push to `main` and on every pull
-request: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`, `build`, then Playwright on desktop and
-mobile. A failed e2e run uploads `playwright-report` as an artifact for 7 days.
+There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on every push to `main` and `develop` and on
+every pull request: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`, `build`, then Playwright on
+desktop and mobile. On a pull request it also runs commitlint over the pull request's commits, which catches
+commits made on github.com where husky never ran. A failed e2e run uploads `playwright-report` as an
+artifact for 7 days.
 
 ## 2. Commit messages
 
@@ -82,13 +84,20 @@ a byte-order mark that commitlint rejects as `header-trim` / `type-empty`.
 
 ## 3. Branches and deploy
 
-- `main` is the only long-lived branch. Before the first push there is no `origin`: commands that need it
-  (`git fetch origin`) fail; that is expected, not broken.
+- Two long-lived branches: `develop` (work lands here) and `main` (production). A ruleset on `main` requires
+  a pull request with green CI and allows merge commits only; squash or rebase would give `main` commits that
+  `develop` lacks. A ruleset on `develop` blocks deletion and force pushes. Commit and push to `develop`;
+  `main` changes only through a pull request `develop → main` that the user merges.
+- After that merge, fast-forward `develop` to `origin/main` (`git merge --ff-only origin/main`) and push, so
+  the next pull request shows only new commits.
+- Pull request descriptions follow `.github/pull_request_template.md`, in English.
 - For a larger piece (a component of the MVP plan), the user may prefer a branch
-  `<type>/<kebab-slug>` (`feat/magazine-page-flip`), the type from the commitlint enum. Ask once; create it
-  with `git switch -c <branch>` (`git checkout` asks for permission, as it can overwrite files).
+  `<type>/<kebab-slug>` (`feat/magazine-page-flip`) off `develop`, the type from the commitlint enum. Ask
+  once; create it with `git switch -c <branch>` (`git checkout` asks for permission, as it can overwrite
+  files).
 - Deploy is Vercel's Git integration, configured in `vercel.json` (`pnpm build`, output `build/`, SPA
-  rewrites, security headers). Never run the `vercel` CLI: it asks for permission on purpose.
+  rewrites, security headers): a merge into `main` deploys production, `develop` and pull requests get
+  preview URLs behind Vercel login. Never run the `vercel` CLI: it asks for permission on purpose.
 
 ## Must not
 
