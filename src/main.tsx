@@ -5,6 +5,8 @@ import { App } from '@/app';
 
 import './styles/index.css';
 
+import '@/i18n';
+
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {

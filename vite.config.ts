@@ -1,10 +1,22 @@
 import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
+import { createThemeScript } from './src/modules/common/utils/theme.ts';
+
+function themeScript(): Plugin {
+  return {
+    name: 'theme-script',
+    transformIndexHtml: () => [
+      { tag: 'script', children: createThemeScript(), injectTo: 'head' },
+    ],
+  };
+}
+
 export default defineConfig({
-  plugins: [tailwindcss(), react()],
+  plugins: [tailwindcss(), react(), themeScript()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
