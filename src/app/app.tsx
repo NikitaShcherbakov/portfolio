@@ -1,7 +1,9 @@
+import { createBrowserRouter, RouterProvider } from 'react-router';
+
+import { routeObjects } from '@/router';
+
+const router = createBrowserRouter(routeObjects);
+
 export function App() {
-  return (
-    <main>
-      <h1 className="sr-only">Никита Щербаков</h1>
-    </main>
-  );
+  return <RouterProvider router={router} />;
 }

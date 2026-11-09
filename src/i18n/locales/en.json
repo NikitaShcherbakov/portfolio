@@ -1,0 +1,32 @@
+{
+  "site": {
+    "name": "Nikita Shcherbakov",
+    "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "cv": "CV",
+    "games": "Games"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "system": "System theme"
+  },
+  "footer": {
+    "contacts": "Contacts",
+    "phone": "Phone",
+    "newTab": "(opens in a new tab)"
+  },
+  "pages": {
+    "notFound": {
+      "title": "Page not found",
+      "backHome": "Back to home"
+    }
+  }
+}
