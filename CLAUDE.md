@@ -66,6 +66,7 @@ pnpm format          # Prettier
 
 - **Skills** (`.claude/skills/`), loaded on demand: `check` (the gate and how to unstick it), `testing`, `styling`, `accessibility`, `youtube-player`, `content-pipeline`, `git-workflow`, `pr-description` (after every push), and `/new-module <name>` (user-invoked). A skill holds the how-to; a rule that must hold in every session belongs in this file.
 - **Agents** (`.claude/agents/`): `code-reviewer` (static review against this file and the skills; run before a commit) and `qa` (drives a real browser through the `playwright` MCP server, takes screenshots to `.claude/qa-artifacts/`; it needs a `playwright` entry in `.mcp.json`).
+- **Full QA cycle** (manual only): `/qa-full [url|local] [levels…]` tests the deployed Vercel site (default production; `local` builds and serves the working tree on port 4317) with the `qa-smoke`, `qa-functional`, `qa-integration`, `qa-visual`, `qa-a11y`, `qa-performance`, `qa-chaos` agents one at a time, then `qa-verifier`, and writes `.claude/qa-artifacts/<run-id>/report.md`. Never dispatch a `qa-*` level agent or `/qa-full` on your own: only when the user asks.
 - **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`): `post-edit-format`, `post-edit-comments`, `pre-stop-typecheck`.
 - Personal overrides go into `.claude/settings.local.json` (ignored by `.claude/.gitignore`).
 
