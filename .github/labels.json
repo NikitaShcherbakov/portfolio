@@ -1,0 +1,88 @@
+[
+  {
+    "name": "feature",
+    "color": "a2eeef",
+    "description": "A new feature (feat)",
+    "types": ["feat"]
+  },
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "A bug fix (fix)",
+    "types": ["fix"]
+  },
+  {
+    "name": "documentation",
+    "color": "0075ca",
+    "description": "Documentation only (docs)",
+    "types": ["docs"]
+  },
+  {
+    "name": "refactor",
+    "color": "d4c5f9",
+    "description": "Restructures code without changing behaviour (refactor)",
+    "types": ["refactor"]
+  },
+  {
+    "name": "performance",
+    "color": "fbca04",
+    "description": "Makes something faster or lighter (perf)",
+    "types": ["perf"]
+  },
+  {
+    "name": "ci",
+    "color": "1d76db",
+    "description": "GitHub Actions workflows (ci)",
+    "types": ["ci"]
+  },
+  {
+    "name": "build",
+    "color": "0e8a16",
+    "description": "Build setup: Vite, TypeScript, tooling config (build)",
+    "types": ["build"]
+  },
+  {
+    "name": "chore",
+    "color": "ededed",
+    "description": "Maintenance that changes no app behaviour (chore)",
+    "types": ["chore"]
+  },
+  {
+    "name": "style",
+    "color": "f9d0c4",
+    "description": "Formatting only (style)",
+    "types": ["style"]
+  },
+  {
+    "name": "test",
+    "color": "bfd4f2",
+    "description": "Tests only (test)",
+    "types": ["test"]
+  },
+  {
+    "name": "revert",
+    "color": "e99695",
+    "description": "Reverts an earlier change (revert)",
+    "types": ["revert"]
+  },
+  {
+    "name": "ui",
+    "color": "c2e0c6",
+    "description": "Changes what a page renders"
+  },
+  {
+    "name": "content",
+    "color": "fef2c0",
+    "description": "Changes src/content, the content pipeline or band images"
+  },
+  {
+    "name": "dependencies",
+    "color": "0366d6",
+    "description": "Adds, removes or upgrades a package"
+  },
+  {
+    "name": "breaking change",
+    "color": "b60205",
+    "description": "Changes a contract other code or users rely on"
+  }
+]

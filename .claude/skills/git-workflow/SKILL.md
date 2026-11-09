@@ -34,13 +34,19 @@ re-stage** files, so a commit can contain fixes you never typed. Then `tsc -b` o
 the index: an unstaged broken file still blocks the commit. Tests and the build do not run here: run
 `/check` first.
 
-There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on every push to `main` and on every pull
-request: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`, `build`, then Playwright on desktop and
-mobile. A failed e2e run uploads `playwright-report` as an artifact for 7 days.
+There is no pre-push hook. CI (`.github/workflows/ci.yml`) runs on a push to any branch except
+`dependabot/**`, and on pull requests: `format:check`, `lint`, `typecheck`, `knip`, `test:coverage`,
+`build`, then Playwright on desktop and mobile. The push run matters: a pull request opened by the
+open-pull-request workflow starts no `pull_request` run, so its first head is checked only by the push run
+(the check names are the same, so they satisfy the `main` ruleset). It also runs commitlint over the pushed
+commits (or the pull request's), which catches commits made on github.com where husky never ran. A failed
+e2e run uploads `playwright-report` as an artifact for 7 days.
 
 ## 2. Commit messages
 
-`commitlint.config.ts` extends `@commitlint/config-conventional` with no overrides. The errors:
+`commitlint.config.ts` extends `@commitlint/config-conventional`; its only override skips Dependabot's
+commits (their bodies carry release-note links over the line limit; `dependabot.yml` gives their headers a
+`chore(deps)` / `ci(deps)` prefix). The errors:
 
 | Rule                                             | Meaning                                                                           |
 | ------------------------------------------------ | --------------------------------------------------------------------------------- |
@@ -82,13 +88,23 @@ a byte-order mark that commitlint rejects as `header-trim` / `type-empty`.
 
 ## 3. Branches and deploy
 
-- `main` is the only long-lived branch. Before the first push there is no `origin`: commands that need it
-  (`git fetch origin`) fail; that is expected, not broken.
+- Two long-lived branches: `develop` (work lands here) and `main` (production). A ruleset on `main` requires
+  a pull request with green CI and allows merge commits only; squash or rebase would give `main` commits that
+  `develop` lacks. A ruleset on `develop` blocks deletion and force pushes. Commit and push to `develop`;
+  `main` changes only through a pull request `develop → main` that the user merges.
+- After that merge, fast-forward `develop` to `origin/main` (`git merge --ff-only origin/main`) and push, so
+  the next pull request shows only new commits.
+- `.github/workflows/open-pull-request.yml` opens the pull request on a branch's first push (`develop` into
+  `main`, other branches into `develop`) with the commit headers, type boxes and labels from
+  `.github/labels.json`. After every push run the **pr-description** skill: it writes the summary and test
+  plan, in English, through the personal account's token.
 - For a larger piece (a component of the MVP plan), the user may prefer a branch
-  `<type>/<kebab-slug>` (`feat/magazine-page-flip`), the type from the commitlint enum. Ask once; create it
-  with `git switch -c <branch>` (`git checkout` asks for permission, as it can overwrite files).
+  `<type>/<kebab-slug>` (`feat/magazine-page-flip`) off `develop`, the type from the commitlint enum. Ask
+  once; create it with `git switch -c <branch>` (`git checkout` asks for permission, as it can overwrite
+  files).
 - Deploy is Vercel's Git integration, configured in `vercel.json` (`pnpm build`, output `build/`, SPA
-  rewrites, security headers). Never run the `vercel` CLI: it asks for permission on purpose.
+  rewrites, security headers): a merge into `main` deploys production, `develop` and pull requests get
+  preview URLs behind Vercel login. Never run the `vercel` CLI: it asks for permission on purpose.
 
 ## Must not
 

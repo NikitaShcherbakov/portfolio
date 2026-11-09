@@ -1,0 +1,148 @@
+name: Open pull request
+
+# develop opens a pull request into main, any other branch one into develop.
+# The first push with a commit of its own opens it from the template: the
+# commit headers as Changes, the Type of change boxes and the labels of their
+# types, the pusher as assignee. A later push only adds the labels of new
+# commit types; the summary and the test plan come from the pr-description
+# skill in the Claude session that did the work.
+on:
+  push:
+    branches-ignore:
+      - main
+      - 'dependabot/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  # Labels and assignees go through the issues API
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  open:
+    # Deleting a branch is a push as well
+    if: ${{ !github.event.deleted }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/pull_request_template.md
+            .github/labels.json
+          sparse-checkout-cone-mode: false
+
+      - name: Open or label the pull request
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          # A branch name and commit messages are user-controlled: passed as
+          # data, never interpolated into the script
+          BRANCH: ${{ github.ref_name }}
+          HEAD_SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+
+          if [ "$BRANCH" = develop ]; then base=main; else base=develop; fi
+
+          compare=$(gh api "repos/$GH_REPO/compare/$base...$HEAD_SHA")
+          if [ "$(jq -r '.ahead_by' <<<"$compare")" = 0 ]; then
+            echo "$BRANCH has no commits ahead of $base"
+            exit 0
+          fi
+
+          # Merge commits are skipped: after a release, develop holds main's merge commit
+          headers=$(jq -r '.commits[] | select((.parents | length) == 1) | .commit.message | split("\n")[0]' <<<"$compare")
+          if [ -z "$headers" ]; then
+            echo "$BRANCH is ahead of $base by merge commits only"
+            exit 0
+          fi
+          # A plain `git revert` header is `Revert "feat: x"`
+          types=$({ grep -oE '^[a-z]+' <<<"$headers" || true; grep -q '^Revert ' <<<"$headers" && echo revert || true; } | sort -u)
+          messages=$(jq -r '.commits[] | select((.parents | length) == 1) | .commit.message' <<<"$compare")
+
+          labels=()
+          for type in $types; do
+            label=$(jq -r --arg type "$type" 'first(.[] | select(any(.types[]?; . == $type)) | .name) // empty' .github/labels.json)
+            if [ -n "$label" ]; then labels+=("$label"); fi
+          done
+          if grep -qE '^[a-z]+(\([^)]*\))?!:' <<<"$headers" || grep -qE '^BREAKING[ -]CHANGE:' <<<"$messages"; then
+            labels+=("breaking change")
+          fi
+
+          number=$(gh pr list --head "$BRANCH" --base "$base" --state open --json number --jq '.[0].number // empty')
+
+          if [ -z "$number" ]; then
+            count=$(grep -c . <<<"$headers" || true)
+            if [ "$count" = 1 ]; then
+              title=$headers
+            else
+              # The most significant type of the commits, so a squash merge keeps it
+              type=chore
+              for candidate in feat fix perf refactor; do
+                if grep -qx "$candidate" <<<"$types"; then type=$candidate; break; fi
+              done
+              if [ "$BRANCH" = develop ]; then
+                subject="release develop into main"
+              else
+                # commitlint's subject-case rejects upper case: feat/Magazine-Flip -> magazine flip
+                subject=$(printf '%s' "${BRANCH#*/}" | tr '/_-' '   ' | tr '[:upper:]' '[:lower:]' | sed 's/  */ /g; s/^ //; s/ $//')
+              fi
+              title="$type: ${subject:-update}"
+            fi
+            title=${title:0:100}
+
+            boxes=
+            for type in $types; do
+              case $type in
+                feat) boxes+=$'New feature\n' ;;
+                fix) boxes+=$'Bug fix\n' ;;
+                refactor) boxes+=$'Refactoring\n' ;;
+                perf) boxes+=$'Performance\n' ;;
+                docs) boxes+=$'Documentation\n' ;;
+                ci | build) boxes+=$'Configuration / CI\n' ;;
+              esac
+            done
+
+            body="$RUNNER_TEMP/pull-request-body.md"
+            CHANGES=$(sed 's/^/- /' <<<"$headers") BOXES=$boxes awk '
+              BEGIN { n = split(ENVIRON["BOXES"], boxes, "\n") }
+              /^-[ \t]*$/ { if (!done) { print ENVIRON["CHANGES"]; done = 1 } ; next }
+              /^- \[ \] / {
+                for (i = 1; i <= n; i++) {
+                  box = boxes[i]
+                  if (box != "" && substr($0, length($0) - length(box) + 1) == box) sub(/^- \[ \]/, "- [x]")
+                }
+              }
+              { print }
+            ' .github/pull_request_template.md > "$body"
+
+            url=$(gh pr create --base "$base" --head "$BRANCH" --title "$title" --body-file "$body")
+            number=${url##*/}
+            gh api --silent "repos/$GH_REPO/issues/$number/assignees" -f "assignees[]=$ACTOR" \
+              || echo "::warning::Could not assign $ACTOR to #$number"
+          else
+            echo "$BRANCH already has #$number; adding labels only"
+          fi
+
+          if [ ${#labels[@]} -gt 0 ]; then
+            existing=$(gh label list --limit 200 --json name --jq '.[].name') \
+              || echo "::warning::Could not list the labels"
+            for label in "${labels[@]}"; do
+              if ! grep -Fxqi -- "$label" <<<"$existing"; then
+                color=$(jq -r --arg name "$label" '.[] | select(.name == $name) | .color' .github/labels.json)
+                description=$(jq -r --arg name "$label" '.[] | select(.name == $name) | .description' .github/labels.json)
+                gh label create "$label" --color "$color" --description "$description" \
+                  || echo "::warning::Could not create the $label label"
+              fi
+              gh api --silent "repos/$GH_REPO/issues/$number/labels" -f "labels[]=$label" \
+                || echo "::warning::Could not add the $label label to #$number"
+            done
+          fi

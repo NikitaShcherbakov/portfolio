@@ -1,8 +1,12 @@
 name: CI
 
 on:
+  # Every branch: a pull request opened by the open-pull-request workflow
+  # (GITHUB_TOKEN) starts no pull_request run, so its first head is checked
+  # only by this push run
   push:
-    branches: [main, develop]
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
 
 permissions:
@@ -13,6 +17,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  commits:
+    name: Commit messages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - env:
+          EVENT: ${{ github.event_name }}
+          BRANCH: ${{ github.ref_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            from=$PR_BASE
+            to=$PR_HEAD
+          # A new branch has no "before"; after a force push it is gone from history
+          elif ! git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+            case $BRANCH in
+              main | develop) base=origin/main ;;
+              *) base=origin/develop ;;
+            esac
+            from=$(git merge-base "$base" "$PUSH_AFTER")
+            to=$PUSH_AFTER
+          else
+            from=$PUSH_BEFORE
+            to=$PUSH_AFTER
+          fi
+          # commitlint exits 9 on an empty range (a branch pushed with no commits of its own)
+          if [ "$(git rev-parse "$from")" = "$(git rev-parse "$to")" ]; then
+            echo "No commits to lint"
+            exit 0
+          fi
+          pnpm exec commitlint --from "$from" --to "$to" --verbose
+
   checks:
     name: Format, lint, types, dead code, tests, build
     runs-on: ubuntu-latest
