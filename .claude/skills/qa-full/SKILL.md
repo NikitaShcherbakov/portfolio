@@ -29,26 +29,42 @@ except the summary, which is in Russian.
 
 ## 1. Preflight (stop on failure)
 
-- **`local` only**, before anything else: `pnpm exec vite build --outDir node_modules/.cache/qa-site`
+- **`local` only**, before anything else: `netstat -ano` and look for `:4317` LISTENING. If a process
+  holds it, it is a preview left from an earlier run serving an old build (a `200` from it proves
+  nothing): stop it as below, and if it is still listening, stop the run and tell the user its PID.
+  Then `pnpm exec vite build --outDir node_modules/.cache/qa-site`
   (a separate folder: `pnpm check` in `auto` empties `build/` while the testers browse, and ESLint would
   lint anything under `.claude/`), then in the background
-  `pnpm exec vite preview --outDir node_modules/.cache/qa-site --port 4317 --strictPort`, and poll the
-  URL with `curl` until it answers. The **commit under test** is `working tree (<git rev-parse --short
-HEAD> + uncommitted changes)`. Vercel's headers, caching, compression and HTTPS do not exist locally:
-  tell the testers so in their prompt (the protocol's "Local target" section). Stop that background
-  task (TaskStop) after step 5, also when the run stops early.
+  `pnpm exec vite preview --outDir node_modules/.cache/qa-site --port 4317 --strictPort`. Check it with
+  single `curl -s -o /dev/null -w '%{http_code}' http://localhost:4317/` calls, not a shell loop (a loop
+  matches no allow rule, and `sleep` is blocked): read the task's output for vite's ready line between
+  tries. The **commit under test** is `working tree (<git rev-parse --short HEAD> + uncommitted
+changes)`. Vercel's headers, caching, compression and HTTPS do not exist locally: tell the testers so
+  in their prompt (the protocol's "Local target" section). After step 5, also when the run stops early:
+  load TaskStop with ToolSearch (`select:TaskStop`), stop that task, then run `netstat -ano` and look
+  for `:4317`; if it is still listening, a `vite` child survived on Windows: check with PowerShell
+  `Get-Process -Id <pid>` that it is `node`, then `Stop-Process -Id <pid> -Confirm:$false` once, and
+  run `netstat` again. If the stop is denied or the port is still held, tell the user the PID.
 - `curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' <target>` must print `200`. A `302` to
   `vercel.com` means a protected preview deployment: tell the user only production is public and stop.
 - ToolSearch `select:mcp__playwright__browser_navigate`. If it is missing, tell the user: the
   `playwright` server from `.mcp.json` has to be approved (run `/mcp`, or restart Claude Code and accept
   the prompt), then stop the browser levels; `auto` and `review` can still run.
-- `git fetch -q origin main`, then note `git log -1 --format='%h %s' origin/main`: production is built
-  from `main`, so this is the **commit under test** (for any other target write "unknown"). Say so if
+- Default target only (skip for `local` and for any other URL): `git fetch -q origin main`, then note
+  `git log -1 --format='%h %s' origin/main`: production is built from `main`, so this is the **commit
+  under test**. For any other URL write `unknown (testers read the working tree)`, and warn the user
+  that its `curl` calls are not in the allow list, so testers will stop on permission prompts. Say so if
   the working tree is ahead of it (`git log --oneline origin/main..HEAD`, `git status --short`): those
   changes are not deployed yet, and the testers must not expect them. In that case tell the user in one
   line that `/qa-full local` tests those changes, then go on with the target given.
 
-## 2. Non-browser levels (start these first; they run in parallel with the browser levels)
+## 2. Non-browser levels
+
+`review` starts first and runs in parallel with the browser levels (static, light). `auto` loads the
+CPU and the site, which would skew timing checks (TIME, the OSD, LCP, interaction delay) into false
+bugs: start it only after the verifier has finished (the verifier replays those timing bugs too), or
+after the last browser level when there is nothing to verify; for `local`, while the preview still runs.
+The `E2E_BASE_URL=…` prefix matches no allow rule, so the e2e step asks the user once: expected.
 
 - **auto**: in Bash, in the background: `pnpm check`, then `E2E_BASE_URL=<target> pnpm test:e2e`
   (the scripted Playwright suite, desktop + mobile, against the deployment; no local server starts when
@@ -92,7 +108,8 @@ pass: say so next to each.
 
 ## 5. Report
 
-Write `.claude/qa-artifacts/<run-id>/report.md`:
+Wait for `auto` and `review` to finish (their notifications), then write
+`.claude/qa-artifacts/<run-id>/report.md`:
 
 1. **Сводка** (Russian): target, commit, date, levels run, totals by severity, the 3 most important bugs
    in one line each, what could not be verified and why.

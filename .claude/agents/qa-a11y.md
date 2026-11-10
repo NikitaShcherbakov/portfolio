@@ -15,6 +15,7 @@ tools:
   - mcp__playwright__browser_navigate
   - mcp__playwright__browser_snapshot
   - mcp__playwright__browser_click
+  - mcp__playwright__browser_type
   - mcp__playwright__browser_press_key
   - mcp__playwright__browser_select_option
   - mcp__playwright__browser_wait_for
@@ -58,6 +59,7 @@ async () => {
   return violations.map((v) => ({
     id: v.id,
     impact: v.impact,
+    tags: v.tags.filter((t) => t.startsWith('wcag') || t === 'best-practice'),
     help: v.help,
     nodes: v.nodes.slice(0, 5).map((n) => n.target.join(' ')),
   }));
@@ -66,10 +68,17 @@ async () => {
 
 If a Content-Security-Policy blocks the script, report it as an Observation and continue with the manual
 checks. Run it on `/`, `/cv`, `/games`, and in each interactive state that exists: a magazine section
-open, a band spread open, the iPod menu open, the player playing, the floating video on `/cv`. Run it at
+open, a band spread open, the iPod menu open, the player playing, the floating video on `/cv`; for the
+stereo deck: playing, standby (power off), the playlist drawer open, a search with no results. Check
+the deck against its handoff's accessibility section (`.design/player/SPEC.md` §9 and Appendix B):
+every listed `aria-*` present and its dynamic label following the state; the seek bar operable by
+keyboard (Enter/Space, +10 s) with the time in its label; Esc closing the drawer and returning focus to
+LIST ▾; the live region holding only title and artist, never the ticking time (a screen reader would
+read it every second). Run it at
 1440×900 and 390×844. If the site has themes (protocol "Themes"), run it again on every route
-in the dark theme at 1440×900: colour-contrast results differ per theme. `critical`/`serious` → major
-bug; `moderate` → minor; `best-practice` → trivial.
+in the dark theme at 1440×900: colour-contrast results differ per theme. Severity: a rule tagged
+`best-practice` (and no `wcag*` tag) is at most minor, whatever its impact; otherwise
+`critical`/`serious` → major, `moderate`/`minor` → minor.
 
 ## 2. Keyboard only
 

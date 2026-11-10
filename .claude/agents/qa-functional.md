@@ -68,13 +68,28 @@ For each element, at 1440×900:
   section spread (cover left, band list right, bands ordered by founding year); a band in the list opens
   its spread; "Случайно" opens a random band **and** starts its track, several times in a row (not the
   same band every time); page numbers are visible and not under the page curl; "Слушать" plays that band.
-- **iPod**: MENU, ⏮, ⏭, ▶❚❚ and centre each do what their label says; the screen shows cover, track,
-  album, year and progress that moves; the playlist scrolls and selecting a row plays it; ⏮ at the first
-  track and ⏭ at the last track behave sanely.
+- **Stereo deck** (the player on Home; its handoff is `.design/player/SPEC.md`: run §5 "Поведение" and
+  the behaviour lines of §11): every transport button (POWER, ⏮, ▶❚❚, ⏭, SHUFFLE, REPEAT, RANDOM) does
+  what SPEC §5 says, including the edges (⏮ within the first 3 s vs later, ⏭ on the last track per
+  repeat mode, SHUFFLE's NEXT ▸ prediction matching the track that actually comes next); POWER off
+  stops everything and shows STANDBY, and every other control then behaves as SPEC says; the status line,
+  TRACK nn / total, the flags and TIME agree with the store after every action; TIME advances once per
+  second while playing and stops while paused; ▶ with POWER off powers on and plays; the seek bar by
+  click, drag and keyboard (Enter/Space = +10 s); VOLUME −/+ stop at 0 and 10, − down to 0 mutes and +
+  unmutes, the knob toggles mute, the OSD shows for about 1.5 s; RANDOM never picks the current track; the disc click toggles play; MAGAZINE ⏏ is disabled (MVP
+  plan: until the magazine exists); the playlist drawer opens and closes (button, Esc), scrolls to
+  the current track, a row plays its track, search matches title, artist, album and year, the counter
+  shows the total with the right plural for the real track count and «найдено N из M» while searching,
+  in every language (other counts cannot be reached from the UI: unit tests own them), the empty
+  state shows for no match, and clearing the search brings every row back. Scroll the virtualized list
+  to the very end: the last track exists and plays.
+- **iPod** dock (when built; MVP plan): MENU, ⏮, ⏭, ▶❚❚ and centre each do what their label says; the
+  screen shows cover, track, album, year and progress that moves; collapsing it pauses (SPEC §5).
 - **Rock chart**: 6 rows; clicking a row plays that track and marks it as current in the chart and the
   iPod.
-- **Player**: first play only after ▶ (no autoplay on load); pause/resume; next/previous; the visible
-  video is at least 200×200 (`browser_evaluate` on the iframe's `getBoundingClientRect`).
+- **Player**: first play only after ▶ (no autoplay on load: TIME stays at 00:00 for 3 s after a fresh
+  load); pause/resume; next/previous; once YouTube is built, the visible video is at least 200×200
+  (`browser_evaluate` on the iframe's `getBoundingClientRect`).
 - **CV and Games tabs**: every section renders, every link works, downloadable files (a CV PDF) return
   200 (`curl -sI`).
 

@@ -45,6 +45,11 @@ happens at the right size), wait 3 s, then one `browser_evaluate`:
   `startTime` and `element` (tag + class);
 - CLS: sum of `layout-shift` entries without `hadRecentInput`, and the sources of the biggest shift;
 - long tasks: `longtask` entries (count, longest);
+- read each entry type through its own observer wrapped in a promise that also resolves with `[]`
+  after 1 s: a type with no entries never calls the observer back, and an unguarded `await` hangs the
+  call. No LCP entry means nothing contentful was painted (a page holding only an `sr-only` heading):
+  that row is COULD NOT VERIFY with the reason, never PASS. No `layout-shift` or `longtask` entry means
+  zero of them;
 - `performance.getEntriesByType('resource')`: per `initiatorType`, count and total `transferSize`; the
   ten biggest resources. Cross-origin entries (Google Fonts, YouTube) report `transferSize` 0 without
   `Timing-Allow-Origin`: say so instead of counting them as free.
@@ -61,23 +66,34 @@ transferred (minor); any single image over 300 KB (minor); a long task over 200 
   `fonts.gstatic.com` with `crossorigin`), `display=swap` in the CSS URL, only families and weights the
   page uses (compare the requested `family=` list with computed `font-family` values in use).
 - Caching and compression: hashed `/assets/*` have `immutable` and a year `max-age`; `index.html` is not
-  cached long; text responses come compressed (`curl -sI -H 'Accept-Encoding: br, gzip'`).
+  cached long; the JS and CSS assets come compressed (a GET, not `-I`: `curl -s -o /dev/null -D -
+-H 'Accept-Encoding: br, gzip' <url>` must show `content-encoding`). Vercel does not compress tiny
+  responses such as the ~1 KB `index.html`: not a bug. On a local target these rows are NOT APPLICABLE.
 - The YouTube iframe API script is loaded once (count requests to `iframe_api` / `www-widgetapi`), not on
   every tab change.
 
 ## 3. Runtime
 
 - Interaction delay (INP-like): before clicking, start an Event Timing observer with `browser_evaluate`:
-  `window.__qaEvents = []; new PerformanceObserver((l) => window.__qaEvents.push(...l.getEntries().map((e) => ({ name: e.name, duration: e.duration, target: e.target?.tagName })))).observe({ type: 'event', durationThreshold: 16, buffered: true })`.
-  Click each main control (tab stickers, magazine flip, iPod buttons) with `browser_click`, then read
-  `window.__qaEvents`. A `click`/`pointerup` entry over 200 ms is a minor bug, over 500 ms major. A full
-  navigation wipes the observer: start it again after one.
+  `window.__qaEvents = []; new PerformanceObserver((l) => window.__qaEvents.push(...l.getEntries().filter((e) => ['click', 'pointerdown', 'pointerup', 'keydown'].includes(e.name)).map((e) => ({ name: e.name, duration: e.duration, target: e.target?.tagName })))).observe({ type: 'event', durationThreshold: 16, buffered: true })`
+  (unfiltered, one click logs dozens of `pointerenter`/`mouseover` entries). Durations are rounded to
+  8 ms and include the next frame, so 48–64 ms per click in headless Chromium is the baseline, not slow.
+  Click each main control (tab stickers, magazine flip, player buttons, LIST ▾, a playlist row) with
+  `browser_click`, then read
+  `window.__qaEvents`. A `click`/`pointerup` entry over 200 ms is a minor bug, over 500 ms major. Start it once
+  per page load: a second observer on the same page keeps running and doubles every entry. A full
+  navigation wipes it: start it again after one.
 - Leaks: read `performance.memory.usedJSHeapSize` (Chromium; coarse-grained, so only large growth means
   anything), then do 20 tab changes and 20 page flips by
   clicks, read it again; growth over 20 MB, or a DOM node count (`document.getElementsByTagName('*')`)
-  that keeps growing, is a minor bug. Also check that the number of `iframe` elements stays 1.
+  that keeps growing, is a minor bug. Once the YouTube player is built, check that the number of `iframe` elements stays 1 (0 before it is).
 - Smoothness of the flip: `requestAnimationFrame` frame times during one flip (record for 1 s); frames
   over 50 ms are an Observation.
+- Player: the playlist is virtualized, so count the row elements in the open drawer (a few dozen at
+  most, not one per track) and record frame times while scrolling it from top to bottom. Let a track
+  play for 60 s on Home with the drawer closed: count long tasks and DOM growth over that minute (a
+  clock that re-renders the whole page each second shows up here). The spinning disc and spectrum must
+  not keep the main thread busy: frames over 50 ms during playback are an Observation.
 
 ## Coverage rows
 

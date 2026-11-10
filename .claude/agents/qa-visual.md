@@ -16,6 +16,8 @@ tools:
   - mcp__playwright__browser_navigate
   - mcp__playwright__browser_snapshot
   - mcp__playwright__browser_click
+  - mcp__playwright__browser_type
+  - mcp__playwright__browser_drag
   - mcp__playwright__browser_press_key
   - mcp__playwright__browser_select_option
   - mcp__playwright__browser_hover
@@ -40,12 +42,20 @@ First read `.claude/skills/qa-full/protocol.md` and follow it. Your level prefix
 ## Matrix
 
 Widths × heights: 320×640, 390×844, 768×1024, 1024×768, 1440×900, 1920×1080. For each route (`/`, `/cv`,
-`/games`) at each size:
+`/games`) at each size, plus `/` at every breakpoint width and width + 1 (protocol "Breakpoints"; for
+the stereo deck today: 640/641, 760/761, 980/981, 1180/1181).
+
+**Budget.** Every image you Read stays in your context, and a run that overflows it loses its whole
+report. Screenshot everything (the files are the evidence), but Read back only: one image per route at
+390 and 1440, every image whose `browser_evaluate` below flagged something, and the handoff pairs.
+Write your findings as you go, and if you sense the context filling up, stop taking new screenshots
+and report what you have, marking the rest COULD NOT VERIFY. Every `filename` is the full
+`.claude/qa-artifacts/<run-id>/…` path: a bare name lands in the repo root. For each:
 
 1. `browser_resize`, navigate, wait until `document.fonts.status === 'loaded'`.
 2. `browser_take_screenshot` with `fullPage: true` and
-   `filename: .claude/qa-artifacts/<run-id>/visual-<route>-<width>.png`. **Look at it**: read the image back with
-   Read and describe what is wrong, the way a designer would (misaligned, cut off, overlapping, empty
+   `filename: .claude/qa-artifacts/<run-id>/visual-<route>-<width>.png`. **Look at it** (within the
+   budget above): read the image back with Read and describe what is wrong, the way a designer would (misaligned, cut off, overlapping, empty
    gaps, unreadable text on a photo).
 3. One `browser_evaluate` that returns:
    - `document.documentElement.scrollWidth > innerWidth` (horizontal scroll is a bug), and the elements
@@ -60,6 +70,15 @@ Widths × heights: 320×640, 390×844, 768×1024, 1024×768, 1440×900, 1920×10
 
 ## Feature-specific checks (only for what exists)
 
+- **Against the handoff** (protocol "Design handoffs"): for every built feature with
+  `.design/<feature>/screens/`, put the page in the state each reference shows (for the player: playing,
+  paused, standby, shuffle + repeat one, volume OSD, muted, seeking, list open, list search, list empty)
+  at the reference's width (desktop 1320 if `layout-desktop-1320.json` exists, tablet 900, mobile 390),
+  screenshot it as `.claude/qa-artifacts/<run-id>/visual-<feature>-<state>-<width>.png`, Read both images, and list every visible
+  difference: missing or extra element, wrong font, colour, spacing, alignment, label text. Elements the
+  SPEC's breakpoint table hides at a width must be hidden there, and shown above it. Compare `details/`
+  close-ups with an element screenshot (`target`) of the same part. Differences in parts whose MVP item
+  is unchecked are "Not built yet".
 - Magazine: the spread keeps `aspect-ratio: 3/2` at every width and scales as a whole (text inside does
   not reflow differently from the page); genre stickers stick out on the right and the active one sticks
   out further; `.corner` curls cover no text; page numbers visible; duotone photos look duotone, not plain
@@ -71,13 +90,15 @@ Widths × heights: 320×640, 390×844, 768×1024, 1024×768, 1440×900, 1920×10
 ## Languages
 
 If the site has a language switcher, switch to each non-default language through it and repeat the
-matrix at 320×640, 390×844 and 1440×900 (filenames `visual-<route>-<width>-<lang>.png`): longer
+matrix at 320×640, 390×844 and 1440×900 (filenames
+`.claude/qa-artifacts/<run-id>/visual-<route>-<width>-<lang>.png`): longer
 translations overflow buttons, stickers and headings where Russian fits.
 
 ## Media and zoom
 
 - **Themes** (protocol "Themes"): if the site has themes, repeat the matrix in the dark theme at
-  320×640, 390×844 and 1440×900 (filenames `visual-<route>-<width>-dark.png`), chosen with its button.
+  320×640, 390×844 and 1440×900 (filenames `.claude/qa-artifacts/<run-id>/visual-<route>-<width>-dark.png`),
+  chosen with its button.
   The theme group must fit next to the language switcher at 320 px without overflowing the header.
   Look for a component left in light colours, borders that vanish, native controls (the language
   `select` and its open options, scrollbars) in the wrong scheme, text whose contrast collapses. If the

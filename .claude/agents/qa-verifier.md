@@ -47,7 +47,8 @@ reproducing, add it at the end as `VERIFY-<n>` in the protocol's bug format.
 1. Read its steps and nothing else about it (ignore the reporter's interpretation until you have tried).
 2. Fresh context (`browser_close`, then `browser_navigate`), the stated URL, viewport and media; follow
    the steps literally. Try up to 3 times, each from a fresh context.
-3. Check the "Expected" against its stated source: is the rule really in `CLAUDE.md`, or is the feature
+3. Check the "Expected" against its stated source: is the rule really in `CLAUDE.md` or in the cited
+   `.design/<feature>/SPEC.md` section (read it; the protocol says which wins), or is the feature
    in the MVP plan unchecked (then it is "Not built yet", not a bug)? Is it really a bug of this site, or
    of YouTube, Vercel or the headless browser?
 4. Verdict:

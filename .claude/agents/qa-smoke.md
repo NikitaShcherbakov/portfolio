@@ -62,17 +62,23 @@ For `/`, `/cv`, `/games`, `/cv/` and an unknown path `/no-such-page-qa`:
 
 ## Browser level
 
-For each route `/`, `/cv`, `/games`, `/no-such-page-qa`:
+Order at the start: `browser_close`, `browser_navigate` to the target, `browser_resize` 1440×900, then
+`browser_close` + `browser_navigate` again, so the first load you measure happens at 1440×900 in a fresh
+context. For each route `/`, `/cv`, `/cv/`, `/games`, `/no-such-page-qa`:
 
 1. `browser_navigate`, wait for the page, `browser_snapshot`: a `main` landmark, one `h1`, nothing that
-   says "error" or is empty.
+   says "error" or is empty, and the tab for that page marked `aria-current="page"` (none on the 404).
 2. `browser_console_messages` and `browser_network_requests`: zero errors, zero failed requests. A
-   `404` for `/favicon.ico` alone is the missing-favicon Observation from the HTTP level, not a bug.
+   `404` for `/favicon.ico` alone is the missing-favicon Observation from the HTTP level, not a bug. It
+   shows only in the console of a fresh context (the browser caches the failure, and the network list
+   never shows it): judge it from the first load only.
    On the first `browser_evaluate` after loading `/`, read `html[data-theme]` and `html[lang]`: when the
    site has themes, `data-theme` is already `light` or `dark` (set before paint, no flash).
 3. `browser_take_screenshot` at 1440×900.
 4. Reload the same URL (navigate again): the same page renders (deep link + refresh work).
-5. Navigate back and forward between two routes with `browser_navigate_back`: the right page shows.
+5. Navigate back with `browser_navigate_back`, forward with `browser_evaluate`
+   `() => { history.forward(); }`; that call returns mid-navigation, so read the page in a separate
+   `browser_snapshot` after it: the right page shows each time.
 
 Then measure `performance.getEntriesByType('navigation')[0]` (`domContentLoadedEventEnd`, `loadEventEnd`)
 with `browser_evaluate` for `/` only: a first load over 3 s is an Observation, over 6 s a minor bug.

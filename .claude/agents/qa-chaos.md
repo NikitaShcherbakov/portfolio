@@ -52,6 +52,22 @@ on a feature that does not exist yet are skipped as "Not built yet".
 - Press ⏭ ten times fast while a video is loading: the player ends on one track, the UI agrees with it.
 - Hold keys: press ArrowRight 20 times, Tab 30 times, Enter on a focused button 10 times.
 
+## Player attacks (the built player; stereo deck today)
+
+- ⏭ 50 times fast with SHUFFLE on, then ⏮ 50 times: TRACK nn / total, the title, NEXT ▸ and TIME agree
+  afterwards, and TRACK never shows 00 or more than the total. RANDOM 30 times: never an error, and
+  never the current track again (SPEC §5: "кроме текущего").
+- POWER during a seek drag, during the volume OSD, and with the playlist open; then POWER back on:
+  the deck resumes in one consistent state.
+- Seek bar: drag far past the left and right ends and release outside the deck; Home/End/arrows held at
+  the ends; seek, then ⏭ within 300 ms: the bar resets for the new track (SPEC: instant reset).
+- VOLUME −/+ 20 times past each end, then the mute knob 11 times: the value and the OSD agree.
+- Playlist search: type `<img src=x onerror=alert(1)>`, `"'><script>alert(1)</script>`, `.*`, `[(`,
+  `\`, `%`, spaces only, emoji, a 5000-character string, Cyrillic in the wrong layout (`Kbyrby`), then
+  clear it: no dialog, nothing rendered as HTML, no console error, the counter and the rows agree, the
+  layout holds the long string without horizontal scroll. Type while the drawer is closing.
+- Open and close the drawer 10 times fast, with Esc and with the button mixed.
+
 ## Navigation attacks
 
 - Back/forward 10 times quickly across all tabs (`browser_navigate_back`, and `history.forward()` via

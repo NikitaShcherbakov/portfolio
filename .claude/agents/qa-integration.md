@@ -18,6 +18,7 @@ tools:
   - mcp__playwright__browser_snapshot
   - mcp__playwright__browser_find
   - mcp__playwright__browser_click
+  - mcp__playwright__browser_type
   - mcp__playwright__browser_press_key
   - mcp__playwright__browser_select_option
   - mcp__playwright__browser_hover
@@ -47,6 +48,17 @@ recreates the player, which hides exactly the bugs you are here for.
 
 ## Flows
 
+Run every flow whose features exist at the commit under test. Only the steps that need a feature the
+MVP plan has not checked yet (YouTube, iPod dock, chart, magazine) are "Not built yet"; flows 0, 4, 5,
+9 and 10 need none of them, so run them in full.
+
+0. **Playback survives tab changes (simulated clock, protocol "Playback before YouTube").** On `/`,
+   start a track on the stereo deck, set a non-default volume, SHUFFLE on and REPEAT ONE. Note TIME,
+   the track, and `Date.now()`. Click to `/cv`, wait 5 s, click to `/games`, wait 5 s, click Home.
+   Expected: the same track, still playing, TIME advanced by the time spent away (± 2 s), and volume,
+   shuffle, repeat and power as you left them. Repeat with the deck paused: TIME must not move while
+   away. Repeat with the playlist drawer open and a search typed: report what the deck restores as an
+   Observation. Then reload on `/cv` and go Home: report what survives a reload (no source requires it).
 1. **Player survives tab changes.** On `/`, press ▶. Tag the iframe:
    `document.querySelector('iframe[src*="youtube"]').dataset.qaMark = 'same'`. Click to `/cv`, then
    `/games`, then back home. After each step: the iframe with `data-qa-mark="same"` still exists (same
