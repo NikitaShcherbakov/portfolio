@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import contacts from '@/content/contacts.json';
+import { cn } from '@/lib/utils';
 
+import { focusRingClassName } from '../utils/focus-ring';
 import { getContactLinks } from '../utils/get-contact-links';
 
 const contactLinks = getContactLinks(contacts);
@@ -32,7 +34,10 @@ export function SiteFooter() {
                   href={link.href}
                   target={link.isExternal ? '_blank' : undefined}
                   rel={link.isExternal ? 'noopener noreferrer' : undefined}
-                  className="inline-flex min-h-11 items-center underline underline-offset-4"
+                  className={cn(
+                    'inline-flex min-h-11 min-w-11 items-center justify-center underline underline-offset-4',
+                    focusRingClassName
+                  )}
                 >
                   {labels[link.id]}
                   {link.isExternal && (

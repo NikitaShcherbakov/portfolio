@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils';
+
 import { useTheme } from '../hooks/use-theme';
+import { focusRingClassName } from '../utils/focus-ring';
 import { themePreferences } from '../utils/theme';
 
 const options = [
@@ -29,7 +32,10 @@ export function ThemeSwitcher() {
           onClick={() => {
             changeTheme(option.value);
           }}
-          className="inline-flex size-11 items-center justify-center rounded-md text-xl aria-pressed:bg-neutral-900 aria-pressed:text-white dark:aria-pressed:bg-neutral-100 dark:aria-pressed:text-neutral-900"
+          className={cn(
+            'inline-flex size-11 items-center justify-center rounded-md text-xl aria-pressed:bg-neutral-900 aria-pressed:text-white dark:aria-pressed:bg-neutral-100 dark:aria-pressed:text-neutral-900',
+            focusRingClassName
+          )}
         >
           <span aria-hidden="true">{option.icon}</span>
         </button>

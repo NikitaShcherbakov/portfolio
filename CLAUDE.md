@@ -18,7 +18,7 @@ Talk to the user in Russian. Code, comments and commit messages stay in English.
 
 No backend, no auth, no API client. Do not add libraries "just in case": add a dependency only when a feature needs it.
 
-**The project starts empty.** Features are built step by step from designs the user sends. Planned when needed: React Router 7 (`react-router` package) for tabs, Zustand for the player state, Zod for content validation, `cn()` (`clsx` + `tailwind-merge` in `src/lib/utils.ts`) with the first conditional class. Propose each one when the feature needs it and install it only after the user agrees (`pnpm add` asks for permission); never a second library for a capability already chosen.
+**The project starts empty.** Features are built step by step from designs the user sends. Chosen so far: `react-router` for tabs, Zustand for the player state (`createSelectors` in `src/utils/`), Zod for content validation (`src/content/schemas.ts`), `cn()` (`clsx` + `tailwind-merge` in `src/lib/utils.ts`), `@tanstack/react-virtual` for the playlist. Propose any new one when the feature needs it and install it only after the user agrees (`pnpm add` asks for permission); never a second library for a capability already chosen.
 
 ### Does not exist — never reference
 
@@ -167,6 +167,7 @@ Order (auto-fixed by ESLint): external, `@/` aliases, relative, styles. Use `@/`
 
 - Tailwind utilities; project tokens and shared classes go into a stylesheet imported by `src/styles/index.css`. Conditional classes via `cn()`, added with the first one. Details: the **styling** skill.
 - No CSS modules or styled-components. Inline `style` only for values computed at runtime (band theme colors, animation delays).
+- **Player exception:** `src/modules/player/styles/player.css` is the design's stylesheet, kept as delivered (never sort, dedupe or rewrite it into Tailwind: rule order is the result). `player-compat.css` before it is unlayered and reverts every Tailwind utility inside `.player-deck`/`.ipod-dock`, so inside the player use the design's classes and the design's inline `style` positions, not utilities. Fixes to the design's CSS (hit areas, disabled states, breakpoints it was not checked at) go into `player-overrides.css`, imported after `player.css`. The design's phone breakpoint is inclusive: use the `phone:` variant, not `max-[640px]:`. The design handoff lives in `.design/player/` (ignored by git, ESLint and Prettier).
 - Band colors are not tokens: they come from `bands.json → theme`.
 - shadcn/ui primitives are added on demand and only where they fit the look (Dialog, Tooltip); ask before the first one. Its `init` expects the `@/*` alias in the root `tsconfig.json` (today only `tsconfig.app.json` has it) and writes its own theme into `src/styles/index.css`, which must not replace the project's tokens; its components import `lucide-react`, which is not installed. Never restyle the design into shadcn defaults.
 
@@ -210,7 +211,8 @@ Change only what the task needs. Read related code before editing. No drive-by r
   - band spread: photo on the left (full-page poster, or a square cover "sleeve" over a blurred backdrop), article on the right: genre, name in the band font, lead, 3 big stats, dossier, 2 polaroids, "Слушать" button and favorite tracks;
   - photos use the duotone filter (`.duo`: image `grayscale + multiply`, `::after` dark color with `lighten`, halftone `::before`);
   - aged paper: `.aged`, `.coffee`, `.dogear`, staples `.staple`; the `.corner` page curls must not cover content (page numbers sit at the top).
-- Fonts: none are loaded yet. The first component that uses one adds a single Google Fonts `<link>` to `index.html` (Anton, Oswald, Caveat, PT Sans, PT Mono, Permanent Marker, Special Elite; only the weights in use). Band fonts (Black Ops One, Cinzel, Cinzel Decorative, Michroma, Rubik Wet Paint, Archivo Black) are added with the magazine.
+- Fonts: one Google Fonts `<link>` in `index.html`, only the families and weights in use; extend that link, never add a second. Loaded now: Caveat 700, Michroma, Oswald 600/700, PT Mono, PT Sans 400/700, PT Serif 700, Rubik Mono One, Russo One (player and cut-out headings). Still to come when used: Anton, Permanent Marker, Special Elite; band fonts (Black Ops One, Cinzel, Cinzel Decorative, Rubik Wet Paint, Archivo Black) with the magazine.
+- All UI text, including aria-labels and the deck's English engravings, lives in `src/i18n/locales/{ru,en,uk}.json`; plurals use i18next `_one/_few/_many/_other` keys (every locale keeps all four so the key-parity type check holds).
 - Accessibility: real `<button>`/`<a>`, `aria-label` on icon buttons, 4.5:1 contrast, hit areas ≥ 44px, honor `prefers-reduced-motion`. The axe e2e check must stay green.
 - Mobile is mandatory: check with the Playwright `mobile` project.
 - Performance: every `<img>` has `width`/`height` (no layout shift) and `loading="lazy"` unless it is on the first screen; band photos are WebP; Google Fonts load with `preconnect` and `display=swap`, and only the families and weights the design uses.
@@ -243,10 +245,10 @@ One component at a time; after each, verify (`pnpm check`, `pnpm test:e2e`) and 
 
 - [x] Empty project: tooling, strict TS, ESLint, tests (Vitest + RTL, Playwright + axe), CI
 - [ ] Layout: header with flag and sticker tabs, garland, routes `/`, `/cv`, `/games`
-- [ ] Content: JSON + Zod schemas, player store
+- [x] Content: `tracks.json` + Zod schema, player store (`src/modules/player/stores/player-store.ts`)
+- [x] `StereoDeck` (STEREO 2000 deck on Home, design in `.design/player/`): screen, transport, volume, TIME, disc, MAGAZINE unit (⏏ disabled until the magazine exists), virtualized playlist with search; time is driven by `usePlaybackClock` until YouTube replaces it
 - [ ] `Magazine`: spread, page flips, sections and stickers, "Случайно", duotone photos, typographic fallback poster when there is no photo
-- [ ] `IPod`: screen (cover, track, album, year, progress), click wheel (MENU, ⏮, ⏭, ▶❚❚, center), scrollable playlist in menu
-- [ ] `YouTubePlayer` wired to the store; `VideoFrame` on Home, floating window on other tabs
+- [ ] `YouTubePlayer` wired to the store; «смотрим клип» block on Home, iPod dock (`.ipod-dock`, SPEC §5) with the video window on other tabs
 - [ ] `RockChart`: top 6, linked to the player
 - [ ] Deploy to Vercel
 - [ ] Content pipeline stages 2–5

@@ -28,7 +28,6 @@ declare module 'i18next' {
 
 i18n.on('languageChanged', (language) => {
   document.documentElement.lang = language;
-  document.title = i18n.t('site.name');
 });
 
 void i18n.use(initReactI18next).init({

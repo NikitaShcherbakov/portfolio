@@ -2,8 +2,10 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { languageNames, languages } from '@/i18n';
+import { cn } from '@/lib/utils';
 
 import { useLanguage } from '../hooks/use-language';
+import { focusRingClassName } from '../utils/focus-ring';
 
 export function LanguageSwitcher() {
   const { t } = useTranslation();
@@ -19,7 +21,10 @@ export function LanguageSwitcher() {
         id={selectId}
         value={language}
         onChange={(event) => void changeLanguage(event.target.value)}
-        className="h-11 rounded-md border border-neutral-300 bg-transparent px-2 dark:border-neutral-700 dark:bg-neutral-950"
+        className={cn(
+          'h-11 rounded-md border border-neutral-300 bg-transparent px-2 dark:border-neutral-700 dark:bg-neutral-950',
+          focusRingClassName
+        )}
       >
         {languages.map((option) => (
           <option key={option} value={option} lang={option}>

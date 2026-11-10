@@ -58,7 +58,7 @@ test('language and theme survive a reload', async ({ page }) => {
 
   await page.getByRole('combobox', { name: 'Язык' }).selectOption('uk');
   await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
-  await expect(page).toHaveTitle('Микита Щербаков');
+  await expect(page).toHaveTitle('Резюме — Микита Щербаков');
 
   await page.getByRole('button', { name: 'Темна тема' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');

@@ -1,6 +1,7 @@
 {
   "site": {
     "name": "Nikita Shcherbakov",
+    "pageTitle": "{{page}} — {{name}}",
     "skipToContent": "Skip to content"
   },
   "nav": {
@@ -27,6 +28,104 @@
     "notFound": {
       "title": "Page not found",
       "backHome": "Back to home"
+    },
+    "home": {
+      "music": "Music"
+    }
+  },
+  "player": {
+    "deck": {
+      "brand": "STEREO 2000",
+      "model": "NS-CD1",
+      "tagline": "HIGH FIDELITY",
+      "hello": "HELLO",
+      "disc": "DISC",
+      "standby": "STANDBY",
+      "shuffleFlag": "SHUFFLE",
+      "nextKey": "NEXT ▸",
+      "captionMain": "COMPACT DISC",
+      "captionTail": " · DIGITAL MUSIC SYSTEM",
+      "lineOut": "LINE OUT",
+      "left": "L",
+      "right": "R",
+      "serial": "S/N NS-CD1-0001",
+      "phones": "PHONES",
+      "nowSpinning": "NOW SPINNING",
+      "source": "PLAYLIST",
+      "list": "LIST"
+    },
+    "status": {
+      "playing": "▶ PLAYING",
+      "paused": "❚❚ PAUSED",
+      "standby": "■ STANDBY"
+    },
+    "trackNumber": "TRACK {{current}} / {{total}}",
+    "repeatFlag": {
+      "all": "REPEAT ALL",
+      "one": "REPEAT ONE",
+      "off": "REPEAT OFF"
+    },
+    "upNext": {
+      "track": "{{artist}} — {{title}}",
+      "repeat": "repeat: {{title}}",
+      "end": "end of queue"
+    },
+    "osd": {
+      "volume": "VOL {{volume}}",
+      "mute": "MUTE"
+    },
+    "engraving": {
+      "power": "POWER",
+      "prev": "PREV",
+      "play": "PLAY",
+      "next": "NEXT",
+      "shuffle": "SHUFFLE",
+      "repeat": "REPEAT",
+      "random": "RANDOM",
+      "volume": "VOLUME",
+      "pushToMute": "PUSH TO MUTE",
+      "time": "TIME",
+      "elapsedTotal": "ELAPSED · TOTAL"
+    },
+    "magazine": {
+      "pageUnknown": "MAGAZINE · P.—",
+      "pageCaption": "MAGAZINE · PAGE",
+      "open": "OPEN",
+      "openLabel": "Open {{artist}} in the magazine"
+    },
+    "controls": {
+      "seek": "Seek",
+      "seekValue": "{{elapsed}} of {{length}}",
+      "transport": "Playback controls",
+      "power": "Power",
+      "previous": "Previous track",
+      "play": "Play",
+      "pause": "Pause",
+      "next": "Next track",
+      "shuffle": "Shuffle",
+      "repeat": {
+        "all": "Repeat: whole queue",
+        "one": "Repeat: one track",
+        "off": "Repeat: off"
+      },
+      "random": "Random track",
+      "volume": "Volume",
+      "volumeDown": "Quieter",
+      "volumeUp": "Louder",
+      "volumeKnob": "Volume {{volume}} of {{max}}. Press to mute or unmute",
+      "volumeKnobMuted": "Volume muted. Press to mute or unmute",
+      "disc": "Disc: {{label}}. {{action}}"
+    },
+    "playlist": {
+      "label": "Playlist",
+      "search": "Search the playlist",
+      "searchPlaceholder": "Band, song or album",
+      "count_one": "{{count}} track",
+      "count_few": "{{count}} tracks",
+      "count_many": "{{count}} tracks",
+      "count_other": "{{count}} tracks",
+      "found": "{{count}} of {{total}} found",
+      "empty": "Nothing found. Try another title."
     }
   }
 }

@@ -1,6 +1,7 @@
 {
   "site": {
     "name": "Микита Щербаков",
+    "pageTitle": "{{page}} — {{name}}",
     "skipToContent": "Перейти до вмісту"
   },
   "nav": {
@@ -27,6 +28,104 @@
     "notFound": {
       "title": "Сторінку не знайдено",
       "backHome": "На головну"
+    },
+    "home": {
+      "music": "Музика"
+    }
+  },
+  "player": {
+    "deck": {
+      "brand": "STEREO 2000",
+      "model": "NS-CD1",
+      "tagline": "HIGH FIDELITY",
+      "hello": "HELLO",
+      "disc": "DISC",
+      "standby": "STANDBY",
+      "shuffleFlag": "SHUFFLE",
+      "nextKey": "NEXT ▸",
+      "captionMain": "COMPACT DISC",
+      "captionTail": " · DIGITAL MUSIC SYSTEM",
+      "lineOut": "LINE OUT",
+      "left": "L",
+      "right": "R",
+      "serial": "S/N NS-CD1-0001",
+      "phones": "PHONES",
+      "nowSpinning": "NOW SPINNING",
+      "source": "PLAYLIST",
+      "list": "LIST"
+    },
+    "status": {
+      "playing": "▶ PLAYING",
+      "paused": "❚❚ PAUSED",
+      "standby": "■ STANDBY"
+    },
+    "trackNumber": "TRACK {{current}} / {{total}}",
+    "repeatFlag": {
+      "all": "REPEAT ALL",
+      "one": "REPEAT ONE",
+      "off": "REPEAT OFF"
+    },
+    "upNext": {
+      "track": "{{artist}} — {{title}}",
+      "repeat": "повтор: {{title}}",
+      "end": "кінець черги"
+    },
+    "osd": {
+      "volume": "VOL {{volume}}",
+      "mute": "MUTE"
+    },
+    "engraving": {
+      "power": "POWER",
+      "prev": "PREV",
+      "play": "PLAY",
+      "next": "NEXT",
+      "shuffle": "SHUFFLE",
+      "repeat": "REPEAT",
+      "random": "RANDOM",
+      "volume": "VOLUME",
+      "pushToMute": "PUSH TO MUTE",
+      "time": "TIME",
+      "elapsedTotal": "ELAPSED · TOTAL"
+    },
+    "magazine": {
+      "pageUnknown": "MAGAZINE · P.—",
+      "pageCaption": "MAGAZINE · PAGE",
+      "open": "OPEN",
+      "openLabel": "Відкрити {{artist}} у журналі"
+    },
+    "controls": {
+      "seek": "Перемотування",
+      "seekValue": "{{elapsed}} з {{length}}",
+      "transport": "Керування відтворенням",
+      "power": "Живлення",
+      "previous": "Попередній трек",
+      "play": "Грати",
+      "pause": "Пауза",
+      "next": "Наступний трек",
+      "shuffle": "Перемішати",
+      "repeat": {
+        "all": "Повтор: уся черга",
+        "one": "Повтор: один трек",
+        "off": "Повтор: вимкнено"
+      },
+      "random": "Випадковий трек",
+      "volume": "Гучність",
+      "volumeDown": "Тихіше",
+      "volumeUp": "Гучніше",
+      "volumeKnob": "Гучність {{volume}} з {{max}}. Натисни, щоб вимкнути або увімкнути звук",
+      "volumeKnobMuted": "Гучність вимкнено. Натисни, щоб вимкнути або увімкнути звук",
+      "disc": "Диск: {{label}}. {{action}}"
+    },
+    "playlist": {
+      "label": "Плейлист",
+      "search": "Пошук у плейлисті",
+      "searchPlaceholder": "Гурт, пісня або альбом",
+      "count_one": "{{count}} трек",
+      "count_few": "{{count}} треки",
+      "count_many": "{{count}} треків",
+      "count_other": "{{count}} треку",
+      "found": "знайдено {{count}} з {{total}}",
+      "empty": "Нічого не знайшлося. Спробуй іншу назву."
     }
   }
 }
