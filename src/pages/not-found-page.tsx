@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { PageContainer, PageTitle } from '@/modules/common';
 import { routes } from '@/router/routes';
 
 export function NotFoundPage() {
   const { t } = useTranslation();
 
   return (
-    <>
+    <PageContainer>
+      <PageTitle page={t('pages.notFound.title')} />
       <h1 className="text-3xl font-bold">{t('pages.notFound.title')}</h1>
       <Link
         to={routes.Home}
@@ -15,6 +17,6 @@ export function NotFoundPage() {
       >
         {t('pages.notFound.backHome')}
       </Link>
-    </>
+    </PageContainer>
   );
 }

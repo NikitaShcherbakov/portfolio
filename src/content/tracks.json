@@ -1,0 +1,114 @@
+[
+  {
+    "id": "linkin-park-in-the-end",
+    "title": "In the End",
+    "artist": "Linkin Park",
+    "album": "Hybrid Theory",
+    "year": 2000,
+    "durationSec": 216
+  },
+  {
+    "id": "seether-fine-again",
+    "title": "Fine Again",
+    "artist": "Seether",
+    "album": "Disclaimer",
+    "year": 2002,
+    "durationSec": 244
+  },
+  {
+    "id": "creed-my-own-prison",
+    "title": "My Own Prison",
+    "artist": "Creed",
+    "album": "My Own Prison",
+    "year": 1997,
+    "durationSec": 298
+  },
+  {
+    "id": "staind-its-been-awhile",
+    "title": "It's Been Awhile",
+    "artist": "Staind",
+    "album": "Break the Cycle",
+    "year": 2001,
+    "durationSec": 265
+  },
+  {
+    "id": "chevelle-send-the-pain-below",
+    "title": "Send the Pain Below",
+    "artist": "Chevelle",
+    "album": "Wonder What's Next",
+    "year": 2002,
+    "durationSec": 253
+  },
+  {
+    "id": "godsmack-voodoo",
+    "title": "Voodoo",
+    "artist": "Godsmack",
+    "album": "Godsmack",
+    "year": 1998,
+    "durationSec": 280
+  },
+  {
+    "id": "pantera-floods",
+    "title": "Floods",
+    "artist": "Pantera",
+    "album": "The Great Southern Trendkill",
+    "year": 1996,
+    "durationSec": 420
+  },
+  {
+    "id": "type-o-negative-love-you-to-death",
+    "title": "Love You to Death",
+    "artist": "Type O Negative",
+    "album": "October Rust",
+    "year": 1996,
+    "durationSec": 429
+  },
+  {
+    "id": "the-smashing-pumpkins-tonight-tonight",
+    "title": "Tonight, Tonight",
+    "artist": "The Smashing Pumpkins",
+    "album": "Mellon Collie and the Infinite Sadness",
+    "year": 1995,
+    "durationSec": 254
+  },
+  {
+    "id": "the-cranberries-salvation",
+    "title": "Salvation",
+    "artist": "The Cranberries",
+    "album": "To the Faithful Departed",
+    "year": 1996,
+    "durationSec": 143
+  },
+  {
+    "id": "guns-n-roses-november-rain",
+    "title": "November Rain",
+    "artist": "Guns N' Roses",
+    "album": "Use Your Illusion I",
+    "year": 1991,
+    "durationSec": 537
+  },
+  {
+    "id": "radiohead-high-and-dry",
+    "title": "High and Dry",
+    "artist": "Radiohead",
+    "album": "The Bends",
+    "year": 1995,
+    "durationSec": 257
+  },
+  {
+    "id": "local-h-bound-for-the-floor",
+    "title": "Bound for the Floor",
+    "artist": "Local H",
+    "album": "As Good as Dead",
+    "year": 1996,
+    "durationSec": 262
+  },
+  {
+    "id": "superheaven-youngest-daughter",
+    "title": "Youngest Daughter",
+    "artist": "Superheaven",
+    "album": "Jar",
+    "year": 2013,
+    "durationSec": 192
+  }
+]

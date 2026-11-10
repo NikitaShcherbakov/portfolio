@@ -9,6 +9,9 @@ test-results
 *.tsbuildinfo
 .cache
 
+# Design handoffs (local reference, never committed)
+.design
+
 # Env (keep .env.example)
 .env
 .env.*

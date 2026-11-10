@@ -1,0 +1,20 @@
+/* The player design was drawn on browser defaults: this restores them inside the player after Tailwind preflight.
+   Unlayered on purpose, so it also overrides every Tailwind utility there: style the player with its own classes. */
+:where(.player-deck, .ipod-dock),
+:where(.player-deck, .ipod-dock) :where(*:not(svg, svg *)),
+:where(.player-deck, .ipod-dock) :where(*:not(svg, svg *))::before,
+:where(.player-deck, .ipod-dock) :where(*:not(svg, svg *))::after {
+  all: revert;
+}
+:where(.player-deck, .ipod-dock) {
+  font-family: 'PT Sans', sans-serif;
+  font-size: 16px;
+  line-height: normal;
+  color: #ece4d6;
+  text-align: left;
+}
+:where(.player-deck, .ipod-dock) :where(svg) {
+  display: inline;
+  vertical-align: baseline;
+  box-sizing: content-box;
+}

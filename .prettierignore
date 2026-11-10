@@ -1,2 +1,4 @@
 # Prettier also skips everything in .gitignore.
 pnpm-lock.yaml
+# Ignored by .claude/.gitignore, which Prettier does not read.
+.claude/qa-artifacts

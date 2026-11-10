@@ -31,6 +31,7 @@ export default defineConfig(
     'playwright-report',
     'test-results',
     '.cache',
+    '.design',
     // Claude Code settings and hooks: tooling, not project code.
     '.claude',
   ]),

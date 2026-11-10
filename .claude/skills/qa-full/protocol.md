@@ -16,7 +16,8 @@ file says how every level works and how to report.
   `.gitignore`. Read the saved path back from the tool result.
 - The prompt also gives the **commit under test**. Production is built from `main`, while the working tree
   may be `develop` with newer, undeployed code: when you read source to learn what an element should do,
-  read it at that commit (`git show <hash>:src/...`), not from the working tree.
+  read it at that commit (`git show <hash>:src/...`), not from the working tree. When it says
+  `unknown`, read the working tree and write under Observations that the deployed code may differ.
 
 ### Local target
 
@@ -28,12 +29,30 @@ the same way.
 
 ## What counts as expected behavior
 
-1. `CLAUDE.md`: design rules, YouTube player constraints, accessibility and performance rules.
-2. The **MVP plan** in `CLAUDE.md`: an unchecked item is not built yet. A missing magazine, iPod or chart
-   is "not built yet", **not a bug**: list it once under "Not built yet" and move on. A feature that is
-   checked, or that is visibly on the page, is fair game.
-3. Common sense of a real visitor (a recruiter on a laptop or a phone): broken layout, dead buttons, text
+1. `CLAUDE.md` **at the commit under test** (`git show <hash>:CLAUDE.md`; the working tree's for a
+   local or unknown target): design rules, YouTube player constraints, accessibility and performance
+   rules.
+2. The **MVP plan** in that same `CLAUDE.md`: an unchecked item is not built yet. A missing magazine,
+   iPod or chart is "not built yet", **not a bug**: list it once under "Not built yet" and move on. A
+   feature that is checked, or that is visibly on the page, is fair game. Before testing a feature,
+   confirm its code exists at the commit under test (for the stereo deck: `src/modules/player/`, via
+   `git ls-tree -r --name-only <hash> src/modules`); if it does not, every check of it is "Not built
+   yet" for this target, never a bug.
+3. **Design handoffs** in `.design/<feature>/` (git-ignored, on the owner's machine; list them with the
+   Glob tool, `.design/*/SPEC.md`):
+   `SPEC.md` (behaviour, states, breakpoints, aria-labels verbatim, and an acceptance checklist) and
+   `screens/` (reference PNGs per width and state). For a checked MVP item that has a handoff, the
+   SPEC's acceptance checklist is your test list for that feature: give every line that your level can
+   check a Coverage row. The SPEC also describes parts whose MVP item is still unchecked (for the
+   player: YouTube, the iPod dock, the «смотрим клип» block, the magazine links): those are "Not built
+   yet", not bugs. Where the SPEC and `CLAUDE.md` disagree, `CLAUDE.md` wins; say so under Observations.
+4. Common sense of a real visitor (a recruiter on a laptop or a phone): broken layout, dead buttons, text
    cut off, errors in the console, music that stops, things that only work with a mouse.
+
+Your agent file names features as they were planned (an iPod, a YouTube iframe, a chart). The project
+moves faster than these files: the checked MVP items and their handoffs are the truth. Test what is
+built under its real name, apply your level's checks to it, and never report "the iPod is missing"
+when the plan says the player is a different, built component.
 
 Read `CLAUDE.md` and `git log --oneline -15` first, so you know what was built recently: recent work is
 where bugs live.
@@ -44,6 +63,19 @@ Wherever your agent file says "every route" or names `/`, `/cv`, `/games`, use t
 in `src/router/` at the commit under test (`git show <hash>:src/router/...`; `git ls-tree -r --name-only
 <hash> src/router` lists the files), plus any link on the page that leads to a path of the same site.
 Fall back to `/`, `/cv`, `/games` only when there is no router yet.
+
+## Breakpoints
+
+Layout changes at the widths in the stylesheets: the Grep tool with pattern `@media[^{]*`, glob
+`*.css`, path `src`, output mode content (not Bash `grep`, which is not in the allow list), plus
+Tailwind's `max-[…]`/`min-[…]` and `sm:`/`md:`/`lg:` classes in `src/`. Bugs hide right at a boundary:
+wherever your agent file picks widths, add each breakpoint width and that width + 1.
+
+## Playback before YouTube
+
+While the MVP item for the YouTube player is unchecked, playback is simulated: a clock in the store
+advances the time once per second, no video and no sound exist. Test the simulation like the real thing
+(state, time, track changes, controls), and mark sound and video "Not built yet".
 
 ## Languages
 
@@ -120,7 +152,11 @@ All testers drive one browser through one `playwright` MCP server, and run one a
 - `browser_evaluate` is for reading state (geometry, computed styles, `document.fonts`, performance
   entries, tagging a DOM node to check it is the same node later). Never use it to click, to change the
   app's state or to "fix" the page to continue a flow: a flow that needs that is a bug. The exceptions
-  are the steps your agent file spells out (injecting axe, corrupting `localStorage`, `history.forward()`).
+  are the steps your agent file spells out (injecting axe, corrupting `localStorage`, `history.forward()`
+  to go forward, since there is no forward tool; it returns mid-navigation, so read the page in a
+  separate call), and, for the verifier, any `browser_evaluate` step written in the bug it reproduces.
+- A missing favicon (a `404` for `/favicon.ico` and its console error) is one Observation for every
+  level, never a bug: `CLAUDE.md` does not require a favicon. The error shows only in a fresh context.
 
 ## Must not
 
@@ -153,7 +189,7 @@ One block per bug:
 - URL / viewport / media: https://…/cv · 390×844 · reduced-motion
 - Steps (from a fresh page load):
   1. …
-- Expected: … (source: CLAUDE.md "<section>" | MVP plan | common sense)
+- Expected: … (source: CLAUDE.md "<section>" | MVP plan | .design/<feature>/SPEC.md §<n> | design screen <path> | common sense)
 - Actual: …
 - Evidence: screenshot path, console text, failed request (method, URL, status)
 - Reproducibility: always | 2 of 3 | once
