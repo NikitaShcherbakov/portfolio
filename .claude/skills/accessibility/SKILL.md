@@ -4,7 +4,7 @@ description:
   What `jsx-a11y-x` strict and the axe e2e check already catch in the portfolio, and the gaps they cannot see —
   a focus ring removed by a Tailwind class, hit areas under 44px, contrast over duotone photos and aged
   paper, motion without a reduced-motion path, a page flip or click wheel that works only with a mouse or a
-  swipe, a YouTube iframe without a title. Use when adding an interactive element (the sticker tabs, the
+  swipe, a track change no screen reader hears. Use when adding an interactive element (the sticker tabs, the
   magazine flip, the iPod click wheel, the chart rows, the player controls), an icon-only button, an
   animation, or text over an image.
 when_to_use:
@@ -24,8 +24,9 @@ The bar (CLAUDE.md): real `<button>`/`<a>`, `aria-label` on icon buttons, 4.5:1 
   handler, `<img>` without `alt`, an `<a>` without a valid `href`, a non-interactive element with an
   interactive role, `autoFocus`, and more. Raw DOM elements are used everywhere here, so lint sees them.
 - `e2e/smoke.spec.ts` runs axe with the `wcag2a`, `wcag2aa` and `wcag21aa` tags and fails on any violation,
-  on desktop and mobile. Contrast is checked only where axe can compute it: not over images.
-- `index.html` sets `lang="ru"`, matching the Russian UI copy.
+  on desktop and mobile; `e2e/layout.spec.ts` runs it on every tab in both themes. Contrast is checked only where axe can compute it: not over images.
+- `index.html` sets `lang="ru"` (the default language); `src/i18n/i18n.ts` updates `html[lang]` on every
+  language switch. Every accessible name comes from `src/i18n/locales/{ru,en,uk}.json`, never a literal.
 
 ## The gaps — check these yourself
 
@@ -41,13 +42,14 @@ The bar (CLAUDE.md): real `<button>`/`<a>`, `aria-label` on icon buttons, 4.5:1 
   **styling** skill §5).
 - **Keyboard parity for gestures.** A page flip by drag or swipe also needs buttons ("Следующая страница",
   "Предыдущая страница") reachable by Tab, or arrow keys on a focusable magazine region. The iPod click
-  wheel is a set of `<button>`s (MENU, ⏮, ⏭, ▶❚❚, center), each with an `aria-label` in Russian; its
+  wheel is a set of `<button>`s (MENU, ⏮, ⏭, ▶❚❚, center), each with an `aria-label` from the locales; its
   menu playlist is a list of buttons or links, scrollable with the keyboard.
 - **State.** A tab or sticker that shows the current section carries `aria-current` (`"page"` for a route
   link); a play/pause toggle carries `aria-pressed` or swaps its label; the "Случайно" sticker says what it
   does in its accessible name.
-- **The YouTube iframe** needs a `title` describing the video ("Клип: <artist> — <track>"). Track changes
-  are announced through a `role="status"` element mounted before its text changes, not by moving focus.
+- **The `<audio>` element** has no native `controls`: the deck, the iPod and the chart are the labelled
+  controls. Track changes are announced through a `role="status"` element mounted before its text
+  changes, not by moving focus.
 - **Icons.** A decorative SVG is `aria-hidden="true"`; an icon-only button has an `aria-label` naming the
   action, not the icon.
 - **Focus after a change.** When the focused element unmounts (a flipped page, a closed menu), move focus to
@@ -60,7 +62,8 @@ The bar (CLAUDE.md): real `<button>`/`<a>`, `aria-label` on icon buttons, 4.5:1 
 - An accessible name; icon-only → `aria-label`.
 - The state the interaction implies (`aria-current`, `aria-pressed`, `aria-expanded`).
 - A hit area ≥ 44×44 px.
-- A Testing Library test that finds it by role and name, and acts with `userEvent`.
+- A Testing Library test that finds it by role and name, and acts with `userEvent` (not while tests are
+  paused: CLAUDE.md "Testing").
 
 ## Must not
 

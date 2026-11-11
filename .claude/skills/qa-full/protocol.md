@@ -30,7 +30,7 @@ the same way.
 ## What counts as expected behavior
 
 1. `CLAUDE.md` **at the commit under test** (`git show <hash>:CLAUDE.md`; the working tree's for a
-   local or unknown target): design rules, YouTube player constraints, accessibility and performance
+   local or unknown target): design rules, audio player constraints, accessibility and performance
    rules.
 2. The **MVP plan** in that same `CLAUDE.md`: an unchecked item is not built yet. A missing magazine,
    iPod or chart is "not built yet", **not a bug**: list it once under "Not built yet" and move on. A
@@ -43,13 +43,13 @@ the same way.
    `SPEC.md` (behaviour, states, breakpoints, aria-labels verbatim, and an acceptance checklist) and
    `screens/` (reference PNGs per width and state). For a checked MVP item that has a handoff, the
    SPEC's acceptance checklist is your test list for that feature: give every line that your level can
-   check a Coverage row. The SPEC also describes parts whose MVP item is still unchecked (for the
-   player: YouTube, the iPod dock, the «смотрим клип» block, the magazine links): those are "Not built
-   yet", not bugs. Where the SPEC and `CLAUDE.md` disagree, `CLAUDE.md` wins; say so under Observations.
+   check a Coverage row. The SPEC also describes parts whose MVP item is still unchecked at the commit
+   under test (for the player, read that commit's MVP plan: the iPod dock, preloading the next track and
+   the magazine links may still be open): those are "Not built yet", not bugs. Where the SPEC and `CLAUDE.md` disagree, `CLAUDE.md` wins; say so under Observations.
 4. Common sense of a real visitor (a recruiter on a laptop or a phone): broken layout, dead buttons, text
    cut off, errors in the console, music that stops, things that only work with a mouse.
 
-Your agent file names features as they were planned (an iPod, a YouTube iframe, a chart). The project
+Your agent file names features as they were planned (an iPod, an `<audio>` element, a chart). The project
 moves faster than these files: the checked MVP items and their handoffs are the truth. Test what is
 built under its real name, apply your level's checks to it, and never report "the iPod is missing"
 when the plan says the player is a different, built component.
@@ -71,11 +71,17 @@ Layout changes at the widths in the stylesheets: the Grep tool with pattern `@me
 Tailwind's `max-[…]`/`min-[…]` and `sm:`/`md:`/`lg:` classes in `src/`. Bugs hide right at a boundary:
 wherever your agent file picks widths, add each breakpoint width and that width + 1.
 
-## Playback before YouTube
+## Playback
 
-While the MVP item for the YouTube player is unchecked, playback is simulated: a clock in the store
-advances the time once per second, no video and no sound exist. Test the simulation like the real thing
-(state, time, track changes, controls), and mark sound and video "Not built yet".
+Check the MVP item `AudioPlayer` in `CLAUDE.md` at the commit under test.
+
+- **Checked**: one hidden `<audio>` element appended to `body` plays the tracks from the audio Worker;
+  TIME and buffering come from its events. The Worker answers only allowed origins (`ALLOWED_ORIGINS` in
+  `worker/wrangler.jsonc`: production, `localhost:5173/4173/4317`): a `403` for audio on another origin
+  is a configuration Observation, not a player bug.
+- **Unchecked** (an older deployment): playback is simulated by a clock that advances the time in the
+  store once per second, with no `<audio>` element and no sound. Test the simulation like the real thing
+  (state, time, track changes, controls), and mark sound "Not built yet".
 
 ## Languages
 
@@ -161,7 +167,11 @@ All testers drive one browser through one `playwright` MCP server, and run one a
 ## Must not
 
 - Must not edit repo files, by any tool. The only files you create are screenshots via the MCP server.
-- Must not load-test: no loops of requests, at most a handful of `curl` calls per URL. The site is on a
+- Must not load-test: no loops of requests, at most a handful of `curl` calls per URL. A `curl` runs
+  without a prompt only in the read-only form the `pre-curl-allow` hook approves: plain `curl` with
+  `-s`/`-S`/`-I`/`-i`/`-v`, `-o /dev/null`, `-D -`, `-w '…'` (plain text, `\n` and `%{variable}` only), `-X GET|HEAD`, `-m <s>`, `--compressed`, and
+  `-H` for `Accept-Encoding`, `Accept`, `Origin`, `Range` or `Cache-Control`, to the site or the audio
+  Worker; one command per call, no pipes, redirects or `-L`. Anything else stops on a prompt. The site is on a
   Vercel Hobby plan.
 - Must not sign in anywhere, submit anything to a third party, or follow external links beyond reading
   their `href` and `target`/`rel`.

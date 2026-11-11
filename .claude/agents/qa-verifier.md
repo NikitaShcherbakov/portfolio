@@ -50,7 +50,7 @@ reproducing, add it at the end as `VERIFY-<n>` in the protocol's bug format.
 3. Check the "Expected" against its stated source: is the rule really in `CLAUDE.md` or in the cited
    `.design/<feature>/SPEC.md` section (read it; the protocol says which wins), or is the feature
    in the MVP plan unchecked (then it is "Not built yet", not a bug)? Is it really a bug of this site, or
-   of YouTube, Vercel or the headless browser?
+   of the R2 bucket, Vercel or the headless browser?
 4. Verdict:
    - **CONFIRMED**: reproduced every time from the written steps;
    - **FLAKY**: reproduced at least once, not every time; say how often;

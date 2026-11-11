@@ -51,7 +51,7 @@ happens at the right size), wait 3 s, then one `browser_evaluate`:
   that row is COULD NOT VERIFY with the reason, never PASS. No `layout-shift` or `longtask` entry means
   zero of them;
 - `performance.getEntriesByType('resource')`: per `initiatorType`, count and total `transferSize`; the
-  ten biggest resources. Cross-origin entries (Google Fonts, YouTube) report `transferSize` 0 without
+  ten biggest resources. Cross-origin entries (Google Fonts, the audio Worker) report `transferSize` 0 without
   `Timing-Allow-Origin`: say so instead of counting them as free.
 
 Budgets (bug above): LCP 2.5 s (minor), 4 s (major); CLS 0.1 (minor), 0.25 (major); own JS over 300 KB
@@ -59,7 +59,8 @@ transferred (minor); any single image over 300 KB (minor); a long task over 200 
 
 ## 2. Assets
 
-- Images: band photos are WebP (`Content-Type` via `curl -sI`); rendered size vs natural size (an 800px
+- Images: covers and photos load from Cover Art Archive's storage (`archive.org`) or TheAudioDB, never from
+  the R2 bucket or the site's own origin; rendered size vs natural size (an 800px
   image drawn at 100px is waste); every `img` has `width`/`height`; below-the-fold images are
   `loading="lazy"`, first-screen ones are not.
 - Fonts: Google Fonts preconnected (`link rel=preconnect` to `fonts.googleapis.com` and
@@ -69,8 +70,10 @@ transferred (minor); any single image over 300 KB (minor); a long task over 200 
   cached long; the JS and CSS assets come compressed (a GET, not `-I`: `curl -s -o /dev/null -D -
 -H 'Accept-Encoding: br, gzip' <url>` must show `content-encoding`). Vercel does not compress tiny
   responses such as the ~1 KB `index.html`: not a bug. On a local target these rows are NOT APPLICABLE.
-- The YouTube iframe API script is loaded once (count requests to `iframe_api` / `www-widgetapi`), not on
-  every tab change.
+- Audio: the tracks come from the audio Worker with `Cache-Control: public, max-age=31536000,
+immutable` (`curl -sI -H 'Origin: <site origin>'` on an `audioUrl`: without an allowed `Origin` the
+  Worker answers `403` by design); before ▶ at most the metadata of the current track is
+  fetched, not whole files; a tab change fetches no audio again.
 
 ## 3. Runtime
 
@@ -86,7 +89,7 @@ transferred (minor); any single image over 300 KB (minor); a long task over 200 
 - Leaks: read `performance.memory.usedJSHeapSize` (Chromium; coarse-grained, so only large growth means
   anything), then do 20 tab changes and 20 page flips by
   clicks, read it again; growth over 20 MB, or a DOM node count (`document.getElementsByTagName('*')`)
-  that keeps growing, is a minor bug. Once the YouTube player is built, check that the number of `iframe` elements stays 1 (0 before it is).
+  that keeps growing, is a minor bug. Once `AudioPlayer` is built, check that the number of `audio` elements stays 1 (0 before it is).
 - Smoothness of the flip: `requestAnimationFrame` frame times during one flip (record for 1 s); frames
   over 50 ms are an Observation.
 - Player: the playlist is virtualized, so count the row elements in the open drawer (a few dozen at
@@ -98,5 +101,5 @@ transferred (minor); any single image over 300 KB (minor); a long task over 200 
 ## Coverage rows
 
 LCP · CLS · long tasks · transfer by type · JS weight · image format · image sizing · width/height · lazy
-loading · fonts · caching · compression · YouTube API loaded once · interaction delay · memory · DOM
+loading · fonts · caching · compression · audio caching and preload · interaction delay · memory · DOM
 growth · flip smoothness, each per route and viewport where it applies.

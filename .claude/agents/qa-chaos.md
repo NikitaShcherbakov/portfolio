@@ -49,7 +49,8 @@ on a feature that does not exist yet are skipped as "Not built yet".
   right spread, no sheet stuck mid-rotation, no two sheets at z = 100.
 - Start a flip, and within 300 ms click a genre sticker / change tab / press ⏭.
 - Resize from 1440 to 390 and back in the middle of a flip and during playback.
-- Press ⏭ ten times fast while a video is loading: the player ends on one track, the UI agrees with it.
+- Press ⏭ ten times fast while a track is still buffering: the player ends on one track, the UI and the
+  `<audio>` element's `src` agree with it, and only that track keeps downloading.
 - Hold keys: press ArrowRight 20 times, Tab 30 times, Enter on a focused button 10 times.
 
 ## Player attacks (the built player; stereo deck today)
