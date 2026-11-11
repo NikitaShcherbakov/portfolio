@@ -15,8 +15,11 @@
 
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
     "erasableSyntaxOnly": true,
     "forceConsistentCasingInFileNames": true
   },
@@ -24,6 +27,7 @@
     "vite.config.ts",
     "playwright.config.ts",
     "commitlint.config.ts",
-    "e2e"
+    "e2e",
+    "scripts"
   ]
 }

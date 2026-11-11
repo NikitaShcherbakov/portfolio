@@ -21,7 +21,11 @@
   },
   "footer": {
     "contacts": "Контакти",
+    "email": "Пошта",
     "phone": "Телефон",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
     "newTab": "(відкриється в новій вкладці)"
   },
   "pages": {
@@ -57,8 +61,11 @@
     "status": {
       "playing": "▶ PLAYING",
       "paused": "❚❚ PAUSED",
-      "standby": "■ STANDBY"
+      "standby": "■ STANDBY",
+      "loading": "◌ LOADING",
+      "noSignal": "✕ NO SIGNAL"
     },
+    "playbackFailed": "Не вдалося завантажити жоден трек. Натисни «Грати», щоб спробувати ще раз.",
     "trackNumber": "TRACK {{current}} / {{total}}",
     "repeatFlag": {
       "all": "REPEAT ALL",
@@ -120,6 +127,7 @@
       "label": "Плейлист",
       "search": "Пошук у плейлисті",
       "searchPlaceholder": "Гурт, пісня або альбом",
+      "clearSearch": "Очистити пошук",
       "count_one": "{{count}} трек",
       "count_few": "{{count}} треки",
       "count_many": "{{count}} треків",

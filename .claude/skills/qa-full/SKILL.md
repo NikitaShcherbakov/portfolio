@@ -33,8 +33,8 @@ except the summary, which is in Russian.
   holds it, it is a preview left from an earlier run serving an old build (a `200` from it proves
   nothing): stop it as below, and if it is still listening, stop the run and tell the user its PID.
   Then `pnpm exec vite build --outDir node_modules/.cache/qa-site`
-  (a separate folder: `pnpm check` in `auto` empties `build/` while the testers browse, and ESLint would
-  lint anything under `.claude/`), then in the background
+  (a separate folder: `pnpm check` in `auto` empties `build/` while the testers browse), then in the
+  background
   `pnpm exec vite preview --outDir node_modules/.cache/qa-site --port 4317 --strictPort`. Check it with
   single `curl -s -o /dev/null -w '%{http_code}' http://localhost:4317/` calls, not a shell loop (a loop
   matches no allow rule, and `sleep` is blocked): read the task's output for vite's ready line between
@@ -53,7 +53,9 @@ changes)`. Vercel's headers, caching, compression and HTTPS do not exist locally
 - Default target only (skip for `local` and for any other URL): `git fetch -q origin main`, then note
   `git log -1 --format='%h %s' origin/main`: production is built from `main`, so this is the **commit
   under test**. For any other URL write `unknown (testers read the working tree)`, and warn the user
-  that its `curl` calls are not in the allow list, so testers will stop on permission prompts. Say so if
+  that its `curl` calls are not auto-approved, so testers will stop on permission prompts (the
+  `pre-curl-allow` hook approves read-only `curl` only for the hosts in `ALLOWED_ORIGINS` and the audio
+  Worker). Say so if
   the working tree is ahead of it (`git log --oneline origin/main..HEAD`, `git status --short`): those
   changes are not deployed yet, and the testers must not expect them. In that case tell the user in one
   line that `/qa-full local` tests those changes, then go on with the target given.

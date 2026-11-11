@@ -9,16 +9,16 @@ import { getContactLinks } from '../utils/get-contact-links';
 const contactLinks = getContactLinks(contacts);
 const currentYear = new Date().getFullYear();
 
-const brandLabels = {
-  email: 'Email',
-  telegram: 'Telegram',
-  linkedin: 'LinkedIn',
-  github: 'GitHub',
+const labelKeys = {
+  email: 'footer.email',
+  phone: 'footer.phone',
+  telegram: 'footer.telegram',
+  linkedin: 'footer.linkedin',
+  github: 'footer.github',
 } as const;
 
 export function SiteFooter() {
   const { t } = useTranslation();
-  const labels = { ...brandLabels, phone: t('footer.phone') };
 
   return (
     <footer className="border-t border-neutral-300 dark:border-neutral-700">
@@ -39,7 +39,7 @@ export function SiteFooter() {
                     focusRingClassName
                   )}
                 >
-                  {labels[link.id]}
+                  {t(labelKeys[link.id])}
                   {link.isExternal && (
                     <>
                       {' '}

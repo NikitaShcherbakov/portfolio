@@ -43,7 +43,7 @@ First read `.claude/skills/qa-full/protocol.md` and follow it. Your level prefix
 ## 1. Build an inventory
 
 For every route (`/`, `/cv`, `/games`), `browser_snapshot` and list every interactive element: links,
-buttons, tabs, stickers, sliders, list rows, the click wheel, iframes. Put the inventory in your Coverage
+buttons, tabs, stickers, sliders, list rows, the click wheel. Put the inventory in your Coverage
 table: one row per element, so nothing is skipped silently. Read the matching source under `src/` (Grep
 for the accessible name) when you need to know what an element is supposed to do.
 
@@ -88,8 +88,8 @@ For each element, at 1440×900:
 - **Rock chart**: 6 rows; clicking a row plays that track and marks it as current in the chart and the
   iPod.
 - **Player**: first play only after ▶ (no autoplay on load: TIME stays at 00:00 for 3 s after a fresh
-  load); pause/resume; next/previous; once YouTube is built, the visible video is at least 200×200
-  (`browser_evaluate` on the iframe's `getBoundingClientRect`).
+  load); pause/resume; next/previous; once `AudioPlayer` is built, there is exactly one `<audio>` element,
+  its `src` follows the current track and it is not reachable by Tab (no native `controls`).
 - **CV and Games tabs**: every section renders, every link works, downloadable files (a CV PDF) return
   200 (`curl -sI`).
 

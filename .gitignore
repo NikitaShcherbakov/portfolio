@@ -8,6 +8,13 @@ playwright-report
 test-results
 *.tsbuildinfo
 .cache
+.wrangler
+
+# Wrangler's local secrets for `wrangler dev`
+.dev.vars
+
+# Source mp3 files for `pnpm sync:music` (audio lives in R2)
+music
 
 # Design handoffs (local reference, never committed)
 .design

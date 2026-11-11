@@ -21,7 +21,11 @@
   },
   "footer": {
     "contacts": "Contacts",
+    "email": "Email",
     "phone": "Phone",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
     "newTab": "(opens in a new tab)"
   },
   "pages": {
@@ -57,8 +61,11 @@
     "status": {
       "playing": "▶ PLAYING",
       "paused": "❚❚ PAUSED",
-      "standby": "■ STANDBY"
+      "standby": "■ STANDBY",
+      "loading": "◌ LOADING",
+      "noSignal": "✕ NO SIGNAL"
     },
+    "playbackFailed": "None of the tracks could be loaded. Press Play to try again.",
     "trackNumber": "TRACK {{current}} / {{total}}",
     "repeatFlag": {
       "all": "REPEAT ALL",
@@ -120,6 +127,7 @@
       "label": "Playlist",
       "search": "Search the playlist",
       "searchPlaceholder": "Band, song or album",
+      "clearSearch": "Clear search",
       "count_one": "{{count}} track",
       "count_few": "{{count}} tracks",
       "count_many": "{{count}} tracks",

@@ -9,11 +9,11 @@
 // it cannot loop.
 //
 // Scope is what the type-check reads. The script is `tsc -b` over the tsconfig.json references:
-// tsconfig.app.json (src/) and tsconfig.node.json (vite.config.ts, playwright.config.ts,
-// commitlint.config.ts, e2e/). PATHSPECS mirrors both `include` lists, plus scripts/ (the planned
-// content pipeline), package.json and the lockfile, because a dependency change alone can break
+// tsconfig.app.json (src/), tsconfig.node.json (vite.config.ts, playwright.config.ts,
+// commitlint.config.ts, e2e/, scripts/) and worker/tsconfig.json (worker/). PATHSPECS mirrors those
+// `include` lists, plus package.json and the lockfile, because a dependency change alone can break
 // types. src/ is taken whole: resolveJsonModule puts imported .json (src/content/*.json) into the
-// program. Widen it when either include list grows.
+// program. Widen it when an include list or the references grow.
 //
 // Stop fires at the end of every turn, not only when the work is done, and uncommitted files stay
 // dirty across turns — so a plain "dirty files present" gate would re-run the full type-check
@@ -30,7 +30,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 
 import {
   projectDir,
@@ -43,6 +43,7 @@ const PATHSPECS = [
   'src',
   'e2e',
   'scripts',
+  'worker',
   'vite.config.ts',
   'playwright.config.ts',
   'commitlint.config.ts',
@@ -50,13 +51,6 @@ const PATHSPECS = [
   'package.json',
   'pnpm-lock.yaml',
 ];
-const CACHE_FILE = join(
-  projectDir,
-  'node_modules',
-  '.cache',
-  'claude-hooks',
-  'type-check.json'
-);
 // Kept below the 300s hook timeout in .claude/settings.json. A normal run takes seconds; on a
 // machine under full CPU load it was measured at over two minutes.
 const TYPE_CHECK_TIMEOUT_MS = 280_000;
@@ -71,20 +65,43 @@ const MAX_BUFFER = 32 * 1024 * 1024;
 const childEnv = { ...process.env, NO_COLOR: '1' };
 delete childEnv.FORCE_COLOR;
 
+// A null payload (no stdin, or a shape this version cannot read) reads as a first fire rather
+// than a re-invocation, so a failure reaches the agent and not only the user.
+const input = await readHookInput();
+
+// In a .claude/worktrees/<name>/ session CLAUDE_PROJECT_DIR stays at the main checkout, so the
+// checkout to type-check comes from the payload's cwd. node_modules is resolved upwards from there,
+// so a worktree without its own install still finds the main checkout's typescript.
+const getCheckoutDir = (cwd) => {
+  if (typeof cwd !== 'string') return projectDir;
+  const [top, sub, name] = relative(projectDir, resolve(projectDir, cwd)).split(
+    /[\\/]/
+  );
+  return top === '.claude' && sub === 'worktrees' && name
+    ? join(projectDir, top, sub, name)
+    : projectDir;
+};
+const checkoutDir = getCheckoutDir(input?.cwd);
+
+// One cache file per checkout, so sessions in different worktrees do not evict each other's pass.
+const CACHE_FILE = join(
+  projectDir,
+  'node_modules',
+  '.cache',
+  'claude-hooks',
+  `type-check-${createHash('sha256').update(checkoutDir).digest('hex').slice(0, 12)}.json`
+);
+
 // --no-optional-locks: a plain `git status` refreshes the index and takes .git/index.lock, which
 // made a `git add` running at the same moment fail with "index.lock: File exists" (reproduced).
 // The hook runs in the background of every turn, exactly the case the flag exists for.
 const git = (args) =>
   spawnSync('git', ['--no-optional-locks', ...args], {
-    cwd: projectDir,
+    cwd: checkoutDir,
     encoding: 'utf8',
   });
 
 const hasGitFailed = (result) => Boolean(result.error) || result.status !== 0;
-
-// A null payload (no stdin, or a shape this version cannot read) reads as a first fire rather
-// than a re-invocation, so a failure reaches the agent and not only the user.
-const input = await readHookInput();
 
 // Already continuing because a Stop hook said so. The agent's fix is exactly what needs checking,
 // so run again, but hand a remaining failure to the user as a systemMessage, which does not
@@ -145,7 +162,7 @@ if (!dirtyPaths.length) process.exit(0);
 // fingerprint, so it contributes a marker instead of throwing.
 const readForFingerprint = (relativePath) => {
   try {
-    return readFileSync(join(projectDir, relativePath));
+    return readFileSync(join(checkoutDir, relativePath));
   } catch (error) {
     return `<unreadable: ${error.code}>`;
   }
@@ -181,8 +198,8 @@ if (readLastPassedFingerprint() === fingerprint) process.exit(0);
 const readTypeCheckScript = () => {
   try {
     return (
-      JSON.parse(readFileSync(join(projectDir, 'package.json'), 'utf8')).scripts
-        ?.typecheck ?? ''
+      JSON.parse(readFileSync(join(checkoutDir, 'package.json'), 'utf8'))
+        .scripts?.typecheck ?? ''
     );
   } catch {
     return '';
@@ -203,7 +220,7 @@ const toTscSteps = (script) => {
 const resolveTscBin = () => {
   try {
     const packageJsonPath = createRequire(
-      join(projectDir, 'package.json')
+      join(checkoutDir, 'package.json')
     ).resolve('typescript/package.json');
     const { bin } = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
     return resolve(dirname(packageJsonPath), bin.tsc);
@@ -224,7 +241,7 @@ const runTscDirectly = (steps, tscBin) => {
   let isCutOff = false;
   for (const args of steps) {
     const result = spawnSync(process.execPath, [tscBin, ...args], {
-      cwd: projectDir,
+      cwd: checkoutDir,
       encoding: 'utf8',
       env: childEnv,
       maxBuffer: MAX_BUFFER,
@@ -257,7 +274,7 @@ const runTscDirectly = (steps, tscBin) => {
 // contains a glob or a space. On timeout this route can leave tsc running (see the header).
 const runThroughPnpm = () => {
   const result = spawnSync('pnpm', ['run', 'typecheck'], {
-    cwd: projectDir,
+    cwd: checkoutDir,
     encoding: 'utf8',
     env: childEnv,
     maxBuffer: MAX_BUFFER,

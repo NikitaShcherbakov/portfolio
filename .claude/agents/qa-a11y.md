@@ -68,7 +68,7 @@ async () => {
 
 If a Content-Security-Policy blocks the script, report it as an Observation and continue with the manual
 checks. Run it on `/`, `/cv`, `/games`, and in each interactive state that exists: a magazine section
-open, a band spread open, the iPod menu open, the player playing, the floating video on `/cv`; for the
+open, a band spread open, the iPod menu open, the player playing; for the
 stereo deck: playing, standby (power off), the playlist drawer open, a search with no results. Check
 the deck against its handoff's accessibility section (`.design/player/SPEC.md` §9 and Appendix B):
 every listed `aria-*` present and its dynamic label following the state; the seek bar operable by
@@ -91,9 +91,9 @@ expensive. Then check:
 - the focus is visible: the computed `outline`/`box-shadow` of the focused element is not `none`, and a
   screenshot of a few focused elements confirms it (a ring under an overlapping element does not count);
 - no keyboard trap (Shift+Tab gets back out), focus never lands on something invisible or off-screen;
-- the YouTube iframe can be tabbed into and out of;
-- Enter/Space activate buttons; Escape closes anything that opened (menus, the floating window if
-  closable); after a tab change the focus goes somewhere sensible, not lost to `body`;
+- the `<audio>` element is never reached by Tab (no native `controls`; the deck and the iPod are the
+  controls);
+- Enter/Space activate buttons; Escape closes anything that opened (menus); after a tab change the focus goes somewhere sensible, not lost to `body`;
 - the first Tab on a fresh page reaches a "skip to content" link if there is one: it becomes visible on
   focus, and Enter moves the focus to `main` (the next Tab lands inside the content, not in the header);
 - the focus ring is visible in the dark theme too, and on the language `select` and each theme button.
@@ -102,7 +102,7 @@ expensive. Then check:
 
 From `browser_snapshot`: one `h1` per page, heading levels do not skip; landmarks `banner`, `navigation`,
 `main`, `contentinfo`; every button and link has a meaningful name (no "button", "link", "▶" alone);
-icon-only buttons have `aria-label`; the YouTube iframe has a `title`; images have `alt` (decorative ones
+icon-only buttons have `aria-label`; images have `alt` (decorative ones
 `alt=""`); `html[lang]` matches the language on screen, in every language the switcher offers (switch
 and re-check; also run axe once per language on `/`); the language switcher exposes its current value to
 a screen reader and has a label; the theme control is a named group whose buttons each have a name
@@ -127,6 +127,6 @@ end.
 
 ## Coverage rows
 
-axe per route and state × viewport · tab order per route · focus visible · traps · iframe · headings ·
+axe per route and state × viewport · tab order per route · focus visible · traps · audio element · headings ·
 landmarks · names · alt · lang · live regions · hit areas · contrast (light and dark) · skip link ·
 theme control · reduced motion.

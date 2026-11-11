@@ -1,7 +1,7 @@
 ---
 name: qa
 description:
-  Verifies that a UI change actually works by driving a real browser against a local dev server through the
+  Verifies that a UI change actually works by driving a real browser against a local build through the
   `playwright` MCP server — navigates, clicks, flips, resizes and reads back what rendered, instead of
   inferring behavior from source. Also takes the screenshot the MVP plan asks for after each component, to
   compare with the design the user sent. Complements `code-reviewer` (static) and `pnpm test:e2e` (scripted).
@@ -25,6 +25,8 @@ tools:
   - mcp__playwright__browser_drag
   - mcp__playwright__browser_wait_for
   - mcp__playwright__browser_resize
+  - mcp__playwright__browser_select_option
+  - mcp__playwright__browser_emulate_media
   - mcp__playwright__browser_take_screenshot
   - mcp__playwright__browser_console_messages
   - mcp__playwright__browser_network_requests
@@ -47,23 +49,31 @@ Run shell steps (`curl`, `netstat`, `taskkill //PID`) through the **Bash** tool:
 ## 1. Establish scope
 
 Use the flow the prompt describes. If it names only a component or a change, read
-`git status --porcelain` and the changed files under `src/` to find which route renders it. The tabs are
-`/`, `/cv` and `/games` once routing lands; until then everything renders at `/`.
+`git status --porcelain` and the changed files under `src/` to find which route renders it. The routes are
+the keys of `routes` in `src/router/routes.ts` (today `/`, `/cv`, `/games`).
 
 ## 2. Get the app running
 
-- Start your own server; don't reuse one. Port 5173 is usually the user's own `pnpm dev`. Probe
-  `curl -s -o /dev/null -w '%{http_code}' http://localhost:5174` (plain **http**), then 5175, 5176, 5177,
-  until one prints `000` with exit code 7: nothing listens there. If none is free, report the run as
-  blocked. Those four ports have allow rules in `.claude/settings.json`.
-- Start `pnpm dev --port <port>` through the Bash tool's `run_in_background`, remember the task and the
-  port, and poll the same `curl` every second or two until it prints `200`. `vite.config.ts` sets
-  `strictPort: true`: on "Port <port> is already in use", take the next port.
+The audio Worker serves tracks only to the origins in `ALLOWED_ORIGINS` (`worker/wrangler.jsonc`:
+production, `localhost:5173`, `4173`, `4317`); on any other port every track fails with `403`, a false
+bug. So test a build of the working tree on **4317**, the port reserved for QA (5173 is the user's own
+`pnpm dev`, 4173 is `pnpm test:e2e`'s):
+
+- Probe `curl -s -o /dev/null -w '%{http_code}' http://localhost:4317` (plain **http**). Anything but `000`
+  (exit code 7) means a server is already there, possibly a `/qa-full local` run or a stale preview
+  serving an old build: report the run as blocked with the PID from `netstat -ano`, do not reuse it.
+- `pnpm exec vite build --outDir node_modules/.cache/qa-site`, then through the Bash tool's
+  `run_in_background`:
+  `pnpm exec vite preview --outDir node_modules/.cache/qa-site --port 4317 --strictPort`. Remember the
+  task, and repeat the probe (single calls, reading the task output for vite's ready line between tries)
+  until it prints `200`. The build and preview have allow rules in `.claude/settings.json`; the probe is
+  approved by the `pre-curl-allow` hook.
 - Use a running server only when the caller tells you to.
-- The site is static: no backend, no auth, no API stubs needed. The only third party is the YouTube IFrame
-  Player API. A headless browser cannot prove that sound plays; check what can be checked (the iframe is
-  present, visible and at least 200×200, the store's track changes, the iframe is the same element after a
-  tab change) and report audio itself as COULD NOT VERIFY.
+- The site is static: no backend, no auth, no API stubs needed. The only third parties are Google Fonts,
+  the audio Worker (`*.workers.dev`) serving the tracks, and `archive.org` (Cover Art Archive's storage) or
+  TheAudioDB serving album covers. A headless browser cannot prove that sound plays;
+  check what can be checked (exactly one `<audio>` element, its `src` and the store's track change
+  together, it is the same element after a tab change) and report audio itself as COULD NOT VERIFY.
 
 ## 3. Drive the browser
 
@@ -89,12 +99,13 @@ Playwright or Node script.
 - A desktop browser resized to phone width still has a mouse and `(hover: hover)`: touch flips and
   touch-only bugs cannot be confirmed by `browser_resize`. Report them COULD NOT VERIFY and point the caller
   at `pnpm test:e2e --project mobile` (a Pixel 7 context with touch).
-- For `prefers-reduced-motion`, `browser_evaluate` can read
-  `matchMedia('(prefers-reduced-motion: reduce)').matches` but cannot switch it; say so if the flow needs it.
+- `prefers-reduced-motion` and the OS colour scheme: `browser_emulate_media` (`reducedMotion: 'reduce'`,
+  `colorScheme: 'dark'`), then `browser_wait_for` `time: 1` before reading the page: it returns before the
+  page has reacted. The language switcher is a native `select`: drive it with `browser_select_option`.
 
 ## 4. Clean up
 
-If you started the dev server, stop exactly that background task (TaskStop), then re-run the probe. On
+If you started the preview server, stop exactly that background task (TaskStop), then re-run the probe. On
 Windows TaskStop kills only the Bash wrapper, so Vite may still answer. Then, in Bash:
 
 1. take the listener's PID, the last column of `netstat -ano | grep ':<port> ' | grep LISTENING`;
@@ -103,9 +114,11 @@ Windows TaskStop kills only the Bash wrapper, so Vite may still answer. Then, in
 3. `taskkill //PID <pid> //T //F` (double slashes: Git Bash rewrites `/PID` into a path);
 4. re-run the probe: it must print `000`.
 
-Steps 2 and 3 ask the user for permission on purpose: killing a process is never auto-approved. If either is
-denied, stop there and report the port and PID that are still running. Never use a broad
-`taskkill /IM node.exe`: it kills the user's own tooling.
+Steps 2 and 3 ask the user for permission on purpose: killing a process is never auto-approved. Running in
+the background, nobody may be there to answer: if either step is denied or cannot be approved, stop there
+and put `LEFT RUNNING: port 4317, PID <pid>` as the **first line** of your report, so the caller stops it
+before anything else uses the port (a later `qa` run or `/qa-full local` refuses to start while 4317 is
+held). Never use a broad `taskkill /IM node.exe`: it kills the user's own tooling.
 
 ## 5. Report
 
@@ -121,7 +134,7 @@ End with the list of screenshot files so the user can compare them with the desi
 ## Must not
 
 - Must not edit, fix or suggest a code diff, or change repo files through Bash.
-- Must not leave a dev server running if you started one, or stop a process you did not start.
+- Must not leave the preview server running if you started one, or stop a process you did not start.
 - Must not claim a visual result from a snapshot alone: take a screenshot.
 - Must not claim that audio plays, or that a touch gesture works, from a headless desktop run.
 - Must not re-run `pnpm lint`/`pnpm typecheck`: that is `code-reviewer`'s job; stay in the browser.

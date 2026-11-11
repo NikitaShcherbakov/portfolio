@@ -3,11 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { getTrack, tracks } from '@/content/tracks';
 import { cn } from '@/lib/utils';
 
-import { getQueueState, usePlayerStore } from '../stores/player-store';
+import { useDelayedFlag } from '../hooks/use-delayed-flag';
+import {
+  selectHasPlaybackFailed,
+  selectUpNextIndex,
+  usePlayerStore,
+} from '../stores/player-store';
+import { getDeckStatus } from '../utils/deck-status';
 import { padTrackNumber } from '../utils/format';
-import { getAutoNextIndex, repeatModes } from '../utils/queue';
+import { repeatModes } from '../utils/queue';
 import { DeckSeekBar } from './deck-seek-bar';
 import { DeckVolumeOsd } from './deck-volume-osd';
+
+const bufferingNoticeDelayMs = 400;
 
 const spectrumDelays = [
   '-0.00s',
@@ -46,23 +54,24 @@ const spectrumDelays = [
 
 export function DeckScreen() {
   const { t } = useTranslation();
-  const upNextIndex = usePlayerStore((state) =>
-    getAutoNextIndex(getQueueState(state))
-  );
+  const upNextIndex = usePlayerStore(selectUpNextIndex);
   const currentIndex = usePlayerStore.use.currentIndex();
   const isPlaying = usePlayerStore.use.isPlaying();
   const isPowerOn = usePlayerStore.use.isPowerOn();
+  const isBuffering = useDelayedFlag(
+    usePlayerStore.use.isBuffering(),
+    bufferingNoticeDelayMs
+  );
+  const hasPlaybackFailed = usePlayerStore(selectHasPlaybackFailed);
   const isShuffle = usePlayerStore.use.isShuffle();
   const repeatMode = usePlayerStore.use.repeatMode();
   const track = getTrack(currentIndex);
-
-  const getStatus = () => {
-    if (!isPowerOn) {
-      return t('player.status.standby');
-    }
-
-    return isPlaying ? t('player.status.playing') : t('player.status.paused');
-  };
+  const status = getDeckStatus({
+    isPowerOn,
+    hasPlaybackFailed,
+    isPlaying,
+    isBuffering,
+  });
 
   const getUpNextLabel = () => {
     if (upNextIndex === null) {
@@ -93,7 +102,7 @@ export function DeckScreen() {
       <div className="hp-screen">
         <div className="hp-on" inert={!isPowerOn}>
           <div className="hp-row">
-            <span className="hp-status">{getStatus()}</span>
+            <span className="hp-status">{t(`player.status.${status}`)}</span>
             <span className="hp-dim">·</span>
             <span className="hp-track">
               {t('player.trackNumber', {
@@ -147,6 +156,9 @@ export function DeckScreen() {
           {t('player.deck.standby')}
         </div>
         <DeckVolumeOsd />
+        <span className="player-sr-only" role="status">
+          {hasPlaybackFailed ? t('player.playbackFailed') : ''}
+        </span>
         <span className="hp-glass" aria-hidden="true" />
       </div>
       <div className="hp-caption" style={{ alignItems: 'center' }}>

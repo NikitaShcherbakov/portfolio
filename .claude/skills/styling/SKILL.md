@@ -34,17 +34,33 @@ Tailwind scale or restyle into shadcn defaults. When the design and a rule here 
 No CSS modules, no styled-components, no CSS-in-JS. Band colors are never tokens: they come from
 `bands.json → theme`.
 
-`src/styles/index.css` is `@import 'tailwindcss';` today. Add a project stylesheet next to it and import it
-there when the first token or shared class arrives.
+`src/styles/index.css` imports, in this order: `tailwindcss`, `theme.css` (tokens), the player's three
+stylesheets, `scrapbook.css` (shared paper and cut-out classes); it also declares the `dark` and `phone`
+custom variants. A new shared stylesheet goes next to them and is imported there; mind the order.
+
+### The player exception
+
+`src/modules/player/styles/player.css` is the design's stylesheet, kept as delivered: never sort, dedupe or
+rewrite it into Tailwind (rule order is the result). `player-compat.css` before it reverts only what
+Tailwind preflight sets inside `.player-deck`/`.ipod-dock`; fixes to the design's CSS go into
+`player-overrides.css` after it. Inside the player use the design's classes and its inline `style`
+positions, not utilities: a utility there fights the design (CLAUDE.md "Styling").
+
+### Breakpoints and theme
+
+- The design's phone breakpoint is inclusive (`max-width: 640px`): use the `phone:` variant, never
+  `max-[640px]:`, which stops at 639.98px.
+- Dark theme: `html[data-theme='dark']`, set before first paint by the script `vite.config.ts` injects.
+  Tailwind's `dark:` variant is redefined in `index.css` to follow that attribute, not
+  `prefers-color-scheme`. Every new surface gets its dark colors in the same change; check both themes.
 
 ## 3. Tooling facts
 
 - `prettier-plugin-tailwindcss` sorts classes in `className`, `cn()` and `clsx()` (`.prettierrc.json`, its
   `tailwindStylesheet` is `./src/styles/index.css`). Never hand-sort; the edit hook runs Prettier on save.
-- `cn()` does not exist yet (CLAUDE.md "Planned when needed"). The first conditional class adds `clsx` and
-  `tailwind-merge` (with the user's agreement: it asks for permission) and `src/lib/utils.ts` in the same
-  change, or Knip fails on unused dependencies. `tailwind-merge` resolves conflicts so the last class wins:
-  put the caller's `className` last (`cn('base classes', className)`).
+- `cn()` lives in `src/lib/utils.ts` (`clsx` + `tailwind-merge`); never add a second class merger.
+  `tailwind-merge` resolves conflicts so the last class wins: put the caller's `className` last
+  (`cn('base classes', className)`).
 - Tailwind 4 has no `tailwind.config.js`: configuration is CSS (`@theme`, `@utility`, `@custom-variant`).
   Never add a JS config.
 
@@ -70,10 +86,10 @@ switches the page without the rotation. The fairy-light twinkle stops.
 
 ## 6. Fonts
 
-None are loaded yet. The first component that uses a font adds one Google Fonts `<link>` to `index.html`
-(CLAUDE.md lists the families) with `preconnect` to `fonts.googleapis.com` and `fonts.gstatic.com` and
-`display=swap`; later families and band fonts go into that same link, only the weights the design uses. A font family is a token; never a raw
-`font-['Anton']` scattered through components.
+`index.html` has one Google Fonts `<link>` with `preconnect` to `fonts.googleapis.com` and
+`fonts.gstatic.com` and `display=swap`; CLAUDE.md "Design rules" lists what it loads and what is still to
+come. A new family or weight goes into that same link, only the weights the design uses; never a second
+link. A font family is a token; never a raw `font-['Anton']` scattered through components.
 
 ## 7. Responsive
 
@@ -89,3 +105,5 @@ magazine.
 - Must not add CSS modules, CSS-in-JS, a `tailwind.config.js` or an animation library.
 - Must not ship an animation without a `prefers-reduced-motion` path.
 - Must not hand-sort classes.
+- Must not rewrite `player.css`, or put Tailwind utilities inside `.player-deck`/`.ipod-dock`.
+- Must not use `max-[640px]:` for the phone breakpoint, or ship a surface without dark-theme colors.

@@ -6,6 +6,8 @@ const slugSchema = z
 
 const nonEmptyStringSchema = z.string().check(z.trim(), z.minLength(1));
 
+const httpsUrlSchema = z.url({ protocol: /^https$/ });
+
 const trackSchema = z.object({
   id: slugSchema,
   title: nonEmptyStringSchema,
@@ -13,6 +15,9 @@ const trackSchema = z.object({
   album: nonEmptyStringSchema,
   year: z.int().check(z.minimum(1900), z.maximum(2100)),
   durationSec: z.int().check(z.positive()),
+  audioUrl: httpsUrlSchema,
+  coverUrl: z.optional(httpsUrlSchema),
+  coverThumbUrl: z.optional(httpsUrlSchema),
 });
 
 export const tracksSchema = z.array(trackSchema).check(
