@@ -4,7 +4,7 @@ description: >-
   How tests are written in the portfolio — Vitest's two projects (the file extension picks node or jsdom),
   Testing Library queries by role and `userEvent.setup()`, what jsdom cannot do (no `matchMedia`,
   `IntersectionObserver`, `ResizeObserver`, `scrollIntoView`, Web Animations, layout, or `transitionend`) and
-  how to test around it, faking the YouTube IFrame API, resetting Zustand stores, and Playwright e2e with axe,
+  how to test around it, stubbing `HTMLMediaElement` playback, resetting Zustand stores, and Playwright e2e with axe,
   the mobile project, reduced motion and network stubs. Use when writing or fixing any `*.test.ts(x)` or
   `e2e/*.spec.ts`, or when a test fails with "document is not defined", "matchMedia is not a function",
   "scrollIntoView is not a function", or waits forever for an animation.
@@ -16,7 +16,8 @@ when_to_use: >-
 
 # Testing
 
-CLAUDE.md "Testing" sets what is tested where. This is how.
+CLAUDE.md "Testing" sets what is tested where. This is how. **While CLAUDE.md says tests are paused, write
+no new tests**: keep the existing ones green, and use this skill to fix them.
 
 ## 1. Which runner, which environment
 
@@ -58,7 +59,8 @@ A component that renders a router `<Link>` (the sticker tabs) throws outside a r
 
 - `userEvent.setup()` before `render`, then `await` every interaction. `fireEvent` only for events
   user-event cannot produce (`transitionEnd`, below).
-- Query by role and accessible name, in Russian as the UI is; `findBy…` for what appears asynchronously.
+- Query by role and accessible name, in Russian: `src/test/setup.ts` switches i18n to the default language
+  before each test; `findBy…` for what appears asynchronously.
   No test ids, class names or `container.querySelector`: `eslint-plugin-testing-library` (`flat/react`)
   flags node access.
 - Assert what the user perceives (text, role, `aria-*` state, `toBeVisible`), not internal state.
@@ -84,15 +86,17 @@ Verified on the installed jsdom 31: `window.matchMedia`, `IntersectionObserver`,
 - **Timers** (progress polling, the garland): `vi.useFakeTimers()` and
   `userEvent.setup({ advanceTimers: vi.advanceTimersByTime })`, or user-event waits forever.
 
-## 4. The YouTube player and stores
+## 4. The audio player and stores
 
-- Never load `https://www.youtube.com/iframe_api` in Vitest. Stub `window.YT` with a fake `Player` class
-  that records calls (`loadVideoById`, `playVideo`, …) and exposes the `events` it received, then drive the
-  component by calling `onReady`, `onStateChange({ data: 0 })` (ended) or `onError({ data: 150 })` directly.
-  The **youtube-player** skill has the API facts.
-- The "player is the same DOM node after navigation" test (CLAUDE.md): keep a reference to the player element,
-  navigate with `user.click` on a tab, assert `toBe(sameElement)`. Needs `renderApp(path)` (memory router)
-  in `src/test/` once routing lands.
+- jsdom does not implement `HTMLMediaElement.prototype.play` / `pause` / `load`: stub them
+  (`vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()`, `mockRejectedValue` for a blocked
+  autoplay), set `currentTime` / `duration` with `Object.defineProperty`, then fire the media events
+  yourself (`fireEvent(audio, new Event('timeupdate'))`, `ended`, `error`). The **audio-player** skill has
+  the element facts.
+- The "player is the same DOM node after navigation" test (CLAUDE.md): keep a reference to the `<audio>` element,
+  navigate with `user.click` on a tab, assert `toBe(sameElement)`. Needs a `renderApp(path)` helper (memory
+  router over the route objects in `src/router/`) in `src/test/`: routing exists, the helper does not yet;
+  add it with the first test that needs it, once tests resume.
 - Zustand: reset in `beforeEach` with `useStore.setState(initialState, true)`; never rely on test order.
 
 ## 5. E2E (Playwright)
@@ -109,9 +113,9 @@ production build served on :4173, traces on first retry and screenshots on failu
 - Touch: the `mobile` project has `hasTouch`; `locator.tap()` works there. Playwright has no swipe API: a
   flip by swipe is driven with `locator.dispatchEvent('pointerdown' | 'pointermove' | 'pointerup', { pointerType: 'touch', clientX, clientY, … })`
   if the flip uses Pointer Events.
-- Network: CI must not depend on YouTube or Google Fonts being reachable. Stub third parties with
-  `page.route('**/iframe_api', …)` for deterministic player tests; keep at most one opt-in check against
-  the real service.
+- Network: CI must not depend on the audio Worker or Google Fonts being reachable. For deterministic player
+  tests serve a tiny fixture mp3 with `page.route` for the Worker's audio URLs (`*.workers.dev`); keep at
+  most one opt-in check against the real Worker. Sound itself cannot be verified headless: say so.
 - Visual regression (`toHaveScreenshot`): baselines differ between Windows (local) and Linux (CI) font
   rendering. Ask the user before adding any; screenshots for comparison with a design go through the `qa`
   agent instead.
@@ -120,7 +124,7 @@ production build served on :4173, traces on first retry and screenshots on failu
 
 - Must not put a rendering test in a `.test.ts` file, or a pure-logic test in jsdom without need.
 - Must not query by test id, class or DOM structure, or assert internal state instead of what the user sees.
-- Must not load the real YouTube API or hit the network in Vitest.
+- Must not load real audio or hit the network in Vitest.
 - Must not test geometry, 3D transforms or visual output in jsdom.
 - Must not use `waitForTimeout`, `.only`, or a retry loop to hide a flaky test: find the race.
 - Must not weaken or skip the axe assertion to get a green run.

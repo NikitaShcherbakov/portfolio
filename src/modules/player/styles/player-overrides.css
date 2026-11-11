@@ -1,0 +1,313 @@
+/* Invisible pseudo-elements enlarge the design's controls to a 44px hit area without changing the look. */
+.hp-vbtn,
+.hp-seek {
+  position: relative;
+}
+
+.hp-vbtn::after,
+.hp-seek::after,
+.hp-mode::after {
+  content: '';
+  position: absolute;
+}
+
+.hp-vbtn::after {
+  inset: -6px;
+  border-radius: 50%;
+}
+
+/* The design leaves 14px above the bar and 4px below it: 2px more on each side gives a 44px hit area
+   clear of the meta and NEXT text. */
+.hp-seek {
+  margin-top: 16px;
+}
+
+.hp-next {
+  margin-top: 6px;
+}
+
+.hp-seek::after {
+  inset: -16px 0 -6px;
+}
+
+.hp-mode::after {
+  inset: -2px 0;
+}
+
+/* The design's hues with lightness raised just enough for 4.5:1 against the darkest background stop. */
+.hp-engrave {
+  color: #58534b;
+}
+
+.vol-lbl-b,
+.hp-jacks,
+.z-lr {
+  color: #56524b;
+}
+
+.hp-serial {
+  color: #68635a;
+}
+
+.hp-flag {
+  color: #748aab;
+}
+
+.hp-next-k {
+  color: #698abe;
+}
+
+.hp-standby {
+  color: #6f8ab2;
+}
+
+.drawer-search input::placeholder {
+  color: #7285a4;
+}
+
+.drawer-n {
+  color: #7588a6;
+}
+
+.disc-label,
+.deck-model-b,
+.mag-eng {
+  color: #96969d;
+}
+
+.mag-key:disabled {
+  cursor: default;
+}
+
+.mag-key:disabled:hover {
+  color: #e9e9ee;
+}
+
+/* The design breaks "❚❚ PAUSED" and "REPEAT ALL" in two on a narrow row: wrap whole items instead. */
+.hp-row {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.hp-status,
+.hp-flag {
+  white-space: nowrap;
+}
+
+.hp-flags {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.drawer-rows {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The search input's intrinsic width pushed the counter out of the drawer. */
+.drawer-head {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.drawer-search {
+  flex: 1 1 180px;
+  min-width: 0;
+  height: 44px;
+}
+
+/* Chrome shows its own clear button only on hover or focus; the drawer has a permanent one. */
+.drawer-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.drawer-clear {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: -6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #9fb3d1;
+  cursor: pointer;
+}
+
+.drawer-clear::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+.drawer-clear:hover {
+  color: #eef5ff;
+}
+
+.drawer-clear:focus-visible {
+  outline: 2px solid #ffb35c;
+  outline-offset: 1px;
+}
+
+/* The list keeps the full playlist height while filtered, so the drawer does not jump on every letter. */
+.drawer-list .drawer-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 10px;
+}
+
+/* Chrome picks a bottom corner screw as the scroll anchor and scrolls the page by the drawer's height
+   when the drawer opens. */
+.player-deck .screw {
+  overflow-anchor: none;
+}
+
+.player-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The design was checked at 1320, 900 and 390 only; between the phone layout and 800px its rows do not fit. */
+@media (min-width: 641px) and (max-width: 800px) {
+  .player-deck .disc-bay {
+    flex-direction: column;
+  }
+
+  .deck-top {
+    flex-wrap: nowrap;
+  }
+
+  .deck-brand {
+    font-size: 18px;
+  }
+
+  .hp-engrave-t span {
+    letter-spacing: 0.04em;
+  }
+}
+
+/* Below about 880px the grille between the brand and the model plate shrinks to a few stray dots. */
+@media (min-width: 641px) and (max-width: 880px) {
+  .deck-vents {
+    display: none;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 700px) {
+  .hp-engrave-t span {
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Keyboard focus follows the phone grid's visual order: PREV, PLAY, NEXT above POWER. */
+  .hp-strip {
+    reading-flow: grid-rows;
+  }
+
+  /* The design's grid slides PHONES over the L/R jacks below ~360px; it is !important there, so here too. */
+  .hp-jacks {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 8px;
+  }
+
+  .jk-r {
+    margin-left: auto;
+  }
+
+  .hp-flags {
+    display: none;
+  }
+}
+
+/* The design fades a new disc in from a dark blur on every track change; the cover swaps in place and the
+   spin keeps its angle. */
+.discA,
+.discB {
+  animation: spin 9s linear infinite;
+  animation-play-state: paused;
+}
+
+/* Three nested paddings squeeze the title to ~100px below 420px: they shrink linearly from full size at
+   420px to the minimum at 360px, so the text column never narrows as the screen widens. */
+@media (max-width: 420px) {
+  .hp {
+    --hp-pad-x: clamp(12px, calc(23.333vw - 72px), 26px);
+
+    padding-right: var(--hp-pad-x);
+    padding-left: var(--hp-pad-x);
+  }
+
+  .hp-bezel {
+    padding-right: clamp(8px, calc(10vw - 28px), 14px);
+    padding-left: clamp(8px, calc(10vw - 28px), 14px);
+  }
+
+  .hp-screen {
+    padding-right: clamp(12px, calc(16.667vw - 48px), 22px);
+    padding-left: clamp(12px, calc(16.667vw - 48px), 22px);
+  }
+
+  /* The design pulls the seam out by the panel's full padding. */
+  .hp-jacks::before {
+    right: calc(-1 * var(--hp-pad-x));
+    left: calc(-1 * var(--hp-pad-x));
+  }
+}
+
+/* Arial scaled to Michroma's advance width and line box (measured in Chromium), so the deck keeps its
+   size while the web font swaps in. */
+@font-face {
+  font-family: 'Michroma Fallback';
+  src: local('Arial'), local('Liberation Sans'), local('Arimo');
+  size-adjust: 145.3%;
+  ascent-override: 79.8%;
+  descent-override: 18.6%;
+  line-gap-override: 0%;
+}
+
+.deck-brand,
+.hp-jacks,
+.hp-disc-ind,
+.hp-title,
+.hp-engrave,
+.disc-label,
+.deck-src-label,
+.vol-lbl-a,
+.vol-lbl-b,
+.z-lr,
+.z-capt,
+.hp-standby,
+.deck-model-a,
+.deck-model-b,
+.mag-eng {
+  font-family: 'Michroma', 'Michroma Fallback', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-bar-fill,
+  .hp-bar-head,
+  .hp-seg,
+  .hp-knob-cap,
+  .deck-caret {
+    transition: none;
+  }
+}

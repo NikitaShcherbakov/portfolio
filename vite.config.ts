@@ -1,15 +1,43 @@
 import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
+import { createThemeScript } from './src/modules/common/utils/theme.ts';
+
+function themeScript(): Plugin {
+  return {
+    name: 'theme-script',
+    transformIndexHtml: () => [
+      { tag: 'script', children: createThemeScript(), injectTo: 'head' },
+    ],
+  };
+}
+
 export default defineConfig({
-  plugins: [tailwindcss(), react()],
+  plugins: [tailwindcss(), react(), themeScript()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   build: { outDir: 'build' },
-  server: { port: 5173, strictPort: true },
+  server: {
+    port: 5173,
+    strictPort: true,
+    // Setting `deny` replaces Vite's default list (copied from vite 8.3), so it is repeated here
+    // with wrangler's local secrets added.
+    fs: {
+      deny: [
+        '.env',
+        '.env.*',
+        '*.{crt,pem,key,p12,pfx,cer,der}',
+        '.npmrc',
+        '.yarnrc.yml',
+        '**/.git/**',
+        '**/.dev.vars',
+      ],
+    },
+  },
   test: {
     // Every test starts clean: no leaked mocks, stubbed globals or env vars.
     restoreMocks: true,

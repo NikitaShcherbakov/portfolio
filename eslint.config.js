@@ -31,11 +31,11 @@ export default defineConfig(
     'playwright-report',
     'test-results',
     '.cache',
-    // Claude Code settings and hooks: tooling, not project code.
+    '.design',
+    'worker/worker-configuration.d.ts',
     '.claude',
   ]),
 
-  // Base: JS + strict type-aware TypeScript for every file.
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
@@ -53,7 +53,6 @@ export default defineConfig(
       'check-file': checkFile,
     },
     rules: {
-      // Import order from CLAUDE.md: external, @/ aliases, relative, styles.
       'simple-import-sort/imports': [
         'error',
         {
@@ -118,17 +117,21 @@ export default defineConfig(
     },
   },
 
-  // Node: root configs and e2e.
   {
-    files: ['*.{js,ts}', 'e2e/**/*.ts'],
+    files: ['*.{js,ts}', 'e2e/**/*.ts', 'scripts/**/*.ts'],
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['scripts/**/*.ts'],
+    rules: {
+      'no-console': ['error', { allow: ['info', 'warn', 'error'] }],
+    },
   },
   {
     files: ['eslint.config.js'],
     extends: [tseslint.configs.disableTypeChecked],
   },
 
-  // React app.
   {
     files: ['src/**/*.{ts,tsx}'],
     extends: [
@@ -146,7 +149,6 @@ export default defineConfig(
     },
   },
 
-  // Tests.
   {
     files: ['src/**/*.test.{ts,tsx}'],
     extends: [vitest.configs.recommended],

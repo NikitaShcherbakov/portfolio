@@ -1,0 +1,139 @@
+{
+  "site": {
+    "name": "Никита Щербаков",
+    "pageTitle": "{{page}} — {{name}}",
+    "skipToContent": "Перейти к содержимому"
+  },
+  "nav": {
+    "label": "Основная навигация",
+    "home": "Главная",
+    "cv": "Резюме",
+    "games": "Игры"
+  },
+  "language": {
+    "label": "Язык"
+  },
+  "theme": {
+    "label": "Тема",
+    "light": "Светлая тема",
+    "dark": "Тёмная тема",
+    "system": "Как в системе"
+  },
+  "footer": {
+    "contacts": "Контакты",
+    "email": "Почта",
+    "phone": "Телефон",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "newTab": "(откроется в новой вкладке)"
+  },
+  "pages": {
+    "notFound": {
+      "title": "Страница не найдена",
+      "backHome": "На главную"
+    },
+    "home": {
+      "music": "Музыка"
+    }
+  },
+  "player": {
+    "deck": {
+      "brand": "STEREO 2000",
+      "model": "NS-CD1",
+      "tagline": "HIGH FIDELITY",
+      "hello": "HELLO",
+      "disc": "DISC",
+      "standby": "STANDBY",
+      "shuffleFlag": "SHUFFLE",
+      "nextKey": "NEXT ▸",
+      "captionMain": "COMPACT DISC",
+      "captionTail": " · DIGITAL MUSIC SYSTEM",
+      "lineOut": "LINE OUT",
+      "left": "L",
+      "right": "R",
+      "serial": "S/N NS-CD1-0001",
+      "phones": "PHONES",
+      "nowSpinning": "NOW SPINNING",
+      "source": "PLAYLIST",
+      "list": "LIST"
+    },
+    "status": {
+      "playing": "▶ PLAYING",
+      "paused": "❚❚ PAUSED",
+      "standby": "■ STANDBY",
+      "loading": "◌ LOADING",
+      "noSignal": "✕ NO SIGNAL"
+    },
+    "playbackFailed": "Не удалось загрузить ни один трек. Нажми «Играть», чтобы попробовать ещё раз.",
+    "trackNumber": "TRACK {{current}} / {{total}}",
+    "repeatFlag": {
+      "all": "REPEAT ALL",
+      "one": "REPEAT ONE",
+      "off": "REPEAT OFF"
+    },
+    "upNext": {
+      "track": "{{artist}} — {{title}}",
+      "repeat": "повтор: {{title}}",
+      "end": "конец очереди"
+    },
+    "osd": {
+      "volume": "VOL {{volume}}",
+      "mute": "MUTE"
+    },
+    "engraving": {
+      "power": "POWER",
+      "prev": "PREV",
+      "play": "PLAY",
+      "next": "NEXT",
+      "shuffle": "SHUFFLE",
+      "repeat": "REPEAT",
+      "random": "RANDOM",
+      "volume": "VOLUME",
+      "pushToMute": "PUSH TO MUTE",
+      "time": "TIME",
+      "elapsedTotal": "ELAPSED · TOTAL"
+    },
+    "magazine": {
+      "pageUnknown": "MAGAZINE · P.—",
+      "pageCaption": "MAGAZINE · PAGE",
+      "open": "OPEN",
+      "openLabel": "Открыть {{artist}} в журнале"
+    },
+    "controls": {
+      "seek": "Перемотка",
+      "seekValue": "{{elapsed}} из {{length}}",
+      "transport": "Управление воспроизведением",
+      "power": "Питание",
+      "previous": "Предыдущий трек",
+      "play": "Играть",
+      "pause": "Пауза",
+      "next": "Следующий трек",
+      "shuffle": "Перемешать",
+      "repeat": {
+        "all": "Повтор: вся очередь",
+        "one": "Повтор: один трек",
+        "off": "Повтор: выключен"
+      },
+      "random": "Случайный трек",
+      "volume": "Громкость",
+      "volumeDown": "Тише",
+      "volumeUp": "Громче",
+      "volumeKnob": "Громкость {{volume}} из {{max}}. Нажми, чтобы выключить или включить звук",
+      "volumeKnobMuted": "Громкость выключена. Нажми, чтобы выключить или включить звук",
+      "disc": "Диск: {{label}}. {{action}}"
+    },
+    "playlist": {
+      "label": "Плейлист",
+      "search": "Поиск по плейлисту",
+      "searchPlaceholder": "Группа, песня или альбом",
+      "clearSearch": "Очистить поиск",
+      "count_one": "{{count}} трек",
+      "count_few": "{{count}} трека",
+      "count_many": "{{count}} треков",
+      "count_other": "{{count}} трека",
+      "found": "найдено {{count}} из {{total}}",
+      "empty": "Ничего не нашлось. Попробуй другое название."
+    }
+  }
+}

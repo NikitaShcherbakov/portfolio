@@ -1,0 +1,35 @@
+[
+  {
+    "id": "moby-porcelain",
+    "title": "Porcelain",
+    "artist": "Moby",
+    "album": "Play",
+    "year": 1999,
+    "durationSec": 239,
+    "audioUrl": "https://portfolio-audio.rockfolio.workers.dev/audio/moby-porcelain.4adf5f3c.mp3",
+    "coverUrl": "https://archive.org/download/mbid-1cc63af7-ff3c-4ec5-a6c5-1bc5563e80d9/mbid-1cc63af7-ff3c-4ec5-a6c5-1bc5563e80d9-10778255429_thumb500.jpg",
+    "coverThumbUrl": "https://archive.org/download/mbid-1cc63af7-ff3c-4ec5-a6c5-1bc5563e80d9/mbid-1cc63af7-ff3c-4ec5-a6c5-1bc5563e80d9-10778255429_thumb250.jpg"
+  },
+  {
+    "id": "moby-flower",
+    "title": "Flower",
+    "artist": "Moby",
+    "album": "Honey",
+    "year": 2000,
+    "durationSec": 206,
+    "audioUrl": "https://portfolio-audio.rockfolio.workers.dev/audio/moby-flower.271a39c5.mp3",
+    "coverUrl": "https://archive.org/download/mbid-627d66b9-a981-4a4e-8af8-8e9cad5fdad2/mbid-627d66b9-a981-4a4e-8af8-8e9cad5fdad2-31370331935_thumb500.jpg",
+    "coverThumbUrl": "https://archive.org/download/mbid-627d66b9-a981-4a4e-8af8-8e9cad5fdad2/mbid-627d66b9-a981-4a4e-8af8-8e9cad5fdad2-31370331935_thumb250.jpg"
+  },
+  {
+    "id": "moby-in-this-world",
+    "title": "In This World",
+    "artist": "Moby",
+    "album": "18",
+    "year": 2002,
+    "durationSec": 243,
+    "audioUrl": "https://portfolio-audio.rockfolio.workers.dev/audio/moby-in-this-world.23c1e4b7.mp3",
+    "coverUrl": "https://archive.org/download/mbid-a4552a95-aea1-3518-9883-baa0c1e72f9a/mbid-a4552a95-aea1-3518-9883-baa0c1e72f9a-14929587216_thumb500.jpg",
+    "coverThumbUrl": "https://archive.org/download/mbid-a4552a95-aea1-3518-9883-baa0c1e72f9a/mbid-a4552a95-aea1-3518-9883-baa0c1e72f9a-14929587216_thumb250.jpg"
+  }
+]

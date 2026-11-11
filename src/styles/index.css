@@ -1,1 +1,17 @@
 @import 'tailwindcss';
+@import './theme.css';
+@import '../modules/player/styles/player-compat.css';
+@import '../modules/player/styles/player.css';
+@import '../modules/player/styles/player-overrides.css';
+@import './scrapbook.css';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* The design's phone breakpoint is inclusive (max-width: 640px); Tailwind's max-[640px] stops at 639.98px. */
+@custom-variant phone (@media (max-width: 640px));
+
+@layer base {
+  body {
+    @apply bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100;
+  }
+}

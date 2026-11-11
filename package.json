@@ -22,9 +22,13 @@
     "test:e2e": "playwright test",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm knip && pnpm test && pnpm build",
     "prepare": "husky",
+    "sync:music": "node --env-file-if-exists=.env.local scripts/sync-music.ts",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
+    "worker:types": "wrangler types --config worker/wrangler.jsonc worker/worker-configuration.d.ts",
     "knip": "knip"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1166.0",
     "@axe-core/playwright": "^4.14.0",
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
@@ -57,13 +61,15 @@
     "jsdom": "^31.0.0",
     "knip": "^6.44.2",
     "lint-staged": "^17.6.0",
+    "music-metadata": "^12.4.0",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.6",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.0",
+    "wrangler": "^4.160.0"
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
@@ -72,7 +78,15 @@
     ]
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.14.26",
+    "clsx": "^2.1.1",
+    "i18next": "^27.0.1",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "react-i18next": "^18.0.1",
+    "react-router": "^8.5.1",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
   }
 }
