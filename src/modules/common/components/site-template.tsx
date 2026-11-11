@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { Outlet, ScrollRestoration } from 'react-router';
 
-import { PlaybackClock } from '@/modules/player';
+import { cn } from '@/lib/utils';
+import { AudioPlayer } from '@/modules/player';
 
+import { focusRingClassName } from '../utils/focus-ring';
 import { SiteFooter } from './site-footer';
 import { SiteHeader } from './site-header';
 
@@ -13,10 +15,13 @@ export function SiteTemplate() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <PlaybackClock />
+      <AudioPlayer />
       <a
         href={`#${contentId}`}
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:rounded-md focus:bg-neutral-900 focus:px-3 focus:py-2.5 focus:text-white"
+        className={cn(
+          'sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:rounded-md focus:bg-neutral-900 focus:px-3 focus:text-white dark:focus:bg-neutral-100 dark:focus:text-neutral-900',
+          focusRingClassName
+        )}
       >
         {t('site.skipToContent')}
       </a>

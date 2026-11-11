@@ -7,8 +7,8 @@ import { focusRingClassName } from '../utils/focus-ring';
 import { themePreferences } from '../utils/theme';
 
 const options = [
-  { value: themePreferences.Light, labelKey: 'theme.light', icon: '☀' },
-  { value: themePreferences.Dark, labelKey: 'theme.dark', icon: '☾' },
+  { value: themePreferences.Light, labelKey: 'theme.light', icon: '☀︎' },
+  { value: themePreferences.Dark, labelKey: 'theme.dark', icon: '☾︎' },
   { value: themePreferences.System, labelKey: 'theme.system', icon: '◐' },
 ] as const;
 

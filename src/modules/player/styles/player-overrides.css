@@ -1,7 +1,4 @@
-/* Fixes on top of the design's player.css, which stays verbatim. */
-
-/* The design draws these controls below the 44px minimum hit area: invisible pseudo-elements enlarge it
-   without changing the look. */
+/* Invisible pseudo-elements enlarge the design's controls to a 44px hit area without changing the look. */
 .hp-vbtn,
 .hp-seek {
   position: relative;
@@ -19,9 +16,8 @@
   border-radius: 50%;
 }
 
-/* The design leaves 14px above the bar and 4px below it, 40px in all: 2px more on each side gives a 44px
-   hit area that stays clear of the meta and NEXT text. The screen keeps its min-height, so on desktop
-   only the NEXT line moves, by 4px. */
+/* The design leaves 14px above the bar and 4px below it: 2px more on each side gives a 44px hit area
+   clear of the meta and NEXT text. */
 .hp-seek {
   margin-top: 16px;
 }
@@ -38,8 +34,7 @@
   inset: -2px 0;
 }
 
-/* The design's secondary text falls below 4.5:1 against the darkest stop of its background; same hues,
-   lightness adjusted just enough to pass. */
+/* The design's hues with lightness raised just enough for 4.5:1 against the darkest background stop. */
 .hp-engrave {
   color: #58534b;
 }
@@ -80,7 +75,6 @@
   color: #96969d;
 }
 
-/* The eject key stays disabled until the magazine exists, so it must not look clickable. */
 .mag-key:disabled {
   cursor: default;
 }
@@ -89,8 +83,7 @@
   color: #e9e9ee;
 }
 
-/* Wrap whole status items, never the words inside them: the design breaks "❚❚ PAUSED" and "REPEAT ALL"
-   in two when the row gets narrow. */
+/* The design breaks "❚❚ PAUSED" and "REPEAT ALL" in two on a narrow row: wrap whole items instead. */
 .hp-row {
   flex-wrap: wrap;
   row-gap: 2px;
@@ -101,15 +94,12 @@
   white-space: nowrap;
 }
 
-/* Keeps SHUFFLE and REPEAT together on the right when the row wraps. */
 .hp-flags {
   display: flex;
   gap: 8px;
   margin-left: auto;
 }
 
-/* The virtual list: the design's .drawer-list stays the scroll box, this inner list holds the full height
-   so the scroll range never depends on which rows are rendered. */
 .drawer-rows {
   position: relative;
   margin: 0;
@@ -117,7 +107,7 @@
   list-style: none;
 }
 
-/* The search field's input has an intrinsic width that pushed the counter out of the drawer. */
+/* The search input's intrinsic width pushed the counter out of the drawer. */
 .drawer-head {
   flex-wrap: wrap;
   row-gap: 8px;
@@ -129,8 +119,53 @@
   height: 44px;
 }
 
-/* The bottom corner screws are pinned to the deck's lower edge, so Chrome picks one as the scroll anchor
-   and scrolls the page by the drawer's height when the drawer opens under the LIST button. */
+/* Chrome shows its own clear button only on hover or focus; the drawer has a permanent one. */
+.drawer-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.drawer-clear {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: -6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #9fb3d1;
+  cursor: pointer;
+}
+
+.drawer-clear::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+.drawer-clear:hover {
+  color: #eef5ff;
+}
+
+.drawer-clear:focus-visible {
+  outline: 2px solid #ffb35c;
+  outline-offset: 1px;
+}
+
+/* The list keeps the full playlist height while filtered, so the drawer does not jump on every letter. */
+.drawer-list .drawer-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 10px;
+}
+
+/* Chrome picks a bottom corner screw as the scroll anchor and scrolls the page by the drawer's height
+   when the drawer opens. */
 .player-deck .screw {
   overflow-anchor: none;
 }
@@ -147,8 +182,7 @@
   border: 0;
 }
 
-/* The design was checked at 1320, 900 and 390 only; between the phone layout and 800px its desktop
-   rows do not fit. */
+/* The design was checked at 1320, 900 and 390 only; between the phone layout and 800px its rows do not fit. */
 @media (min-width: 641px) and (max-width: 800px) {
   .player-deck .disc-bay {
     flex-direction: column;
@@ -156,10 +190,6 @@
 
   .deck-top {
     flex-wrap: nowrap;
-  }
-
-  .deck-vents {
-    display: none;
   }
 
   .deck-brand {
@@ -171,6 +201,13 @@
   }
 }
 
+/* Below about 880px the grille between the brand and the model plate shrinks to a few stray dots. */
+@media (min-width: 641px) and (max-width: 880px) {
+  .deck-vents {
+    display: none;
+  }
+}
+
 @media (min-width: 641px) and (max-width: 700px) {
   .hp-engrave-t span {
     font-size: 8px;
@@ -179,14 +216,12 @@
 }
 
 @media (max-width: 640px) {
-  /* The phone grid shows PREV, PLAY, NEXT above POWER; keep keyboard focus in that visual order. */
+  /* Keyboard focus follows the phone grid's visual order: PREV, PLAY, NEXT above POWER. */
   .hp-strip {
     reading-flow: grid-rows;
   }
 
-  /* With the serial plate hidden the design's grid slides PHONES over the L/R jacks, and below ~360px the
-     row cannot hold both groups: let PHONES wrap to its own line, kept right. The design's grid is
-     !important, so this has to be too. */
+  /* The design's grid slides PHONES over the L/R jacks below ~360px; it is !important there, so here too. */
   .hp-jacks {
     display: flex !important;
     flex-wrap: wrap;
@@ -203,9 +238,16 @@
   }
 }
 
-/* Below ~420px three nested paddings squeeze the track title to about 100px. They shrink with the
-   viewport instead of in one step, so the text column never gets narrower as the screen gets wider:
-   full size at 420px, the minimum at 360px and below. */
+/* The design fades a new disc in from a dark blur on every track change; the cover swaps in place and the
+   spin keeps its angle. */
+.discA,
+.discB {
+  animation: spin 9s linear infinite;
+  animation-play-state: paused;
+}
+
+/* Three nested paddings squeeze the title to ~100px below 420px: they shrink linearly from full size at
+   420px to the minimum at 360px, so the text column never narrows as the screen widens. */
 @media (max-width: 420px) {
   .hp {
     --hp-pad-x: clamp(12px, calc(23.333vw - 72px), 26px);
@@ -224,9 +266,48 @@
     padding-left: clamp(12px, calc(16.667vw - 48px), 22px);
   }
 
-  /* The design pulls the seam out by the panel's full 26px padding. */
+  /* The design pulls the seam out by the panel's full padding. */
   .hp-jacks::before {
     right: calc(-1 * var(--hp-pad-x));
     left: calc(-1 * var(--hp-pad-x));
+  }
+}
+
+/* Arial scaled to Michroma's advance width and line box (measured in Chromium), so the deck keeps its
+   size while the web font swaps in. */
+@font-face {
+  font-family: 'Michroma Fallback';
+  src: local('Arial'), local('Liberation Sans'), local('Arimo');
+  size-adjust: 145.3%;
+  ascent-override: 79.8%;
+  descent-override: 18.6%;
+  line-gap-override: 0%;
+}
+
+.deck-brand,
+.hp-jacks,
+.hp-disc-ind,
+.hp-title,
+.hp-engrave,
+.disc-label,
+.deck-src-label,
+.vol-lbl-a,
+.vol-lbl-b,
+.z-lr,
+.z-capt,
+.hp-standby,
+.deck-model-a,
+.deck-model-b,
+.mag-eng {
+  font-family: 'Michroma', 'Michroma Fallback', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-bar-fill,
+  .hp-bar-head,
+  .hp-seg,
+  .hp-knob-cap,
+  .deck-caret {
+    transition: none;
   }
 }

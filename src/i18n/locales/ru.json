@@ -21,7 +21,11 @@
   },
   "footer": {
     "contacts": "Контакты",
+    "email": "Почта",
     "phone": "Телефон",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
     "newTab": "(откроется в новой вкладке)"
   },
   "pages": {
@@ -57,8 +61,11 @@
     "status": {
       "playing": "▶ PLAYING",
       "paused": "❚❚ PAUSED",
-      "standby": "■ STANDBY"
+      "standby": "■ STANDBY",
+      "loading": "◌ LOADING",
+      "noSignal": "✕ NO SIGNAL"
     },
+    "playbackFailed": "Не удалось загрузить ни один трек. Нажми «Играть», чтобы попробовать ещё раз.",
     "trackNumber": "TRACK {{current}} / {{total}}",
     "repeatFlag": {
       "all": "REPEAT ALL",
@@ -120,6 +127,7 @@
       "label": "Плейлист",
       "search": "Поиск по плейлисту",
       "searchPlaceholder": "Группа, песня или альбом",
+      "clearSearch": "Очистить поиск",
       "count_one": "{{count}} трек",
       "count_few": "{{count}} трека",
       "count_many": "{{count}} треков",

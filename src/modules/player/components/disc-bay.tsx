@@ -2,13 +2,16 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getTrack } from '@/content/tracks';
-import { cn } from '@/lib/utils';
 
+import { useMediaQuery } from '../hooks/use-media-query';
+import { useReadyCover } from '../hooks/use-ready-cover';
 import { selectIsPlaybackActive, usePlayerStore } from '../stores/player-store';
-import { getCoverPlaceholder } from '../utils/cover-placeholder';
+import { getDiscLabel } from '../utils/format';
+import { CoverImage } from './cover-image';
 import { MagazineUnit } from './magazine-unit';
 
 const discSizePx = 236;
+const discOnFirstScreenQuery = '(min-width: 1181px)';
 
 export function DiscBay() {
   const { t } = useTranslation();
@@ -17,8 +20,10 @@ export function DiscBay() {
   const isPlaybackActive = usePlayerStore(selectIsPlaybackActive);
   const togglePlay = usePlayerStore.use.togglePlay();
   const track = getTrack(currentIndex);
-  const discLabel = `${track.artist} · ${track.album} · ${String(track.year)}`;
-  const isOddTrack = currentIndex % 2 === 1;
+  const discCover = useReadyCover(track);
+  const isDiscOnFirstScreen = useMediaQuery(discOnFirstScreenQuery);
+  const discLabel = getDiscLabel(track);
+  const discTrackLabel = getDiscLabel(discCover.track);
 
   return (
     <div className="bay disc-bay">
@@ -31,17 +36,13 @@ export function DiscBay() {
               : t('player.controls.play'),
           })}
         </span>
-        <span
-          key={track.id}
-          className={cn('disc spin-slow', isOddTrack ? 'discA' : 'discB')}
-        >
-          <img
-            src={getCoverPlaceholder(track)}
-            alt=""
-            width={discSizePx}
-            height={discSizePx}
+        <span className="disc spin-slow discA">
+          <CoverImage
+            track={discCover.track}
+            size={discCover.size}
+            isPriority={isDiscOnFirstScreen}
+            sizePx={discSizePx}
             className="disc-art"
-            loading="lazy"
           />
           <span className="disc-rainbow" />
           <span className="disc-grooves" />
@@ -58,7 +59,7 @@ export function DiscBay() {
             </defs>
             <text>
               <textPath href={`#${ringPathId}`}>
-                {`${discLabel} · `.repeat(2)}
+                {`${discTrackLabel} · `.repeat(2)}
               </textPath>
             </text>
           </svg>

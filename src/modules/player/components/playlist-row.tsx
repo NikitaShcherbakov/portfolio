@@ -3,8 +3,9 @@ import type { CSSProperties } from 'react';
 import type { Track } from '@/content/schemas';
 import { cn } from '@/lib/utils';
 
-import { getCoverPlaceholder } from '../utils/cover-placeholder';
+import { preloadCover } from '../utils/cover-preload';
 import { formatDuration } from '../utils/format';
+import { CoverImage } from './cover-image';
 
 const coverSizePx = 40;
 
@@ -42,6 +43,10 @@ export function PlaylistRow({
     animation: isEntering ? undefined : 'none',
   };
 
+  const handlePreload = () => {
+    void preloadCover(track.coverUrl);
+  };
+
   return (
     <li style={style} aria-posinset={rowIndex + 1} aria-setsize={listSize}>
       <button
@@ -49,15 +54,17 @@ export function PlaylistRow({
         className={cn('drawer-row', isCurrent && 'on')}
         aria-current={isCurrent ? 'true' : undefined}
         onClick={onSelect}
-        onFocus={onFocus}
+        onFocus={() => {
+          handlePreload();
+          onFocus();
+        }}
+        onPointerEnter={handlePreload}
       >
         <span className="drawer-n">{trackNumber}</span>
-        <img
-          src={getCoverPlaceholder(track)}
-          alt=""
-          width={coverSizePx}
-          height={coverSizePx}
-          loading="lazy"
+        <CoverImage
+          track={track}
+          size="small"
+          sizePx={coverSizePx}
           className="drawer-art"
         />
         <span className="drawer-tt">

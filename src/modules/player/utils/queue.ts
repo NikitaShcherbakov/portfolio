@@ -11,7 +11,7 @@ export type QueueState = {
   trackCount: number;
   isShuffle: boolean;
   repeatMode: RepeatMode;
-  shuffleSeed: number;
+  shuffleOrder: readonly number[];
 };
 
 const repeatCycle: Record<RepeatMode, RepeatMode> = {
@@ -20,28 +20,59 @@ const repeatCycle: Record<RepeatMode, RepeatMode> = {
   [repeatModes.Off]: repeatModes.All,
 };
 
-const shuffleSeedFactor = 7;
-const shuffleIndexFactor = 13;
-const shuffleOffset = 5;
-
 export function getNextRepeatMode(repeatMode: RepeatMode): RepeatMode {
   return repeatCycle[repeatMode];
 }
 
-function getOtherIndices({ currentIndex, trackCount }: QueueState) {
-  return Array.from({ length: trackCount }, (_, index) => index).filter(
-    (index) => index !== currentIndex
+export function createShuffleOrder(
+  trackCount: number,
+  firstIndex: number,
+  getRandomFraction: () => number = Math.random
+): number[] {
+  const order = Array.from({ length: trackCount - 1 }, (_, index) =>
+    index < firstIndex ? index : index + 1
   );
+
+  for (let index = order.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(getRandomFraction() * (index + 1));
+    const current = order[index];
+    const swapped = order[swapIndex];
+
+    if (current === undefined || swapped === undefined) continue;
+
+    order[index] = swapped;
+    order[swapIndex] = current;
+  }
+
+  return [firstIndex, ...order];
+}
+
+function getSequentialNextIndex({ currentIndex, trackCount }: QueueState) {
+  return (currentIndex + 1) % trackCount;
+}
+
+function getOtherIndex(
+  { currentIndex, trackCount }: QueueState,
+  position: number
+): number | null {
+  const otherCount = trackCount - 1;
+
+  if (otherCount <= 0) return null;
+
+  const otherPosition = position % otherCount;
+
+  return otherPosition < currentIndex ? otherPosition : otherPosition + 1;
 }
 
 function getShuffleIndex(queue: QueueState): number {
-  const pool = getOtherIndices(queue);
-  const hash =
-    queue.shuffleSeed * shuffleSeedFactor +
-    queue.currentIndex * shuffleIndexFactor +
-    shuffleOffset;
+  const { shuffleOrder, currentIndex, trackCount } = queue;
+  const position = shuffleOrder.indexOf(currentIndex);
 
-  return pool[hash % pool.length] ?? queue.currentIndex;
+  if (shuffleOrder.length !== trackCount || position === -1) {
+    return getSequentialNextIndex(queue);
+  }
+
+  return shuffleOrder[(position + 1) % trackCount] ?? currentIndex;
 }
 
 export function getManualNextIndex(queue: QueueState): number {
@@ -49,7 +80,7 @@ export function getManualNextIndex(queue: QueueState): number {
     return getShuffleIndex(queue);
   }
 
-  return (queue.currentIndex + 1) % queue.trackCount;
+  return getSequentialNextIndex(queue);
 }
 
 export function getAutoNextIndex(queue: QueueState): number | null {
@@ -57,19 +88,33 @@ export function getAutoNextIndex(queue: QueueState): number | null {
     return queue.currentIndex;
   }
 
-  const isLastTrack = queue.currentIndex === queue.trackCount - 1;
+  const lastIndex = queue.isShuffle
+    ? queue.shuffleOrder.at(-1)
+    : queue.trackCount - 1;
 
-  if (!queue.isShuffle && isLastTrack && queue.repeatMode === repeatModes.Off) {
+  if (
+    queue.currentIndex === lastIndex &&
+    queue.repeatMode === repeatModes.Off
+  ) {
     return null;
   }
 
   return getManualNextIndex(queue);
 }
 
-export function getPreviousIndex({
-  currentIndex,
-  trackCount,
-}: QueueState): number {
+export function getPreviousIndex(queue: QueueState): number {
+  const { shuffleOrder, currentIndex, trackCount } = queue;
+
+  if (queue.isShuffle && shuffleOrder.length === trackCount) {
+    const position = shuffleOrder.indexOf(currentIndex);
+
+    if (position !== -1) {
+      return (
+        shuffleOrder[(position - 1 + trackCount) % trackCount] ?? currentIndex
+      );
+    }
+  }
+
   return currentIndex <= 0 ? trackCount - 1 : currentIndex - 1;
 }
 
@@ -77,7 +122,8 @@ export function getRandomIndex(
   queue: QueueState,
   randomFraction: number
 ): number | null {
-  const pool = getOtherIndices(queue);
-
-  return pool[Math.floor(randomFraction * pool.length)] ?? null;
+  return getOtherIndex(
+    queue,
+    Math.floor(randomFraction * (queue.trackCount - 1))
+  );
 }

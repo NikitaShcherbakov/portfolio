@@ -1,6 +1,8 @@
+import type { Track } from '@/content/schemas';
 import { clamp } from '@/utils/clamp';
 
 const secondsPerMinute = 60;
+const percentPrecision = 10;
 
 function padTwoDigits(value: number) {
   return String(value).padStart(2, '0');
@@ -13,6 +15,14 @@ function getMinutesAndSeconds(totalSec: number) {
     minutes: Math.floor(wholeSec / secondsPerMinute),
     seconds: padTwoDigits(wholeSec % secondsPerMinute),
   };
+}
+
+export function getDiscLabel({
+  artist,
+  album,
+  year,
+}: Pick<Track, 'artist' | 'album' | 'year'>) {
+  return `${artist} · ${album} · ${String(year)}`;
 }
 
 export function formatElapsed(totalSec: number) {
@@ -28,7 +38,8 @@ export function formatDuration(totalSec: number) {
 }
 
 export function getProgressPercent(value: number, total: number) {
-  const percent = Math.round((value / total) * 1000) / 10;
+  const percent =
+    Math.round((value / total) * 100 * percentPrecision) / percentPrecision;
 
   return clamp(percent, 0, 100);
 }

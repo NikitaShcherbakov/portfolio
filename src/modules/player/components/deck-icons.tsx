@@ -126,6 +126,14 @@ export function ListIcon() {
   );
 }
 
+export function ClearIcon() {
+  return (
+    <DeckIcon size={14} strokeWidth={2.6}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </DeckIcon>
+  );
+}
+
 export function SearchIcon() {
   return (
     <DeckIcon size={16} strokeWidth={2.2}>

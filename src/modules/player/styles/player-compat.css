@@ -1,20 +1,119 @@
 /* The player design was drawn on browser defaults: this restores them inside the player after Tailwind preflight.
-   Unlayered on purpose, so it also overrides every Tailwind utility there: style the player with its own classes. */
-:where(.player-deck, .ipod-dock),
-:where(.player-deck, .ipod-dock) :where(*:not(svg, svg *)),
-:where(.player-deck, .ipod-dock) :where(*:not(svg, svg *))::before,
-:where(.player-deck, .ipod-dock) :where(*:not(svg, svg *))::after {
-  all: revert;
-}
+   Each rule reverts only what preflight sets, not `all`: `all: revert` on every element made a full style
+   recalculation about four times slower. Unlayered on purpose, so it beats the layered preflight; style the
+   player with its own classes, not Tailwind utilities. */
 :where(.player-deck, .ipod-dock) {
   font-family: 'PT Sans', sans-serif;
   font-size: 16px;
   line-height: normal;
   color: #ece4d6;
   text-align: left;
-}
-:where(.player-deck, .ipod-dock) :where(svg) {
-  display: inline;
-  vertical-align: baseline;
-  box-sizing: content-box;
+
+  &,
+  :where(*:not(svg, svg *)),
+  :where(*:not(svg, svg *))::before,
+  :where(*:not(svg, svg *))::after {
+    box-sizing: revert;
+    margin: revert;
+    padding: revert;
+    border: revert;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: revert;
+    font-weight: revert;
+  }
+
+  :where(a) {
+    color: revert;
+    text-decoration: revert;
+  }
+
+  :where(b, strong) {
+    font-weight: revert;
+  }
+
+  :where(code, kbd, samp, pre) {
+    font-family: revert;
+    font-feature-settings: revert;
+    font-variation-settings: revert;
+    font-size: revert;
+  }
+
+  :where(small, sub, sup) {
+    font-size: revert;
+    line-height: revert;
+    position: revert;
+    vertical-align: revert;
+    top: revert;
+    bottom: revert;
+  }
+
+  :where(hr) {
+    height: revert;
+    color: revert;
+  }
+
+  :where(abbr) {
+    text-decoration: revert;
+  }
+
+  :where(table) {
+    text-indent: revert;
+    border-color: revert;
+    border-collapse: revert;
+  }
+
+  :where(progress) {
+    vertical-align: revert;
+  }
+
+  :where(summary) {
+    display: revert;
+  }
+
+  :where(ol, ul, menu) {
+    list-style: revert;
+  }
+
+  :where(img, video, canvas, audio, iframe, embed, object) {
+    display: revert;
+    vertical-align: revert;
+  }
+
+  :where(img, video) {
+    max-width: revert;
+    height: revert;
+  }
+
+  :where(button, input, select, optgroup, textarea) {
+    font: revert;
+    font-feature-settings: revert;
+    font-variation-settings: revert;
+    letter-spacing: revert;
+    color: revert;
+    border-radius: revert;
+    background-color: revert;
+    opacity: revert;
+    appearance: revert;
+  }
+
+  :where(textarea) {
+    resize: revert;
+  }
+
+  :where(input, textarea)::placeholder {
+    opacity: revert;
+    color: revert;
+  }
+
+  :where(input)::-webkit-search-decoration {
+    appearance: revert;
+  }
+
+  :where(svg) {
+    display: inline;
+    vertical-align: baseline;
+    box-sizing: content-box;
+  }
 }
