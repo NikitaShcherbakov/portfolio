@@ -53,7 +53,7 @@ async function createTrack(local: LocalTrack, report: Report): Promise<Track> {
 
   const cover = match ? await getCover(match.releaseGroupId) : undefined;
 
-  if (!cover?.coverUrl) report.withoutCover.push(local.id);
+  if (!cover) report.withoutCover.push(local.id);
 
   return {
     id: local.id,
@@ -63,8 +63,9 @@ async function createTrack(local: LocalTrack, report: Report): Promise<Track> {
     year,
     durationSec: local.durationSec,
     audioUrl: `${audioBaseUrl}/${local.audioKey}`,
-    ...(cover?.coverUrl ? { coverUrl: cover.coverUrl } : {}),
-    ...(cover?.coverThumbUrl ? { coverThumbUrl: cover.coverThumbUrl } : {}),
+    coverUrl: cover?.coverUrl,
+    coverThumbUrl: cover?.coverThumbUrl,
+    coverLargeUrl: cover?.coverLargeUrl,
   };
 }
 

@@ -37,6 +37,66 @@
       "music": "Музика"
     }
   },
+  "magazine": {
+    "title": "Журнал",
+    "flipBackward": "Перегорнути назад",
+    "flipForward": "Перегорнути вперед",
+    "cover": {
+      "alt": "Обкладинка альбому {{album}}",
+      "credit": "ОБКЛАДИНКА · {{album}} · {{year}}"
+    },
+    "photo": {
+      "bandAlt": "Фото {{name}}",
+      "coverAlt": "Обкладинка {{album}}"
+    },
+    "search": {
+      "sticker": "ЗНАЙТИ",
+      "open": "Знайти гурт або пісню",
+      "close": "Закрити пошук",
+      "input": "Знайти гурт або пісню в журналі",
+      "placeholder": "гурт або пісня",
+      "results": "Знайдені статті",
+      "caption": "Тим часом у журналі…",
+      "page": "с. {{page}}!",
+      "empty": "Бам! Нічого не знайшлося…",
+      "found": "Знайдено статей: {{count}}"
+    },
+    "random": {
+      "sticker": "НАВМАННЯ",
+      "label": "Відкрити випадкову статтю"
+    },
+    "article": {
+      "kicker": "{{origin}} · з {{year}}",
+      "song": "Пісня номера",
+      "songMeta": "альбом {{album}} · {{year}} · {{length}}",
+      "trackStory": "Історія треку.",
+      "historyBand": "Історія гурту.",
+      "historySolo": "Історія артиста.",
+      "members": "Склад.",
+      "label": "Лейбл: {{label}}.",
+      "sound": "Звучання.",
+      "dates": "Дати.",
+      "foundedBand": "заснування гурту",
+      "foundedSolo": "початок кар'єри",
+      "album": "альбом {{title}}"
+    },
+    "listen": {
+      "caption": "СЛУХАТИ В ПЛЕЄРІ",
+      "label": "Слухати в плеєрі: {{name}} — {{song}}"
+    },
+    "nav": {
+      "previous": "Попередня стаття: {{name}}",
+      "next": "Далі в журналі: {{name}}",
+      "restart": "На початок журналу: {{name}}",
+      "counter": "Журнал · {{current}} / {{total}}"
+    },
+    "notes": {
+      "soHot": "🔥 so hot",
+      "listen": "→ listen!",
+      "hit": "★ hit!",
+      "rockOn": "ROCK ON!"
+    }
+  },
   "player": {
     "deck": {
       "brand": "STEREO 2000",
@@ -95,10 +155,12 @@
       "elapsedTotal": "ELAPSED · TOTAL"
     },
     "magazine": {
+      "page": "MAGAZINE · P.{{page}}",
       "pageUnknown": "MAGAZINE · P.—",
       "pageCaption": "MAGAZINE · PAGE",
       "open": "OPEN",
-      "openLabel": "Відкрити {{artist}} у журналі"
+      "openLabel": "Відкрити {{artist}} у журналі, сторінка {{page}}",
+      "notInMagazine": "{{artist}}: статті в журналі немає"
     },
     "controls": {
       "seek": "Перемотування",

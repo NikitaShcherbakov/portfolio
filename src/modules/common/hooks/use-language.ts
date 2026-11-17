@@ -9,13 +9,18 @@ import {
 } from '@/i18n';
 import { writeStoredValue } from '@/utils/storage';
 
-export function useLanguage() {
+export function useCurrentLanguage(): Language {
   const { i18n } = useTranslation();
   const { resolvedLanguage } = i18n;
-  const language: Language =
-    resolvedLanguage !== undefined && isLanguage(resolvedLanguage)
-      ? resolvedLanguage
-      : defaultLanguage;
+
+  return resolvedLanguage !== undefined && isLanguage(resolvedLanguage)
+    ? resolvedLanguage
+    : defaultLanguage;
+}
+
+export function useLanguage() {
+  const { i18n } = useTranslation();
+  const language = useCurrentLanguage();
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {

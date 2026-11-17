@@ -1,8 +1,5 @@
 import type { Track } from '@/content/schemas';
-
-function normalizeSearchText(text: string) {
-  return text.trim().toLowerCase();
-}
+import { normalizeSearchText } from '@/utils/normalize-search-text';
 
 export function getTrackSearchText(track: Track) {
   return normalizeSearchText(

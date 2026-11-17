@@ -15,12 +15,22 @@ function themeScript(): Plugin {
   };
 }
 
+function isMagazineDecoAsset(filePath: string) {
+  return filePath
+    .replaceAll('\\', '/')
+    .includes('/src/modules/magazine/assets/deco/');
+}
+
 export default defineConfig({
   plugins: [tailwindcss(), react(), themeScript()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
-  build: { outDir: 'build' },
+  build: {
+    outDir: 'build',
+    assetsInlineLimit: (filePath) =>
+      isMagazineDecoAsset(filePath) ? false : undefined,
+  },
   server: {
     port: 5173,
     strictPort: true,
@@ -39,11 +49,9 @@ export default defineConfig({
     },
   },
   test: {
-    // Every test starts clean: no leaked mocks, stubbed globals or env vars.
     restoreMocks: true,
     unstubGlobals: true,
     unstubEnvs: true,
-    // Plain logic runs in Node; React components run in jsdom.
     projects: [
       {
         extends: true,

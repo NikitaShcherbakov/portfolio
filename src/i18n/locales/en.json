@@ -37,6 +37,66 @@
       "music": "Music"
     }
   },
+  "magazine": {
+    "title": "Magazine",
+    "flipBackward": "Turn the page back",
+    "flipForward": "Turn the page forward",
+    "cover": {
+      "alt": "Cover of the album {{album}}",
+      "credit": "COVER · {{album}} · {{year}}"
+    },
+    "photo": {
+      "bandAlt": "Photo of {{name}}",
+      "coverAlt": "Cover of {{album}}"
+    },
+    "search": {
+      "sticker": "FIND",
+      "open": "Find a band or a song",
+      "close": "Close search",
+      "input": "Find a band or a song in the magazine",
+      "placeholder": "band or song",
+      "results": "Articles found",
+      "caption": "Meanwhile, in the magazine…",
+      "page": "p. {{page}}!",
+      "empty": "Bam! Nothing found…",
+      "found": "Articles found: {{count}}"
+    },
+    "random": {
+      "sticker": "RANDOM",
+      "label": "Open a random article"
+    },
+    "article": {
+      "kicker": "{{origin}} · since {{year}}",
+      "song": "Song of the issue",
+      "songMeta": "album {{album}} · {{year}} · {{length}}",
+      "trackStory": "The story of the song.",
+      "historyBand": "The story of the band.",
+      "historySolo": "The story of the artist.",
+      "members": "Line-up.",
+      "label": "Label: {{label}}.",
+      "sound": "Sound.",
+      "dates": "Dates.",
+      "foundedBand": "the band is formed",
+      "foundedSolo": "career begins",
+      "album": "album {{title}}"
+    },
+    "listen": {
+      "caption": "LISTEN IN THE PLAYER",
+      "label": "Listen in the player: {{name}} — {{song}}"
+    },
+    "nav": {
+      "previous": "Previous article: {{name}}",
+      "next": "Next in the magazine: {{name}}",
+      "restart": "Back to the start of the magazine: {{name}}",
+      "counter": "Magazine · {{current}} / {{total}}"
+    },
+    "notes": {
+      "soHot": "🔥 so hot",
+      "listen": "→ listen!",
+      "hit": "★ hit!",
+      "rockOn": "ROCK ON!"
+    }
+  },
   "player": {
     "deck": {
       "brand": "STEREO 2000",
@@ -95,10 +155,12 @@
       "elapsedTotal": "ELAPSED · TOTAL"
     },
     "magazine": {
+      "page": "MAGAZINE · P.{{page}}",
       "pageUnknown": "MAGAZINE · P.—",
       "pageCaption": "MAGAZINE · PAGE",
       "open": "OPEN",
-      "openLabel": "Open {{artist}} in the magazine"
+      "openLabel": "Open {{artist}} in the magazine, page {{page}}",
+      "notInMagazine": "{{artist}}: no article in the magazine"
     },
     "controls": {
       "seek": "Seek",

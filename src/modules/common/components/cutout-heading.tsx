@@ -11,6 +11,7 @@ const letterStyles = [
 
 type CutoutHeadingProps = {
   children: string;
+  id?: string;
 };
 
 function getWords(text: string) {
@@ -24,9 +25,9 @@ function getWords(text: string) {
     );
 }
 
-export function CutoutHeading({ children }: CutoutHeadingProps) {
+export function CutoutHeading({ children, id }: CutoutHeadingProps) {
   return (
-    <h2 className="m-0 flex flex-wrap items-end gap-x-4">
+    <h2 id={id} className="m-0 flex flex-wrap items-end gap-x-4">
       <span className="sr-only">{children}</span>
       {getWords(children).map((letters) => (
         <span
