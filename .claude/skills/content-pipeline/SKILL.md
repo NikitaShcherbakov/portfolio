@@ -69,23 +69,27 @@ Two user requirements shape every stage:
      artist's, not the credit on that release (an earlier band name stays out). No match → tag data,
      flagged in the report; a track that ends up without album or year fails the run with its path.
 - **Album cover (3)**, always of that exact release group, never a band photo or another album's cover:
-  1. Cover Art Archive `release-group/<mbid>/front-250` and `…/front-500` answer with a redirect: store
-     the `Location` (`archive.org/download/…_thumb250.jpg` / `_thumb500.jpg`), not the CAA URL. The browser
+  1. Cover Art Archive `release-group/<mbid>/front-250`, `…/front-500` and `…/front-1200` answer with a
+     redirect: store the `Location` (`archive.org/download/…_thumb250.jpg` / `_thumb500.jpg` /
+     `_thumb1200.jpg`; CAA never upscales, so the 1200 one is the original when that is smaller; a missing
+     1200 falls back to the 500 URL), not the CAA URL. The browser
      then skips one hop, which neither side lets it cache. Read the redirect only: the JSON index lives on
      archive.org and fails with 500 at times;
   2. else the same for the earliest official release in the group whose `cover-art-archive.front` is true
-     (`coverartarchive.org/release/<mbid>/front-500` / `front-250`);
-  3. else TheAudioDB `album-mb.php?i=<release group mbid>` → `strAlbumThumb` + `/medium` / `/small`
-     (one request per 2 s);
+     (`coverartarchive.org/release/<mbid>/front-500` / `front-250` / `front-1200`);
+  3. else TheAudioDB `album-mb.php?i=<release group mbid>` → `strAlbumThumb` + `/medium` / `/small`, the
+     bare `strAlbumThumb` as the large one (one request per 2 s);
   4. else no URL (the UI placeholder), flagged in the report.
-     Cached in `.cache/covers/<release group>.json`. Only the URL is stored.
+     Cached in `.cache/covers/<release group>.json`. Only the URL is stored. A cached cover without
+     `coverLargeUrl` is looked up again.
 - **Upload (4)**: keys `audio/<id>.<hash8>.mp3` (the Worker accepts only that shape), uploaded with
   `Cache-Control: public, max-age=31536000, immutable` and `audio/mpeg`. List the bucket, upload only
   missing keys, delete keys no track references and list them. Endpoint
   `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`, region `auto`. Secrets come from `.env.local`
   (never read or print it: the user fills it in); a missing variable fails the run with its name.
 - **Build (5)**: `src/content/tracks.json` (`id`, `title`, `artist`, `album`, `year`, `durationSec`,
-  `audioUrl` = `audioBaseUrl` + key, `coverUrl`/`coverThumbUrl` when found), sorted by artist, year,
+  `audioUrl` = `audioBaseUrl` + key, `coverUrl`/`coverThumbUrl`/`coverLargeUrl` when found; the player
+  draws the 500 and 250 ones, the magazine's full-page covers the large one), sorted by artist, year,
   title, parsed with the Zod schema before writing.
 - **Report** (printed and written to `.cache/report.json`, informational only): tracks without a
   MusicBrainz match, tracks without a cover, uploaded and deleted keys, the album chosen for each track.
