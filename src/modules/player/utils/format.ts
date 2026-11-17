@@ -1,12 +1,9 @@
 import type { Track } from '@/content/schemas';
 import { clamp } from '@/utils/clamp';
+import { padTwoDigits } from '@/utils/pad-two-digits';
 
 const secondsPerMinute = 60;
 const percentPrecision = 10;
-
-function padTwoDigits(value: number) {
-  return String(value).padStart(2, '0');
-}
 
 function getMinutesAndSeconds(totalSec: number) {
   const wholeSec = Math.max(0, Math.floor(totalSec));

@@ -25,6 +25,8 @@ import {
 import { maxVolume } from '../utils/volume-knob';
 
 const restartThresholdSec = 3;
+const defaultVolume = 7;
+const volumeStep = 1;
 export const seekStepSec = 10;
 
 type PlayerState = {
@@ -82,7 +84,7 @@ const initialPlayerState: PlayerState = {
   isShuffle: false,
   repeatMode: repeatModes.Off,
   shuffleOrder: [],
-  volume: 7,
+  volume: defaultVolume,
   isMuted: false,
   volumeChangeCount: 0,
 };
@@ -101,8 +103,12 @@ export function selectIsPlaybackActive(state: PlayerState) {
   return state.isPlaying && state.isPowerOn;
 }
 
+function hasEveryTrackFailed(failedTrackCount: number) {
+  return failedTrackCount >= tracks.length;
+}
+
 export function selectHasPlaybackFailed(state: PlayerState) {
-  return state.failedTrackCount >= tracks.length;
+  return hasEveryTrackFailed(state.failedTrackCount);
 }
 
 export function selectUpNextIndex(state: PlayerState) {
@@ -209,9 +215,7 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
 
   return {
     ...initialPlayerState,
-    playTrack: (index) => {
-      startPickedTrack(index);
-    },
+    playTrack: startPickedTrack,
 
     togglePlay: () => {
       setPlaying(!selectIsPlaybackActive(get()));
@@ -226,11 +230,12 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
     },
 
     togglePower: () => {
-      set((state) => ({
-        isPowerOn: !state.isPowerOn,
-        isPlaying: false,
-        isSeeking: false,
-      }));
+      if (!get().isPowerOn) {
+        setPlaying(true);
+        return;
+      }
+
+      set({ isPowerOn: false, isPlaying: false, isSeeking: false });
       pauseAudio();
     },
 
@@ -306,14 +311,14 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
 
     increaseVolume: () => {
       updateVolume((state) => ({
-        volume: getSteppedVolume(state.volume, 1),
+        volume: getSteppedVolume(state.volume, volumeStep),
         isMuted: false,
       }));
     },
 
     decreaseVolume: () => {
       updateVolume((state) => {
-        const volume = getSteppedVolume(state.volume, -1);
+        const volume = getSteppedVolume(state.volume, -volumeStep);
 
         return { volume, isMuted: state.isMuted || volume === 0 };
       });
@@ -322,7 +327,7 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
     toggleMute: () => {
       updateVolume((state) => ({
         isMuted: !state.isMuted,
-        volume: state.isMuted && state.volume === 0 ? 1 : state.volume,
+        volume: state.isMuted && state.volume === 0 ? volumeStep : state.volume,
       }));
     },
 
@@ -373,7 +378,7 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
         `Track "${getTrack(state.currentIndex).id}" failed to load (MediaError code ${String(errorCode ?? 'unknown')}).`
       );
 
-      if (failedTrackCount >= tracks.length) {
+      if (hasEveryTrackFailed(failedTrackCount)) {
         set({ isPlaying: false, isBuffering: false, failedTrackCount });
         pauseAudio();
         return;

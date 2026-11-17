@@ -1,12 +1,16 @@
 /* Invisible pseudo-elements enlarge the design's controls to a 44px hit area without changing the look. */
 .hp-vbtn,
-.hp-seek {
+.hp-seek,
+.mag-key,
+.drawer-clear {
   position: relative;
 }
 
 .hp-vbtn::after,
 .hp-seek::after,
-.hp-mode::after {
+.hp-mode::after,
+.mag-key::after,
+.drawer-clear::after {
   content: '';
   position: absolute;
 }
@@ -75,6 +79,11 @@
   color: #96969d;
 }
 
+/* The design's 38px MAGAZINE key, grown to a 44px hit area. */
+.mag-key::after {
+  inset: -3px;
+}
+
 .mag-key:disabled {
   cursor: default;
 }
@@ -119,13 +128,19 @@
   height: 44px;
 }
 
+/* iOS Safari zooms the page into a focused field whose text is smaller than 16px. */
+@media (pointer: coarse) {
+  .drawer-search input {
+    font-size: 16px;
+  }
+}
+
 /* Chrome shows its own clear button only on hover or focus; the drawer has a permanent one. */
 .drawer-search input::-webkit-search-cancel-button {
   appearance: none;
 }
 
 .drawer-clear {
-  position: relative;
   display: grid;
   flex: none;
   place-items: center;
@@ -141,8 +156,6 @@
 }
 
 .drawer-clear::after {
-  content: '';
-  position: absolute;
   inset: -8px;
 }
 
@@ -252,24 +265,20 @@
   .hp {
     --hp-pad-x: clamp(12px, calc(23.333vw - 72px), 26px);
 
-    padding-right: var(--hp-pad-x);
-    padding-left: var(--hp-pad-x);
+    padding-inline: var(--hp-pad-x);
   }
 
   .hp-bezel {
-    padding-right: clamp(8px, calc(10vw - 28px), 14px);
-    padding-left: clamp(8px, calc(10vw - 28px), 14px);
+    padding-inline: clamp(8px, calc(10vw - 28px), 14px);
   }
 
   .hp-screen {
-    padding-right: clamp(12px, calc(16.667vw - 48px), 22px);
-    padding-left: clamp(12px, calc(16.667vw - 48px), 22px);
+    padding-inline: clamp(12px, calc(16.667vw - 48px), 22px);
   }
 
   /* The design pulls the seam out by the panel's full padding. */
   .hp-jacks::before {
-    right: calc(-1 * var(--hp-pad-x));
-    left: calc(-1 * var(--hp-pad-x));
+    inset-inline: calc(-1 * var(--hp-pad-x));
   }
 }
 

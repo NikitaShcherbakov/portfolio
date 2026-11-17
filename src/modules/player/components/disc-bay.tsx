@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { getTrack } from '@/content/tracks';
 
-import { useMediaQuery } from '../hooks/use-media-query';
 import { useReadyCover } from '../hooks/use-ready-cover';
 import { selectIsPlaybackActive, usePlayerStore } from '../stores/player-store';
 import { getDiscLabel } from '../utils/format';
@@ -11,7 +10,6 @@ import { CoverImage } from './cover-image';
 import { MagazineUnit } from './magazine-unit';
 
 const discSizePx = 236;
-const discOnFirstScreenQuery = '(min-width: 1181px)';
 
 export function DiscBay() {
   const { t } = useTranslation();
@@ -21,7 +19,6 @@ export function DiscBay() {
   const togglePlay = usePlayerStore.use.togglePlay();
   const track = getTrack(currentIndex);
   const discCover = useReadyCover(track);
-  const isDiscOnFirstScreen = useMediaQuery(discOnFirstScreenQuery);
   const discLabel = getDiscLabel(track);
   const discTrackLabel = getDiscLabel(discCover.track);
 
@@ -40,7 +37,6 @@ export function DiscBay() {
           <CoverImage
             track={discCover.track}
             size={discCover.size}
-            isPriority={isDiscOnFirstScreen}
             sizePx={discSizePx}
             className="disc-art"
           />
@@ -70,7 +66,7 @@ export function DiscBay() {
       </button>
       <div className="disc-info">
         <span className="disc-label">{t('player.deck.nowSpinning')}</span>
-        <MagazineUnit artist={track.artist} />
+        <MagazineUnit artist={track.artist} trackIndex={currentIndex} />
       </div>
     </div>
   );

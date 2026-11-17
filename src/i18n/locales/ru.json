@@ -37,6 +37,66 @@
       "music": "Музыка"
     }
   },
+  "magazine": {
+    "title": "Журнал",
+    "flipBackward": "Перелистнуть назад",
+    "flipForward": "Перелистнуть вперёд",
+    "cover": {
+      "alt": "Обложка альбома {{album}}",
+      "credit": "ОБЛОЖКА · {{album}} · {{year}}"
+    },
+    "photo": {
+      "bandAlt": "Фото {{name}}",
+      "coverAlt": "Обложка {{album}}"
+    },
+    "search": {
+      "sticker": "НАЙТИ",
+      "open": "Найти группу или песню",
+      "close": "Закрыть поиск",
+      "input": "Найти группу или песню в журнале",
+      "placeholder": "группа или песня",
+      "results": "Найденные статьи",
+      "caption": "Тем временем, в журнале…",
+      "page": "стр. {{page}}!",
+      "empty": "Бам! Ничего не нашлось…",
+      "found": "Найдено статей: {{count}}"
+    },
+    "random": {
+      "sticker": "НАУГАД",
+      "label": "Открыть случайную статью"
+    },
+    "article": {
+      "kicker": "{{origin}} · с {{year}}",
+      "song": "Песня номера",
+      "songMeta": "альбом {{album}} · {{year}} · {{length}}",
+      "trackStory": "История трека.",
+      "historyBand": "История группы.",
+      "historySolo": "История артиста.",
+      "members": "Состав.",
+      "label": "Лейбл: {{label}}.",
+      "sound": "Звучание.",
+      "dates": "Даты.",
+      "foundedBand": "основание группы",
+      "foundedSolo": "начало карьеры",
+      "album": "альбом {{title}}"
+    },
+    "listen": {
+      "caption": "СЛУШАТЬ В ПЛЕЕРЕ",
+      "label": "Слушать в плеере: {{name}} — {{song}}"
+    },
+    "nav": {
+      "previous": "Предыдущая статья: {{name}}",
+      "next": "Дальше в журнале: {{name}}",
+      "restart": "В начало журнала: {{name}}",
+      "counter": "Журнал · {{current}} / {{total}}"
+    },
+    "notes": {
+      "soHot": "🔥 so hot",
+      "listen": "→ listen!",
+      "hit": "★ hit!",
+      "rockOn": "ROCK ON!"
+    }
+  },
   "player": {
     "deck": {
       "brand": "STEREO 2000",
@@ -95,10 +155,12 @@
       "elapsedTotal": "ELAPSED · TOTAL"
     },
     "magazine": {
+      "page": "MAGAZINE · P.{{page}}",
       "pageUnknown": "MAGAZINE · P.—",
       "pageCaption": "MAGAZINE · PAGE",
       "open": "OPEN",
-      "openLabel": "Открыть {{artist}} в журнале"
+      "openLabel": "Открыть {{artist}} в журнале, страница {{page}}",
+      "notInMagazine": "{{artist}}: статьи в журнале нет"
     },
     "controls": {
       "seek": "Перемотка",

@@ -17,30 +17,24 @@ const audioDbAlbumSchema = z.object({
   ),
 });
 
-const coverSchema = z.object({
-  source: z.enum(['release-group', 'release', 'theaudiodb', 'none']),
-  coverUrl: z.optional(z.url()),
-  coverThumbUrl: z.optional(z.url()),
+const coverUrlsSchema = z.object({
+  coverUrl: z.url(),
+  coverThumbUrl: z.url(),
+  coverLargeUrl: z.url(),
 });
 
-type Cover = z.infer<typeof coverSchema>;
+const cachedCoverSchema = z.discriminatedUnion('source', [
+  z.extend(coverUrlsSchema, {
+    source: z.enum(['release-group', 'release', 'theaudiodb']),
+  }),
+  z.object({ source: z.literal('none') }),
+]);
 
-type CoverUrls = Required<Pick<Cover, 'coverUrl' | 'coverThumbUrl'>>;
+type CoverUrls = z.infer<typeof coverUrlsSchema>;
+
+type CachedCover = z.infer<typeof cachedCoverSchema>;
 
 const waitForAudioDbSlot = createThrottle(audioDbMinGapMs);
-
-async function getAudioDbThumb(
-  releaseGroupId: string
-): Promise<string | undefined> {
-  await waitForAudioDbSlot();
-
-  const result = await fetchJson(
-    `${audioDbAlbumUrl}?i=${releaseGroupId}`,
-    audioDbAlbumSchema
-  );
-
-  return result?.album?.[0]?.strAlbumThumb ?? undefined;
-}
 
 async function getCoverArtFronts(base: string): Promise<CoverUrls | null> {
   const coverThumbUrl = await getRedirectTarget(`${base}/front-250`);
@@ -49,7 +43,12 @@ async function getCoverArtFronts(base: string): Promise<CoverUrls | null> {
 
   const coverUrl = await getRedirectTarget(`${base}/front-500`);
 
-  return coverUrl ? { coverUrl, coverThumbUrl } : null;
+  if (!coverUrl) return null;
+
+  const coverLargeUrl =
+    (await getRedirectTarget(`${base}/front-1200`)) ?? coverUrl;
+
+  return { coverUrl, coverThumbUrl, coverLargeUrl };
 }
 
 async function getReleaseFronts(
@@ -65,7 +64,27 @@ async function getReleaseFronts(
     : null;
 }
 
-async function findCover(releaseGroupId: string): Promise<Cover> {
+async function getAudioDbFronts(
+  releaseGroupId: string
+): Promise<CoverUrls | null> {
+  await waitForAudioDbSlot();
+
+  const result = await fetchJson(
+    `${audioDbAlbumUrl}?i=${releaseGroupId}`,
+    audioDbAlbumSchema
+  );
+  const thumb = result?.album?.[0]?.strAlbumThumb;
+
+  return thumb
+    ? {
+        coverUrl: `${thumb}/medium`,
+        coverThumbUrl: `${thumb}/small`,
+        coverLargeUrl: thumb,
+      }
+    : null;
+}
+
+async function findCover(releaseGroupId: string): Promise<CachedCover> {
   const groupFronts = await getCoverArtFronts(
     `${coverArtUrl}/release-group/${releaseGroupId}`
   );
@@ -76,22 +95,16 @@ async function findCover(releaseGroupId: string): Promise<Cover> {
 
   if (releaseFronts) return { source: 'release', ...releaseFronts };
 
-  const thumb = await getAudioDbThumb(releaseGroupId);
+  const audioDbFronts = await getAudioDbFronts(releaseGroupId);
 
-  if (thumb) {
-    return {
-      source: 'theaudiodb',
-      coverUrl: `${thumb}/medium`,
-      coverThumbUrl: `${thumb}/small`,
-    };
-  }
+  if (audioDbFronts) return { source: 'theaudiodb', ...audioDbFronts };
 
   return { source: 'none' };
 }
 
-export async function getCover(releaseGroupId: string): Promise<Cover> {
+async function getCachedCover(releaseGroupId: string): Promise<CachedCover> {
   const cachePath = path.join(paths.coversCache, `${releaseGroupId}.json`);
-  const cached = await readJsonFile(cachePath, coverSchema);
+  const cached = await readJsonFile(cachePath, cachedCoverSchema);
 
   if (cached) return cached;
 
@@ -99,4 +112,16 @@ export async function getCover(releaseGroupId: string): Promise<Cover> {
   await writeJsonFile(cachePath, cover);
 
   return cover;
+}
+
+export async function getCover(
+  releaseGroupId: string
+): Promise<CoverUrls | undefined> {
+  const cover = await getCachedCover(releaseGroupId);
+
+  if (cover.source === 'none') return undefined;
+
+  const { coverUrl, coverThumbUrl, coverLargeUrl } = cover;
+
+  return { coverUrl, coverThumbUrl, coverLargeUrl };
 }

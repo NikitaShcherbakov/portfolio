@@ -10,7 +10,6 @@ type CoverImageProps = {
   size: CoverSize;
   sizePx: number;
   className: string;
-  isPriority?: boolean;
 };
 
 export function CoverImage({
@@ -18,7 +17,6 @@ export function CoverImage({
   size,
   sizePx,
   className,
-  isPriority = false,
 }: CoverImageProps) {
   const coverUrl = getCoverUrl(track, size);
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
@@ -30,9 +28,8 @@ export function CoverImage({
       alt=""
       width={sizePx}
       height={sizePx}
-      loading={isPriority ? 'eager' : 'lazy'}
-      fetchPriority={isPriority ? 'high' : 'auto'}
-      decoding={isPriority ? 'sync' : 'async'}
+      loading="lazy"
+      decoding="async"
       className={className}
       onError={() => {
         if (hasCover) setFailedUrl(coverUrl);
