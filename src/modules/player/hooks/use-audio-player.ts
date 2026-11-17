@@ -6,6 +6,8 @@ import { selectIsPlaybackActive, usePlayerStore } from '../stores/player-store';
 import { getAudioElement } from '../utils/audio-element';
 import { getCoverPlaceholder } from '../utils/cover-placeholder';
 
+const artworkDelayMs = 800;
+
 function useAudioEvents() {
   const handleTimeUpdate = usePlayerStore.use.handleTimeUpdate();
   const handleBuffering = usePlayerStore.use.handleBuffering();
@@ -90,13 +92,26 @@ function useMediaSession() {
     const artwork = track.coverUrl
       ? { src: track.coverUrl, sizes: '500x500' }
       : { src: getCoverPlaceholder(track) };
-
-    navigator.mediaSession.metadata = new MediaMetadata({
+    const info = {
       title: track.title,
       artist: track.artist,
       album: track.album,
-      artwork: [artwork],
-    });
+    };
+
+    navigator.mediaSession.metadata = new MediaMetadata(info);
+
+    // Chromium downloads the artwork of every new metadata and aborts it when the metadata is replaced, so
+    // skipping through tracks would start and cancel a cover request per skip.
+    const timer = setTimeout(() => {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        ...info,
+        artwork: [artwork],
+      });
+    }, artworkDelayMs);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [currentIndex]);
 
   useEffect(() => {
