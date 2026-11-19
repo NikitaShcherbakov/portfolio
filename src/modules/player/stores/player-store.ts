@@ -1,6 +1,8 @@
-import { create } from 'zustand';
+import { create, type StateCreator } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import { getTrack, tracks } from '@/content/tracks';
+import { captureError } from '@/utils/capture-error';
 import { clamp } from '@/utils/clamp';
 import { createSelectors } from '@/utils/create-selectors';
 
@@ -11,6 +13,13 @@ import {
   seekAudio,
   setAudioVolume,
 } from '../utils/audio-element';
+import {
+  getPersistedPlayer,
+  mergePersistedPlayer,
+  playerStorage,
+  playerStorageKey,
+  playerStorageVersion,
+} from '../utils/player-persistence';
 import {
   createShuffleOrder,
   getAutoNextIndex,
@@ -29,7 +38,7 @@ const defaultVolume = 7;
 const volumeStep = 1;
 export const seekStepSec = 10;
 
-type PlayerState = {
+export type PlayerState = {
   currentIndex: number;
   isPlaying: boolean;
   isPowerOn: boolean;
@@ -134,14 +143,18 @@ function applyVolume({ volume, isMuted }: PlayerState) {
   setAudioVolume(volume / maxVolume, isMuted);
 }
 
-const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
+const createPlayerStore: StateCreator<
+  PlayerState & PlayerActions,
+  [['zustand/persist', unknown]]
+> = (set, get) => {
   let playRequestId = 0;
+  let shouldResumeOnPowerOn = false;
 
   const startAudio = async () => {
     const state = get();
     const requestId = ++playRequestId;
 
-    loadAudio(getTrack(state.currentIndex).audioUrl);
+    loadAudio(getTrack(state.currentIndex).audioUrl, state.elapsed);
     applyVolume(state);
 
     let isStarted = false;
@@ -149,7 +162,7 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
     try {
       isStarted = await playAudio();
     } catch (error) {
-      console.error('Playback failed to start.', error);
+      captureError(error, { source: 'player:play' });
     }
 
     if (!isStarted && requestId === playRequestId) {
@@ -160,7 +173,7 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
   const setPlaying = (isPlaying: boolean) => {
     set((state) => ({
       isPlaying,
-      isPowerOn: true,
+      isPowerOn: isPlaying || state.isPowerOn,
       failedTrackCount:
         isPlaying && selectHasPlaybackFailed(state)
           ? 0
@@ -230,11 +243,19 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
     },
 
     togglePower: () => {
-      if (!get().isPowerOn) {
-        setPlaying(true);
+      const { isPowerOn, isPlaying } = get();
+
+      if (!isPowerOn) {
+        if (shouldResumeOnPowerOn) {
+          setPlaying(true);
+        } else {
+          set({ isPowerOn: true });
+        }
+
         return;
       }
 
+      shouldResumeOnPowerOn = isPlaying;
       set({ isPowerOn: false, isPlaying: false, isSeeking: false });
       pauseAudio();
     },
@@ -374,8 +395,11 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
       const state = get();
       const failedTrackCount = state.failedTrackCount + 1;
 
-      console.error(
-        `Track "${getTrack(state.currentIndex).id}" failed to load (MediaError code ${String(errorCode ?? 'unknown')}).`
+      captureError(
+        new Error(
+          `Track "${getTrack(state.currentIndex).id}" failed to load (MediaError code ${String(errorCode ?? 'unknown')}).`
+        ),
+        { source: 'player:load' }
       );
 
       if (hasEveryTrackFailed(failedTrackCount)) {
@@ -391,6 +415,19 @@ const usePlayerStoreBase = create<PlayerState & PlayerActions>()((set, get) => {
       }
     },
   };
-});
+};
+
+const usePlayerStoreBase = create<PlayerState & PlayerActions>()(
+  persist(createPlayerStore, {
+    name: playerStorageKey,
+    version: playerStorageVersion,
+    storage: playerStorage,
+    partialize: getPersistedPlayer,
+    merge: mergePersistedPlayer,
+    onRehydrateStorage: () => (_state, error) => {
+      if (error) captureError(error, { source: 'player:restore' });
+    },
+  })
+);
 
 export const usePlayerStore = createSelectors(usePlayerStoreBase);

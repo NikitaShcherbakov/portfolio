@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { CornerScrews } from './corner-screws';
 import { DeckHeader } from './deck-header';
 import { DeckJacks } from './deck-jacks';
@@ -10,7 +12,11 @@ import { DeckVolume } from './deck-volume';
 import { DiscBay } from './disc-bay';
 import { NeighborCoverPreloader } from './neighbor-cover-preloader';
 
-export function StereoDeck() {
+type StereoDeckProps = {
+  discControls: ReactNode;
+};
+
+export function StereoDeck({ discControls }: StereoDeckProps) {
   return (
     <DeckShell>
       <NeighborCoverPreloader />
@@ -31,7 +37,7 @@ export function StereoDeck() {
             <DeckJacks />
           </div>
         </div>
-        <DiscBay />
+        <DiscBay controls={discControls} />
       </div>
       <DeckPlaylist />
     </DeckShell>

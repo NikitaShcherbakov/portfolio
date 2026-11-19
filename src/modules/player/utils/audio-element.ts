@@ -17,11 +17,12 @@ function isDomError(error: unknown, name: string) {
   return error instanceof DOMException && error.name === name;
 }
 
-export function loadAudio(url: string) {
+export function loadAudio(url: string, startAtSec: number) {
   const element = getAudioElement();
 
   if (element.src !== url || element.error !== null) {
     element.src = url;
+    element.currentTime = startAtSec;
   }
 }
 
@@ -31,15 +32,16 @@ export async function playAudio() {
 
     return true;
   } catch (error) {
-    // A newer src or pause() interrupted this play(): the newer call owns the playback state.
-    if (isDomError(error, 'AbortError')) {
+    // A newer src or pause() interrupted this play(), or the source failed: the newer call
+    // or the media `error` event, which skips the track, owns the playback state.
+    if (
+      isDomError(error, 'AbortError') ||
+      isDomError(error, 'NotSupportedError')
+    ) {
       return true;
     }
 
-    if (
-      isDomError(error, 'NotAllowedError') ||
-      isDomError(error, 'NotSupportedError')
-    ) {
+    if (isDomError(error, 'NotAllowedError')) {
       return false;
     }
 

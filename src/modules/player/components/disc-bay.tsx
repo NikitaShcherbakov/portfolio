@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { type ReactNode, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getTrack } from '@/content/tracks';
@@ -7,11 +7,14 @@ import { useReadyCover } from '../hooks/use-ready-cover';
 import { selectIsPlaybackActive, usePlayerStore } from '../stores/player-store';
 import { getDiscLabel } from '../utils/format';
 import { CoverImage } from './cover-image';
-import { MagazineUnit } from './magazine-unit';
 
 const discSizePx = 236;
 
-export function DiscBay() {
+type DiscBayProps = {
+  controls: ReactNode;
+};
+
+export function DiscBay({ controls }: DiscBayProps) {
   const { t } = useTranslation();
   const ringPathId = useId();
   const currentIndex = usePlayerStore.use.currentIndex();
@@ -66,7 +69,7 @@ export function DiscBay() {
       </button>
       <div className="disc-info">
         <span className="disc-label">{t('player.deck.nowSpinning')}</span>
-        <MagazineUnit artist={track.artist} trackIndex={currentIndex} />
+        {controls}
       </div>
     </div>
   );

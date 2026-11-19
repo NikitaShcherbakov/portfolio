@@ -1,8 +1,9 @@
-import { type KeyboardEvent, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getTrack, tracks } from '@/content/tracks';
 import { cn } from '@/lib/utils';
+import { invariant } from '@/utils/invariant';
 
 import { usePlaylistVirtualizer } from '../hooks/use-playlist-virtualizer';
 import { usePlayerStore } from '../stores/player-store';
@@ -17,18 +18,14 @@ const searchTexts = tracks.map(getTrackSearchText);
 type PlaylistDrawerProps = {
   id: string;
   isOpen: boolean;
-  onClose: () => void;
 };
 
-export function PlaylistDrawer({ id, isOpen, onClose }: PlaylistDrawerProps) {
+export function PlaylistDrawer({ id, isOpen }: PlaylistDrawerProps) {
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const currentIndex = usePlayerStore.use.currentIndex();
   const playTrack = usePlayerStore.use.playTrack();
-  const matchingIndices = useMemo(
-    () => getMatchingIndices(searchTexts, query),
-    [query]
-  );
+  const matchingIndices = getMatchingIndices(searchTexts, query);
   const {
     scrollRef,
     listHeight,
@@ -44,19 +41,8 @@ export function PlaylistDrawer({ id, isOpen, onClose }: PlaylistDrawerProps) {
     isOpen,
   });
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  };
-
   return (
-    // eslint-disable-next-line jsx-a11y-x/no-static-element-interactions -- the container only catches Escape bubbling up from the search field and rows inside it
-    <div
-      className={cn('drawer-wrap', isOpen && 'on')}
-      inert={!isOpen}
-      onKeyDown={handleKeyDown}
-    >
+    <div className={cn('drawer-wrap', isOpen && 'on')} inert={!isOpen}>
       <div className="drawer-clip">
         <div className="deck-drawer" id={id}>
           <div className="drawer-head">
@@ -83,11 +69,10 @@ export function PlaylistDrawer({ id, isOpen, onClose }: PlaylistDrawerProps) {
               {virtualRows.map((virtualRow) => {
                 const trackIndex = matchingIndices[virtualRow.index];
 
-                if (trackIndex === undefined) {
-                  throw new Error(
-                    `Playlist row ${String(virtualRow.index)} has no track.`
-                  );
-                }
+                invariant(
+                  trackIndex !== undefined,
+                  `Playlist row ${String(virtualRow.index)} has no track.`
+                );
 
                 const track = getTrack(trackIndex);
 

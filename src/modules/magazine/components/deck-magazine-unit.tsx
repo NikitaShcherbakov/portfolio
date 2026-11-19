@@ -1,16 +1,14 @@
 import { useTranslation } from 'react-i18next';
 
-import { useMagazineLink } from '@/modules/magazine';
+import { getTrack } from '@/content/tracks';
+import { CornerScrews, usePlayerStore } from '@/modules/player';
 
-import { CornerScrews } from './corner-screws';
+import { useMagazineLink } from '../hooks/use-magazine-link';
 
-type MagazineUnitProps = {
-  artist: string;
-  trackIndex: number;
-};
-
-export function MagazineUnit({ artist, trackIndex }: MagazineUnitProps) {
+export function DeckMagazineUnit() {
   const { t } = useTranslation();
+  const trackIndex = usePlayerStore.use.currentIndex();
+  const { artist } = getTrack(trackIndex);
   const { page, openInMagazine } = useMagazineLink(trackIndex);
 
   return (
