@@ -12,6 +12,11 @@ export const focusKeys = {
 
 export type FocusKey = (typeof focusKeys)[keyof typeof focusKeys];
 
+type FocusWithinHandlers = {
+  onFocusIn: (event: FocusEvent) => void;
+  onFocusLeave: () => void;
+};
+
 const focusKeySet: ReadonlySet<string> = new Set(Object.values(focusKeys));
 
 const fallbackKeys: readonly FocusKey[] = [
@@ -59,6 +64,44 @@ export function getFocusKey(element: EventTarget | null): FocusKey | null {
   return isFocusKey(key) ? key : null;
 }
 
+export function trackFocusWithin(
+  element: HTMLElement,
+  { onFocusIn, onFocusLeave }: FocusWithinHandlers
+) {
+  const listeners = new AbortController();
+  const options = { signal: listeners.signal };
+
+  element.addEventListener('focusin', onFocusIn, options);
+  element.addEventListener(
+    'focusout',
+    (event) => {
+      if (
+        event.relatedTarget instanceof Node &&
+        !element.contains(event.relatedTarget)
+      ) {
+        onFocusLeave();
+      }
+    },
+    options
+  );
+
+  return () => {
+    listeners.abort();
+  };
+}
+
+function isBodyFocused(active: Element | null) {
+  return active === null || active === document.body;
+}
+
+export function isFocusLost() {
+  const { activeElement } = document;
+
+  return (
+    isBodyFocused(activeElement) || activeElement?.matches(':disabled') === true
+  );
+}
+
 export async function waitForTransitions(element: HTMLElement) {
   const transitions = element
     .getAnimations({ subtree: true })
@@ -72,8 +115,9 @@ export async function waitForTransitions(element: HTMLElement) {
 export function restoreFocus(book: HTMLElement, leaf: number, key: FocusKey) {
   const active = document.activeElement;
   const isInBook = active !== null && book.contains(active);
-  const isFocusLost = active === null || active === document.body;
-  const shouldKeepFocus = isInBook ? isFocusable(active) : !isFocusLost;
+  const shouldKeepFocus = isInBook
+    ? isFocusable(active)
+    : !isBodyFocused(active);
 
   if (shouldKeepFocus) return;
 

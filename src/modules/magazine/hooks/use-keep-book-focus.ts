@@ -5,6 +5,7 @@ import {
   type FocusKey,
   getFocusKey,
   restoreFocus,
+  trackFocusWithin,
   waitForTransitions,
 } from '../utils/focus';
 
@@ -20,32 +21,14 @@ export function useKeepBookFocus(bookRef: RefObject<HTMLElement | null>) {
 
     if (!book) return undefined;
 
-    const listeners = new AbortController();
-    const options = { signal: listeners.signal };
-
-    book.addEventListener(
-      'focusin',
-      (event) => {
+    return trackFocusWithin(book, {
+      onFocusIn: (event) => {
         focusKeyRef.current = getFocusKey(event.target);
       },
-      options
-    );
-    book.addEventListener(
-      'focusout',
-      (event) => {
-        if (
-          event.relatedTarget instanceof Node &&
-          !book.contains(event.relatedTarget)
-        ) {
-          focusKeyRef.current = null;
-        }
+      onFocusLeave: () => {
+        focusKeyRef.current = null;
       },
-      options
-    );
-
-    return () => {
-      listeners.abort();
-    };
+    });
   }, [bookRef]);
 
   useEffect(() => {

@@ -1,5 +1,7 @@
-import type { Band } from '@/content/schemas';
+import { getBandCopy } from '@/content/band-copy';
+import type { BandCopy } from '@/content/schemas';
 import type { Language } from '@/i18n';
+import { invariant } from '@/utils/invariant';
 
 import { bandPhotoSize, coverSizePx, getMediumPhotoUrl } from './image-sizes';
 import type { MagazineEntry } from './magazine-entries';
@@ -9,6 +11,13 @@ const markClasses = {
   Marker: 'hl-y',
   Pen: 'ul-pen',
 } as const;
+
+const nameSizes = [
+  { maxLength: 12, size: '5.9cqw' },
+  { maxLength: 16, size: '4.9cqw' },
+] as const;
+
+const longNameSize = '4cqw';
 
 type MarkClass = (typeof markClasses)[keyof typeof markClasses];
 
@@ -39,25 +48,24 @@ function findWord(text: string, word: string) {
 function markOnce(segments: TextSegment[], { word, className }: Mark) {
   if (!word) return segments;
 
-  let isMarked = false;
+  const index = segments.findIndex(
+    ({ text, className: marked }) => !marked && findWord(text, word) >= 0
+  );
+  const segment = segments[index];
 
-  return segments.flatMap((segment): TextSegment[] => {
-    const at =
-      isMarked || segment.className ? -1 : findWord(segment.text, word);
+  if (!segment) return segments;
 
-    if (at < 0) return [segment];
+  const at = findWord(segment.text, word);
+  const parts = [
+    { text: segment.text.slice(0, at), className: markClasses.None },
+    { text: word, className },
+    {
+      text: segment.text.slice(at + word.length),
+      className: markClasses.None,
+    },
+  ].filter(({ text }) => text.length > 0);
 
-    isMarked = true;
-
-    return [
-      { text: segment.text.slice(0, at), className: markClasses.None },
-      { text: word, className },
-      {
-        text: segment.text.slice(at + word.length),
-        className: markClasses.None,
-      },
-    ].filter(({ text }) => text.length > 0);
-  });
+  return segments.toSpliced(index, 1, ...parts);
 }
 
 export function getBody({ band, track }: MagazineEntry, body: string) {
@@ -92,22 +100,11 @@ export function getArticleDates({ band, track }: MagazineEntry): ArticleDate[] {
   ].toSorted((first, second) => first.year - second.year);
 }
 
-const nameSizes = [
-  { maxLength: 12, size: '5.9cqw' },
-  { maxLength: 16, size: '4.9cqw' },
-] as const;
-
-const longNameSize = '4cqw';
-
 export function getNameSize(name: string) {
   return (
     nameSizes.find(({ maxLength }) => name.length <= maxLength)?.size ??
     longNameSize
   );
-}
-
-export function getCity(origin: string) {
-  return origin.split(',')[0] ?? origin;
 }
 
 export function getHeroImage({ band, track }: MagazineEntry) {
@@ -129,7 +126,7 @@ export function getHeroImage({ band, track }: MagazineEntry) {
   };
 }
 
-export function formatMembers(members: Band['copy'][Language]['members']) {
+export function formatMembers(members: BandCopy['members']) {
   return `${members.map(({ name, role }) => `${name} — ${role}`).join('; ')}.`;
 }
 
@@ -141,5 +138,14 @@ export function getEntryCopy(
   { band, song }: MagazineEntry,
   language: Language
 ) {
-  return { bandCopy: band.copy[language], songCopy: song.copy[language] };
+  const { bands, songs } = getBandCopy(language);
+  const bandCopy = bands[band.artist];
+  const songCopy = songs[song.trackId];
+
+  invariant(
+    bandCopy && songCopy,
+    `band-copy/${language}.json has no copy for "${band.artist}" / "${song.trackId}".`
+  );
+
+  return { bandCopy, songCopy };
 }

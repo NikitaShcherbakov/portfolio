@@ -12,19 +12,11 @@ export type MagazineEntry = {
 
 type SongTrack = Pick<MagazineEntry, 'track' | 'trackIndex'>;
 
-function findSongTrack(band: Band, song: Song): SongTrack | null {
+function findSongTrack(song: Song): SongTrack | null {
   const trackIndex = tracks.findIndex(({ id }) => id === song.trackId);
   const track = tracks[trackIndex];
 
-  if (!track) return null;
-
-  if (track.artist !== band.artist) {
-    throw new Error(
-      `Song "${song.trackId}" is listed under "${band.artist}", but tracks.json credits it to "${track.artist}".`
-    );
-  }
-
-  return { track, trackIndex };
+  return track ? { track, trackIndex } : null;
 }
 
 function createMagazineEntries(): MagazineEntry[] {
@@ -33,7 +25,7 @@ function createMagazineEntries(): MagazineEntry[] {
     .flatMap((band) =>
       band.songs
         .flatMap((song) => {
-          const songTrack = findSongTrack(band, song);
+          const songTrack = findSongTrack(song);
 
           return songTrack ? [{ band, song, ...songTrack }] : [];
         })

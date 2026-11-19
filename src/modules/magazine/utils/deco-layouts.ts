@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { invariant } from '@/utils/invariant';
 
 type Sticker =
   | 'acoustic'
@@ -43,14 +43,7 @@ type Sticker =
 
 type Note = 'soHot' | 'listen' | 'hit' | 'rockOn';
 
-type DecoItem =
-  | { sticker: Sticker; style: CSSProperties }
-  | { note: Note; style: CSSProperties };
-
-type DecoLayout = {
-  isLeadMarked: boolean;
-  items: readonly DecoItem[];
-};
+export type NoteFont = 'Script' | 'Marker';
 
 type Placement = {
   left: number;
@@ -65,44 +58,29 @@ type StickerPlacement = Placement & {
 type NotePlacement = Placement & {
   size: number;
   color: string;
-  font?: keyof typeof noteFonts;
+  font?: NoteFont;
 };
 
-const noteFonts = {
-  Script: "'Bad Script',cursive",
-  Marker: "'Permanent Marker',cursive",
-} as const;
+type StickerItem = StickerPlacement & { sticker: Sticker };
 
-function getPlacementStyle({ left, top, rotate }: Placement): CSSProperties {
-  return {
-    left: `${String(left)}%`,
-    top: `${String(top)}%`,
-    transform: `rotate(${String(rotate)}deg)`,
-  };
-}
+type NoteItem = Required<NotePlacement> & { note: Note };
 
-function sticker(
-  name: Sticker,
-  { width, ...placement }: StickerPlacement
-): DecoItem {
-  return {
-    sticker: name,
-    style: { ...getPlacementStyle(placement), width: `${String(width)}cqw` },
-  };
+export type DecoItem = StickerItem | NoteItem;
+
+type DecoLayout = {
+  isLeadMarked: boolean;
+  items: readonly DecoItem[];
+};
+
+function sticker(name: Sticker, placement: StickerPlacement): DecoItem {
+  return { sticker: name, ...placement };
 }
 
 function note(
   name: Note,
-  { size, color, font = 'Script', ...placement }: NotePlacement
+  { font = 'Script', ...placement }: NotePlacement
 ): DecoItem {
-  return {
-    note: name,
-    style: {
-      ...getPlacementStyle(placement),
-      font: `400 ${String(size)}cqw ${noteFonts[font]}`,
-      color,
-    },
-  };
+  return { note: name, font, ...placement };
 }
 
 const decoLayouts: readonly DecoLayout[] = [
@@ -280,9 +258,7 @@ const decoLayouts: readonly DecoLayout[] = [
 export function getDecoLayout(bandIndex: number) {
   const layout = decoLayouts[bandIndex % decoLayouts.length];
 
-  if (!layout) {
-    throw new Error(`No sticker layout for band index ${String(bandIndex)}.`);
-  }
+  invariant(layout, `No sticker layout for band index ${String(bandIndex)}.`);
 
   return layout;
 }

@@ -1,2 +1,2 @@
+export { DeckMagazineUnit } from './components/deck-magazine-unit';
 export { Magazine } from './components/magazine';
-export { useMagazineLink } from './hooks/use-magazine-link';

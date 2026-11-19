@@ -1,3 +1,5 @@
+import { invariant } from '@/utils/invariant';
+
 export function findLeaf(book: HTMLElement, index: number) {
   return book.querySelector<HTMLElement>(
     `:scope > .leaf[data-i="${String(index)}"]`
@@ -7,11 +9,10 @@ export function findLeaf(book: HTMLElement, index: number) {
 export function findFace(leaf: HTMLElement, side: 'front' | 'back') {
   const face = leaf.querySelector<HTMLElement>(`:scope > .face-${side}`);
 
-  if (!face) {
-    throw new Error(
-      `Magazine leaf ${String(leaf.dataset.i)} has no ${side} face.`
-    );
-  }
+  invariant(
+    face,
+    `Magazine leaf ${String(leaf.dataset.i)} has no ${side} face.`
+  );
 
   return face;
 }
