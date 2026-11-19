@@ -37,6 +37,13 @@
       "music": "Music"
     }
   },
+  "errors": {
+    "pageTitle": "Something broke",
+    "pageText": "This page failed to load. Reload it or go back to the home page.",
+    "sectionText": "This section failed to load. The rest of the page still works.",
+    "reload": "Reload the page",
+    "backHome": "Back to home"
+  },
   "magazine": {
     "title": "Magazine",
     "flipBackward": "Turn the page back",
@@ -63,7 +70,7 @@
     },
     "random": {
       "sticker": "RANDOM",
-      "label": "Open a random article"
+      "label": "Random: open a random article"
     },
     "article": {
       "kicker": "{{origin}} · since {{year}}",
@@ -82,7 +89,7 @@
     },
     "listen": {
       "caption": "LISTEN IN THE PLAYER",
-      "label": "Listen in the player: {{name}} — {{song}}"
+      "label": "Listen in the player {{song}} — {{name}}"
     },
     "nav": {
       "previous": "Previous article: {{name}}",
@@ -116,7 +123,8 @@
       "phones": "PHONES",
       "nowSpinning": "NOW SPINNING",
       "source": "PLAYLIST",
-      "list": "LIST"
+      "list": "LIST",
+      "listLabel": "LIST — playlist"
     },
     "status": {
       "playing": "▶ PLAYING",
@@ -163,7 +171,7 @@
       "notInMagazine": "{{artist}}: no article in the magazine"
     },
     "controls": {
-      "seek": "Seek",
+      "seek": "Seek. Click the bar to jump, Enter for plus 10 seconds",
       "seekValue": "{{elapsed}} of {{length}}",
       "transport": "Playback controls",
       "power": "Power",

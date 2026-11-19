@@ -1,8 +1,13 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CutoutHeading, PageContainer, PageTitle } from '@/modules/common';
-import { Magazine } from '@/modules/magazine';
+import {
+  CutoutHeading,
+  FeatureBoundary,
+  PageContainer,
+  PageTitle,
+} from '@/modules/common';
+import { DeckMagazineUnit, Magazine } from '@/modules/magazine';
 import { DeckPoster } from '@/modules/player';
 
 export function HomePage() {
@@ -17,12 +22,16 @@ export function HomePage() {
       </PageContainer>
       <div className="overflow-x-clip">
         <div className="mx-auto box-content flex max-w-[1240px] flex-col gap-12 px-6 pt-14 pb-20 phone:px-2.5">
-          <Magazine />
+          <FeatureBoundary>
+            <Magazine />
+          </FeatureBoundary>
           <section aria-labelledby={musicHeadingId}>
             <CutoutHeading id={musicHeadingId}>
               {t('pages.home.music')}
             </CutoutHeading>
-            <DeckPoster />
+            <FeatureBoundary>
+              <DeckPoster discControls={<DeckMagazineUnit />} />
+            </FeatureBoundary>
           </section>
         </div>
       </div>

@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source('..');
 @import './theme.css';
 @import '../modules/player/styles/player-compat.css';
 @import '../modules/player/styles/player.css';
@@ -6,6 +6,7 @@
 @import '../modules/magazine/styles/magazine-compat.css';
 @import '../modules/magazine/styles/magazine.css';
 @import '../modules/magazine/styles/magazine-overrides.css';
+@import '../modules/magazine/styles/magazine-reader.css';
 @import './scrapbook.css';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));

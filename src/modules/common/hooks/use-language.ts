@@ -1,25 +1,43 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
-  defaultLanguage,
+  getBandCopyVersion,
+  preloadBandCopy,
+  subscribeToBandCopy,
+} from '@/content/band-copy';
+import {
+  getResolvedLanguage,
+  i18n,
   isLanguage,
   type Language,
   languageStorageKey,
 } from '@/i18n';
+import { invariant } from '@/utils/invariant';
 import { writeStoredValue } from '@/utils/storage';
 
-export function useCurrentLanguage(): Language {
-  const { i18n } = useTranslation();
-  const { resolvedLanguage } = i18n;
+let requestedLanguage: Language | null = null;
 
-  return resolvedLanguage !== undefined && isLanguage(resolvedLanguage)
-    ? resolvedLanguage
-    : defaultLanguage;
+async function switchLanguage(language: Language) {
+  requestedLanguage = language;
+
+  const isLoaded = await preloadBandCopy(language);
+
+  if (!isLoaded || requestedLanguage !== language) return false;
+
+  await i18n.changeLanguage(language);
+
+  return true;
+}
+
+export function useCurrentLanguage(): Language {
+  useTranslation();
+  useSyncExternalStore(subscribeToBandCopy, getBandCopyVersion);
+
+  return getResolvedLanguage();
 }
 
 export function useLanguage() {
-  const { i18n } = useTranslation();
   const language = useCurrentLanguage();
 
   useEffect(() => {
@@ -29,7 +47,7 @@ export function useLanguage() {
         event.newValue !== null &&
         isLanguage(event.newValue)
       ) {
-        void i18n.changeLanguage(event.newValue);
+        void switchLanguage(event.newValue);
       }
     };
 
@@ -38,19 +56,15 @@ export function useLanguage() {
     return () => {
       window.removeEventListener('storage', handleStorage);
     };
-  }, [i18n]);
+  }, []);
 
-  const changeLanguage = useCallback(
-    async (value: string) => {
-      if (!isLanguage(value)) {
-        throw new Error(`Unsupported language "${value}".`);
-      }
+  const changeLanguage = useCallback(async (value: string) => {
+    invariant(isLanguage(value), `Unsupported language "${value}".`);
 
+    if (await switchLanguage(value)) {
       writeStoredValue(languageStorageKey, value);
-      await i18n.changeLanguage(value);
-    },
-    [i18n]
-  );
+    }
+  }, []);
 
   return { language, changeLanguage };
 }

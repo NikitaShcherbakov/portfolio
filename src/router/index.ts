@@ -1,1 +1,1 @@
-export { routeObjects } from './route-objects';
+export { getIntendedPath, router } from './browser-router';

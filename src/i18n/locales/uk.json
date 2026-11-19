@@ -37,6 +37,13 @@
       "music": "Музика"
     }
   },
+  "errors": {
+    "pageTitle": "Щось зламалося",
+    "pageText": "Ця сторінка не завантажилася. Оновіть її або поверніться на головну.",
+    "sectionText": "Цей блок не завантажився. Решта сторінки працює.",
+    "reload": "Оновити сторінку",
+    "backHome": "На головну"
+  },
   "magazine": {
     "title": "Журнал",
     "flipBackward": "Перегорнути назад",
@@ -63,7 +70,7 @@
     },
     "random": {
       "sticker": "НАВМАННЯ",
-      "label": "Відкрити випадкову статтю"
+      "label": "Навмання: відкрити випадкову статтю"
     },
     "article": {
       "kicker": "{{origin}} · з {{year}}",
@@ -82,7 +89,7 @@
     },
     "listen": {
       "caption": "СЛУХАТИ В ПЛЕЄРІ",
-      "label": "Слухати в плеєрі: {{name}} — {{song}}"
+      "label": "Слухати в плеєрі {{song}} — {{name}}"
     },
     "nav": {
       "previous": "Попередня стаття: {{name}}",
@@ -116,7 +123,8 @@
       "phones": "PHONES",
       "nowSpinning": "NOW SPINNING",
       "source": "PLAYLIST",
-      "list": "LIST"
+      "list": "LIST",
+      "listLabel": "LIST — плейлист"
     },
     "status": {
       "playing": "▶ PLAYING",
@@ -163,7 +171,7 @@
       "notInMagazine": "{{artist}}: статті в журналі немає"
     },
     "controls": {
-      "seek": "Перемотування",
+      "seek": "Перемотування. Клік по смузі — перейти, Enter — плюс 10 секунд",
       "seekValue": "{{elapsed}} з {{length}}",
       "transport": "Керування відтворенням",
       "power": "Живлення",

@@ -37,6 +37,13 @@
       "music": "Музыка"
     }
   },
+  "errors": {
+    "pageTitle": "Что-то сломалось",
+    "pageText": "Эта страница не загрузилась. Обновите её или вернитесь на главную.",
+    "sectionText": "Этот блок не загрузился. Остальная страница работает.",
+    "reload": "Обновить страницу",
+    "backHome": "На главную"
+  },
   "magazine": {
     "title": "Журнал",
     "flipBackward": "Перелистнуть назад",
@@ -63,7 +70,7 @@
     },
     "random": {
       "sticker": "НАУГАД",
-      "label": "Открыть случайную статью"
+      "label": "Наугад: открыть случайную статью"
     },
     "article": {
       "kicker": "{{origin}} · с {{year}}",
@@ -82,7 +89,7 @@
     },
     "listen": {
       "caption": "СЛУШАТЬ В ПЛЕЕРЕ",
-      "label": "Слушать в плеере: {{name}} — {{song}}"
+      "label": "Слушать в плеере {{song}} — {{name}}"
     },
     "nav": {
       "previous": "Предыдущая статья: {{name}}",
@@ -116,7 +123,8 @@
       "phones": "PHONES",
       "nowSpinning": "NOW SPINNING",
       "source": "PLAYLIST",
-      "list": "LIST"
+      "list": "LIST",
+      "listLabel": "LIST — плейлист"
     },
     "status": {
       "playing": "▶ PLAYING",
@@ -163,7 +171,7 @@
       "notInMagazine": "{{artist}}: статьи в журнале нет"
     },
     "controls": {
-      "seek": "Перемотка",
+      "seek": "Перемотка. Клик по полосе — перейти, Enter — плюс 10 секунд",
       "seekValue": "{{elapsed}} из {{length}}",
       "transport": "Управление воспроизведением",
       "power": "Питание",

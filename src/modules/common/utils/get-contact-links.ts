@@ -1,10 +1,4 @@
-type Contacts = {
-  email: string;
-  phone: string;
-  telegram: string;
-  linkedin: string;
-  github: string;
-};
+import type { Contacts } from '@/content/schemas';
 
 type ContactLink = {
   id: keyof Contacts;
