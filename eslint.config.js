@@ -3,7 +3,9 @@ import eslintReact from '@eslint-react/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import checkFile from 'eslint-plugin-check-file';
+import { importX } from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y-x';
 import playwright from 'eslint-plugin-playwright';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -98,7 +100,6 @@ export default defineConfig(
       ],
 
       eqeqeq: ['error', 'smart'],
-      curly: ['error', 'multi-line'],
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-nested-ternary': 'error',
       'object-shorthand': 'error',
@@ -118,7 +119,12 @@ export default defineConfig(
   },
 
   {
-    files: ['*.{js,ts}', 'e2e/**/*.ts', 'scripts/**/*.ts'],
+    files: [
+      '*.{js,ts}',
+      'e2e/**/*.ts',
+      'scripts/**/*.ts',
+      'vite-plugins/**/*.ts',
+    ],
     languageOptions: { globals: globals.node },
   },
   {
@@ -139,14 +145,41 @@ export default defineConfig(
       jsxA11y.configs.strict,
       reactRefresh.configs.vite,
     ],
+    plugins: { 'import-x': importX },
     languageOptions: { globals: globals.browser },
+    settings: {
+      'import-x/extensions': ['.ts', '.tsx'],
+      'import-x/parsers': { '@typescript-eslint/parser': ['.ts', '.tsx'] },
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({ project: './tsconfig.app.json' }),
+      ],
+    },
     rules: {
       'no-restricted-syntax': ['error', noEnum, booleanShorthand],
       'react-refresh/only-export-components': [
         'error',
         { allowConstantExport: true },
       ],
+      'import-x/no-cycle': ['error', { ignoreExternal: true }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^@/modules/[^/]+/',
+              message:
+                'Import another module through its index.ts barrel (`@/modules/<name>`).',
+            },
+          ],
+        },
+      ],
     },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/utils/capture-error.ts', 'src/**/*.test.{ts,tsx}'],
+    // A severity alone would keep the shared block's `allow` list.
+    rules: { 'no-console': ['error', {}] },
   },
 
   {

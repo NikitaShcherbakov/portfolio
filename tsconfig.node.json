@@ -25,6 +25,7 @@
   },
   "include": [
     "vite.config.ts",
+    "vite-plugins",
     "playwright.config.ts",
     "commitlint.config.ts",
     "e2e",
