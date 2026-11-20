@@ -31,6 +31,7 @@ export const CoverPage = memo(function CoverPage({
           width={coverSizePx}
           height={coverSizePx}
           isEager={leaf === 1}
+          isPriority={leaf === 1}
           onLoad={setLoadedSrc}
         />
       </div>

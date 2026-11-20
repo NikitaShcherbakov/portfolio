@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import contacts from '@/content/contacts.json';
+import { contacts } from '@/content/contacts';
 import { cn } from '@/lib/utils';
 
 import { focusRingClassName } from '../utils/focus-ring';
@@ -8,14 +8,6 @@ import { getContactLinks } from '../utils/get-contact-links';
 
 const contactLinks = getContactLinks(contacts);
 const currentYear = new Date().getFullYear();
-
-const labelKeys = {
-  email: 'footer.email',
-  phone: 'footer.phone',
-  telegram: 'footer.telegram',
-  linkedin: 'footer.linkedin',
-  github: 'footer.github',
-} as const;
 
 export function SiteFooter() {
   const { t } = useTranslation();
@@ -39,7 +31,7 @@ export function SiteFooter() {
                     focusRingClassName
                   )}
                 >
-                  {t(labelKeys[link.id])}
+                  {t(`footer.${link.id}`)}
                   {link.isExternal && (
                     <>
                       {' '}

@@ -38,8 +38,11 @@ from R2 is final: do not propose YouTube, streaming services or previews.
 - Drive the store from events, not timers: `timeupdate` (time), `loadedmetadata` / `durationchange`
   (duration), `play` / `pause`, `waiting` / `playing` (buffering), `ended` (next track), `error`.
 - Volume is `element.volume` (0–1); keep the deck's volume in the store and apply it on change.
-- Preload the next track's start (`fetch` with a `Range: bytes=0-…` header, or a second `Audio` with
-  `preload="auto"` that is never played) so the switch has no gap.
+- The next track preloads in the last 30 s of the current one through a detached second `Audio`
+  (`utils/audio-preloader.ts`: `crossOrigin = 'anonymous'`, `preload = 'auto'`, never played, never in the
+  DOM), which fills the HTTP cache the playing element then reads (the Worker serves `immutable`). Not a
+  `fetch` with a `Range` header: outside the CORS-safelisted forms it sends an `OPTIONS` preflight, and the
+  Worker answers only `GET`/`HEAD`.
 - `navigator.mediaSession`: metadata (title, artist, album, cover) and the play/pause/next/previous
   handlers, so lock-screen and hardware keys work.
 
@@ -69,7 +72,9 @@ a tab change and that the deck reacts to the events. Audio itself cannot be veri
 
 ## Must not
 
-- Must not create a second audio element, or remove `StrictMode` to hide a double effect.
+- Must not create a second audio element that plays or sits in the DOM (the detached, never-played
+  preloader in `utils/audio-preloader.ts` is the one exception), or remove `StrictMode` to hide a double
+  effect.
 - Must not unmount or recreate the element on navigation.
 - Must not call `play()` before the user pressed ▶ once, or ignore its rejected promise.
 - Must not drive time from a timer once the element exists.

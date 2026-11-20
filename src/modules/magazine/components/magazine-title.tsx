@@ -64,6 +64,7 @@ export function MagazineTitle({ children }: MagazineTitleProps) {
   return (
     <h2
       aria-label={children}
+      className="mag-title"
       style={{
         margin: 0,
         display: 'flex',

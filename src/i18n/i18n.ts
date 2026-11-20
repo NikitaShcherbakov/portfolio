@@ -1,11 +1,13 @@
 import { initReactI18next } from 'react-i18next';
 import i18n from 'i18next';
 
+import { invariant } from '@/utils/invariant';
 import { readStoredValue } from '@/utils/storage';
 
 import {
   defaultLanguage,
   detectLanguage,
+  isLanguage,
   type Language,
   languageStorageKey,
 } from './languages';
@@ -40,5 +42,16 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
   initAsync: false,
 });
+
+export function getResolvedLanguage(): Language {
+  const { resolvedLanguage } = i18n;
+
+  invariant(
+    resolvedLanguage !== undefined && isLanguage(resolvedLanguage),
+    'i18next resolved a language the site does not support.'
+  );
+
+  return resolvedLanguage;
+}
 
 export { i18n };

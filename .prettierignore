@@ -6,3 +6,5 @@ worker/worker-configuration.d.ts
 # checkouts that `pnpm format` must never rewrite.
 .claude/qa-artifacts
 .claude/worktrees
+# Third-party skill, kept as published upstream.
+.claude/skills/ui-ux-pro-max

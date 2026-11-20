@@ -2,11 +2,12 @@ const audioPathPattern = /^\/(audio\/[a-z0-9-]+\.[0-9a-f]{8}\.mp3)$/;
 const allowedMethods = ['GET', 'HEAD'];
 
 const httpStatus = {
-  ok: 200,
-  partialContent: 206,
-  forbidden: 403,
-  notFound: 404,
-  methodNotAllowed: 405,
+  Ok: 200,
+  PartialContent: 206,
+  Forbidden: 403,
+  NotFound: 404,
+  MethodNotAllowed: 405,
+  BadGateway: 502,
 } as const;
 
 type LooseRange = { offset?: number; length?: number; suffix?: number };
@@ -16,7 +17,11 @@ function getAllowedOrigin(request: Request, env: Env) {
 
   if (!origin) return null;
 
-  return env.ALLOWED_ORIGINS.split(',').includes(origin) ? origin : null;
+  const allowedOrigins = env.ALLOWED_ORIGINS.split(',').map((allowed) =>
+    allowed.trim()
+  );
+
+  return allowedOrigins.includes(origin) ? origin : null;
 }
 
 function createCorsHeaders(origin: string | null) {
@@ -32,7 +37,7 @@ function createErrorResponse(status: number, origin: string | null) {
 
   headers.set('Cache-Control', 'no-store');
 
-  if (status === httpStatus.methodNotAllowed) {
+  if (status === httpStatus.MethodNotAllowed) {
     headers.set('Allow', allowedMethods.join(', '));
   }
 
@@ -48,45 +53,61 @@ function getContentRange(range: R2Range, size: number) {
   return `bytes ${String(start)}-${String(end)}/${String(size)}`;
 }
 
+function readAudioObject(request: Request, bucket: R2Bucket, key: string) {
+  return request.headers.has('Range')
+    ? bucket.get(key, { range: request.headers })
+    : bucket.get(key);
+}
+
+function createAudioResponse(
+  request: Request,
+  object: R2ObjectBody,
+  origin: string
+) {
+  const headers = createCorsHeaders(origin);
+
+  object.writeHttpMetadata(headers);
+  headers.set('ETag', object.httpEtag);
+  headers.set('Accept-Ranges', 'bytes');
+  headers.set('Content-Disposition', 'inline');
+
+  const { range } = object;
+  const isPartial = request.headers.has('Range') && range !== undefined;
+
+  if (isPartial) {
+    headers.set('Content-Range', getContentRange(range, object.size));
+  }
+
+  return new Response(request.method === 'HEAD' ? null : object.body, {
+    status: isPartial ? httpStatus.PartialContent : httpStatus.Ok,
+    headers,
+  });
+}
+
 export default {
   async fetch(request, env) {
     const origin = getAllowedOrigin(request, env);
 
     if (!allowedMethods.includes(request.method)) {
-      return createErrorResponse(httpStatus.methodNotAllowed, origin);
+      return createErrorResponse(httpStatus.MethodNotAllowed, origin);
     }
 
     const key = audioPathPattern.exec(new URL(request.url).pathname)?.[1];
 
-    if (!key) return createErrorResponse(httpStatus.notFound, origin);
+    if (!key) return createErrorResponse(httpStatus.NotFound, origin);
 
-    // Media elements with crossOrigin send Origin; a typed URL or a download link does not.
-    if (!origin) return createErrorResponse(httpStatus.forbidden, null);
+    if (!origin) return createErrorResponse(httpStatus.Forbidden, null);
 
-    const hasRange = request.headers.has('Range');
-    const object = hasRange
-      ? await env.AUDIO.get(key, { range: request.headers })
-      : await env.AUDIO.get(key);
+    try {
+      const object = await readAudioObject(request, env.AUDIO, key);
 
-    if (!object) return createErrorResponse(httpStatus.notFound, origin);
+      return object
+        ? createAudioResponse(request, object, origin)
+        : createErrorResponse(httpStatus.NotFound, origin);
+    } catch (error) {
+      console.error(`R2 read of "${key}" failed.`, error);
 
-    const headers = createCorsHeaders(origin);
-
-    object.writeHttpMetadata(headers);
-    headers.set('ETag', object.httpEtag);
-    headers.set('Accept-Ranges', 'bytes');
-    headers.set('Content-Disposition', 'inline');
-
-    const { range } = object;
-    const isPartial = hasRange && range !== undefined;
-
-    if (isPartial) {
-      headers.set('Content-Range', getContentRange(range, object.size));
+      return createErrorResponse(httpStatus.BadGateway, origin);
     }
-
-    return new Response(request.method === 'HEAD' ? null : object.body, {
-      status: isPartial ? httpStatus.partialContent : httpStatus.ok,
-      headers,
-    });
   },
 } satisfies ExportedHandler<Env>;

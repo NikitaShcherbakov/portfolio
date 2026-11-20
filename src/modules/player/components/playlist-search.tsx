@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ClearIcon, SearchIcon } from './deck-icons';
@@ -11,14 +11,6 @@ type PlaylistSearchProps = {
 export function PlaylistSearch({ query, onChange }: PlaylistSearchProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape' && query) {
-      event.preventDefault();
-      event.stopPropagation();
-      onChange('');
-    }
-  };
 
   const handleClear = () => {
     onChange('');
@@ -37,7 +29,6 @@ export function PlaylistSearch({ query, onChange }: PlaylistSearchProps) {
         onChange={(event) => {
           onChange(event.target.value);
         }}
-        onKeyDown={handleKeyDown}
       />
       {query && (
         <button

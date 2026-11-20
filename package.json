@@ -49,7 +49,9 @@
     "@vitest/eslint-plugin": "^1.6.28",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-check-file": "^3.3.2",
+    "eslint-plugin-import-x": "^4.18.1",
     "eslint-plugin-jsx-a11y-x": "^0.2.0",
     "eslint-plugin-playwright": "^2.12.2",
     "eslint-plugin-react-refresh": "^0.5.7",
@@ -79,6 +81,8 @@
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.14.26",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.1.0",
     "clsx": "^2.1.1",
     "i18next": "^27.0.1",
     "react": "^19.3.1",

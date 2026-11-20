@@ -2,16 +2,14 @@
   .poster {
     position: relative;
     overflow: hidden;
-    box-shadow:
-      0 12px 24px rgba(40, 22, 8, 0.45),
-      0 2px 4px rgba(40, 22, 8, 0.3);
+    box-shadow: var(--shadow-poster);
   }
 
   .kraft {
-    background-color: #cdb48a;
+    background-color: var(--color-kraft);
     background-image:
-      radial-gradient(rgba(90, 60, 30, 0.18) 1px, transparent 1.4px),
-      linear-gradient(160deg, #d8c19a, #bfa275);
+      radial-gradient(var(--color-kraft-grain) 1px, transparent 1.4px),
+      linear-gradient(160deg, var(--color-kraft-light), var(--color-kraft-dark));
     background-size:
       6px 6px,
       100% 100%;
@@ -23,7 +21,7 @@
     z-index: 3;
     width: 92px;
     height: 26px;
-    background: rgba(236, 226, 196, 0.82);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    background: var(--color-tape);
+    box-shadow: var(--shadow-tape);
   }
 }

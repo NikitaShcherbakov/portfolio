@@ -31,11 +31,28 @@ Tailwind scale or restyle into shadcn defaults. When the design and a rule here 
 | a value known only at runtime (a band's theme color, an animation delay)                     | inline `style`, ideally a CSS custom property the stylesheet reads                 |
 | conditional classes                                                                          | `cn()` in `src/lib/utils.ts` (`clsx` + `tailwind-merge`), added with the first one |
 
-No CSS modules, no styled-components, no CSS-in-JS. Band colors are never tokens: they come from
-`bands.json → theme`.
+No CSS modules, no styled-components, no CSS-in-JS, no Sass/Less: Tailwind 4 is not built to run behind a
+preprocessor, and native CSS already has nesting, custom properties, `@layer` and `color-mix()`. Band
+colors are never tokens: they come from `bands.json → theme`.
+
+### Tokens
+
+`src/styles/theme.css` holds the palette and shadows of the project's own layer (`ink`, `coal`, `paper`,
+`flag-blue`, `flag-red`, `marker-yellow`, `kraft*`, `tape`, `shadow-cutout`, `shadow-poster`,
+`shadow-tape`), used as utilities (`bg-paper`, `text-ink`, `shadow-cutout`) or as `var(--color-kraft)` in a
+stylesheet. Outside the design stylesheets, a hex/rgba color that a token already names is a bug; a new
+color repeated in two places becomes a token, named by what it is in the scrapbook, not by its hue
+number. The design stylesheets (`player.css`, `magazine.css`) keep their literal colors: they stay as
+delivered.
+
+### Class names of a new design
+
+Design stylesheets share one global class namespace (`.book`, `.leaf`, `.edge`, `.k-*`, `.deck-*`, …).
+Before porting a new design (CV, Games, iPod), grep its class names against `src/**/*.css`; on a clash,
+prefix the new design's classes with its module (`cv-`, `games-`) in both the stylesheet and the markup.
 
 `src/styles/index.css` imports, in this order: `tailwindcss`, `theme.css` (tokens), the player's three
-stylesheets, `scrapbook.css` (shared paper and cut-out classes); it also declares the `dark` and `phone`
+stylesheets, the magazine's three, `scrapbook.css` (shared paper and cut-out classes); it also declares the `dark` and `phone`
 custom variants. A new shared stylesheet goes next to them and is imported there; mind the order.
 
 ### The player exception

@@ -1,7 +1,15 @@
 import { getScrollBehavior } from './reduced-motion';
 
 export function scrollToCenter(selector: string) {
-  document
-    .querySelector(selector)
-    ?.scrollIntoView({ behavior: getScrollBehavior(), block: 'center' });
+  const element = document.querySelector(selector);
+
+  if (!element) return;
+
+  const isTallerThanViewport =
+    element.getBoundingClientRect().height > window.innerHeight;
+
+  element.scrollIntoView({
+    behavior: getScrollBehavior(),
+    block: isTallerThanViewport ? 'start' : 'center',
+  });
 }

@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils';
 
-import { useListenToBand } from '../hooks/use-band-playback';
+import { useListenToBand } from '../hooks/use-listen-to-band';
 import { useMagazineStore } from '../stores/magazine-store';
 import { focusKeys } from '../utils/focus';
 import type { MagazineEntry } from '../utils/magazine-entries';
@@ -22,9 +23,10 @@ const rings = [
 
 type ListenButtonProps = {
   entry: MagazineEntry;
+  children?: ReactNode;
 };
 
-export function ListenButton({ entry }: ListenButtonProps) {
+export function ListenButton({ entry, children }: ListenButtonProps) {
   const { t } = useTranslation();
   const listenTap = useMagazineStore.use.listenTap();
   const listen = useListenToBand(entry);
@@ -71,6 +73,7 @@ export function ListenButton({ entry }: ListenButtonProps) {
           ))}
         </button>
       </div>
+      {children}
     </div>
   );
 }

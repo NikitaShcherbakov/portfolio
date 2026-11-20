@@ -1,19 +1,11 @@
 import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
-import { createThemeScript } from './src/modules/common/utils/theme.ts';
-
-function themeScript(): Plugin {
-  return {
-    name: 'theme-script',
-    transformIndexHtml: () => [
-      { tag: 'script', children: createThemeScript(), injectTo: 'head' },
-    ],
-  };
-}
+import { contentValidation } from './vite-plugins/content-validation.ts';
+import { themeScript } from './vite-plugins/theme-script.ts';
+import { vercelConfig } from './vite-plugins/vercel-config.ts';
 
 function isMagazineDecoAsset(filePath: string) {
   return filePath
@@ -22,7 +14,13 @@ function isMagazineDecoAsset(filePath: string) {
 }
 
 export default defineConfig({
-  plugins: [tailwindcss(), react(), themeScript()],
+  plugins: [
+    tailwindcss(),
+    react(),
+    themeScript(),
+    contentValidation(),
+    vercelConfig(),
+  ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
