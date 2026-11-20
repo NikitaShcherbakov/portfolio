@@ -1,5 +1,5 @@
 // PostToolUse (Write|Edit) hook: lists the comments a Write or Edit added to a script file in
-// src/, e2e/ or scripts/, each with what looks wrong in it against the CLAUDE.md "Comments" rules.
+// src/, e2e/, scripts/ or worker/, each with what looks wrong in it against the CLAUDE.md "Comments" rules.
 // Advisory only: it never blocks.
 import { spawnSync } from 'node:child_process';
 import { join, relative, resolve } from 'node:path';
@@ -20,7 +20,7 @@ const MAX_PATH_LENGTH = 200;
 const MIN_MOVED_LINE_LENGTH = 20;
 
 const scriptFilePattern = /\.(ts|tsx|js|jsx|mts|mjs)$/i;
-const checkedDirs = ['src', 'e2e', 'scripts'];
+const checkedDirs = ['src', 'e2e', 'scripts', 'worker'];
 
 // Windows paths ignore case, so `Src/x.TSX` is the same file as `src/x.tsx`.
 const isCheckedScript = (repoPath) => {
@@ -440,7 +440,7 @@ if (!blocks.length) process.exit(0);
 
 let report = [
   `This edit added ${blocks.length} comment${blocks.length === 1 ? '' : 's'} to ${truncate(repoPath, MAX_PATH_LENGTH)}. CLAUDE.md "Comments": the default is no comment.`,
-  'Keep one only if a rule requires it (the `-- <why>` of an eslint-disable, the reason of a @ts-expect-error or of a deliberately silent catch), the user asked for it, or the code alone would mislead the next reader (a browser or library quirk such as a YouTube IFrame API or 3D-transform workaround, a value with no visible source) and it says why in one or two English lines, every claim verified this session. Delete the rest now, with Edit. This list is no reason to touch a comment it does not show.',
+  'Keep one only if a rule requires it (the `-- <why>` of an eslint-disable, the reason of a @ts-expect-error or of a deliberately silent catch), the user asked for it, or the code alone would mislead the next reader (a browser or library quirk such as a media autoplay-policy or 3D-transform workaround, a value with no visible source) and it says why in one or two English lines, every claim verified this session. Delete the rest now, with Edit. This list is no reason to touch a comment it does not show.',
   '',
 ].join('\n');
 let shownCount = 0;

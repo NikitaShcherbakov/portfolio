@@ -1,0 +1,22 @@
+[
+  {
+    "artist": "Moby",
+    "name": "MOBY",
+    "kind": "solo",
+    "sinceYear": 1983,
+    "label": "Mute / V2",
+    "highlights": ["Play"],
+    "underline": "Go",
+    "albums": [
+      { "title": "Moby", "year": 1992 },
+      { "title": "Play", "year": 1999 },
+      { "title": "18", "year": 2002 }
+    ],
+    "photoUrl": "https://r2.theaudiodb.com/images/media/artist/fanart/rppvvr1351176956.jpg",
+    "songs": [
+      { "trackId": "moby-porcelain" },
+      { "trackId": "moby-flower" },
+      { "trackId": "moby-in-this-world" }
+    ]
+  }
+]

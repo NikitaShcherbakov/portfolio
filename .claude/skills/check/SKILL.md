@@ -42,7 +42,8 @@ pnpm test:e2e --project mobile      # only the Pixel 7 touch context
 
 ## If format:check fails
 
-It lists the files. Rewrite the ones this task changed: `pnpm exec prettier --write <paths>`. `pnpm format`
+It lists the files. Rewrite the ones this task changed: `pnpm exec prettier --write <paths>` (asks for
+permission, like every rewriting command; a file edited with Edit/Write was already formatted by the hook). `pnpm format`
 rewrites the whole repo: only when `git status` shows nothing but this task's changes. Tailwind class order
 is a Prettier matter here (`prettier-plugin-tailwindcss`, also inside `cn()` and `clsx()`), not ESLint's.
 
@@ -68,8 +69,9 @@ edit:
 
 ## If typecheck fails
 
-`tsc -b` builds two projects: `tsconfig.app.json` (`src/`) and `tsconfig.node.json` (root configs, `e2e/`).
-Both are strict with `noUncheckedIndexedAccess` (an indexed read is `T | undefined`: handle the missing case)
+`tsc -b` builds three projects: `tsconfig.app.json` (`src/`), `tsconfig.node.json` (root configs, `e2e/`,
+`scripts/`) and `worker/tsconfig.json` (`worker/`). An error about a Worker binding or `Env` after a change
+to `worker/wrangler.jsonc` means its types are stale: `pnpm worker:types`. All are strict with `noUncheckedIndexedAccess` (an indexed read is `T | undefined`: handle the missing case)
 and `exactOptionalPropertyTypes` (an optional prop does not accept an explicit `undefined`: omit it, or type
 it `prop?: T | undefined`). `erasableSyntaxOnly` rejects `enum`, `namespace` and constructor parameter
 properties. Read the first error: later ones are often consequences.

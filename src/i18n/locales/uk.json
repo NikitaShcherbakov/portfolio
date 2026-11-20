@@ -1,0 +1,209 @@
+{
+  "site": {
+    "name": "Микита Щербаков",
+    "pageTitle": "{{page}} — {{name}}",
+    "skipToContent": "Перейти до вмісту"
+  },
+  "nav": {
+    "label": "Основна навігація",
+    "home": "Головна",
+    "cv": "Резюме",
+    "games": "Ігри"
+  },
+  "language": {
+    "label": "Мова"
+  },
+  "theme": {
+    "label": "Тема",
+    "light": "Світла тема",
+    "dark": "Темна тема",
+    "system": "Як у системі"
+  },
+  "footer": {
+    "contacts": "Контакти",
+    "email": "Пошта",
+    "phone": "Телефон",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "newTab": "(відкриється в новій вкладці)"
+  },
+  "pages": {
+    "notFound": {
+      "title": "Сторінку не знайдено",
+      "backHome": "На головну"
+    },
+    "home": {
+      "music": "Музика"
+    }
+  },
+  "errors": {
+    "pageTitle": "Щось зламалося",
+    "pageText": "Ця сторінка не завантажилася. Оновіть її або поверніться на головну.",
+    "sectionText": "Цей блок не завантажився. Решта сторінки працює.",
+    "reload": "Оновити сторінку",
+    "backHome": "На головну"
+  },
+  "magazine": {
+    "title": "Журнал",
+    "flipBackward": "Перегорнути назад",
+    "flipForward": "Перегорнути вперед",
+    "cover": {
+      "alt": "Обкладинка альбому {{album}}",
+      "credit": "ОБКЛАДИНКА · {{album}} · {{year}}"
+    },
+    "photo": {
+      "bandAlt": "Фото {{name}}",
+      "coverAlt": "Обкладинка {{album}}"
+    },
+    "search": {
+      "sticker": "ЗНАЙТИ",
+      "open": "Знайти гурт або пісню",
+      "close": "Закрити пошук",
+      "input": "Знайти гурт або пісню в журналі",
+      "placeholder": "гурт або пісня",
+      "results": "Знайдені статті",
+      "caption": "Тим часом у журналі…",
+      "page": "с. {{page}}!",
+      "empty": "Бам! Нічого не знайшлося…",
+      "found": "Знайдено статей: {{count}}"
+    },
+    "random": {
+      "sticker": "НАВМАННЯ",
+      "label": "Навмання: відкрити випадкову статтю"
+    },
+    "article": {
+      "kicker": "{{origin}} · з {{year}}",
+      "song": "Пісня номера",
+      "songMeta": "альбом {{album}} · {{year}} · {{length}}",
+      "trackStory": "Історія треку.",
+      "historyBand": "Історія гурту.",
+      "historySolo": "Історія артиста.",
+      "members": "Склад.",
+      "label": "Лейбл: {{label}}.",
+      "sound": "Звучання.",
+      "dates": "Дати.",
+      "foundedBand": "заснування гурту",
+      "foundedSolo": "початок кар'єри",
+      "album": "альбом {{title}}"
+    },
+    "listen": {
+      "caption": "СЛУХАТИ В ПЛЕЄРІ",
+      "label": "Слухати в плеєрі {{song}} — {{name}}"
+    },
+    "nav": {
+      "previous": "Попередня стаття: {{name}}",
+      "next": "Далі в журналі: {{name}}",
+      "restart": "На початок журналу: {{name}}",
+      "counter": "Журнал · {{current}} / {{total}}"
+    },
+    "notes": {
+      "soHot": "🔥 so hot",
+      "listen": "→ listen!",
+      "hit": "★ hit!",
+      "rockOn": "ROCK ON!"
+    }
+  },
+  "player": {
+    "deck": {
+      "brand": "STEREO 2000",
+      "model": "NS-CD1",
+      "tagline": "HIGH FIDELITY",
+      "hello": "HELLO",
+      "disc": "DISC",
+      "standby": "STANDBY",
+      "shuffleFlag": "SHUFFLE",
+      "nextKey": "NEXT ▸",
+      "captionMain": "COMPACT DISC",
+      "captionTail": " · DIGITAL MUSIC SYSTEM",
+      "lineOut": "LINE OUT",
+      "left": "L",
+      "right": "R",
+      "serial": "S/N NS-CD1-0001",
+      "phones": "PHONES",
+      "nowSpinning": "NOW SPINNING",
+      "source": "PLAYLIST",
+      "list": "LIST",
+      "listLabel": "LIST — плейлист"
+    },
+    "status": {
+      "playing": "▶ PLAYING",
+      "paused": "❚❚ PAUSED",
+      "standby": "■ STANDBY",
+      "loading": "◌ LOADING",
+      "noSignal": "✕ NO SIGNAL"
+    },
+    "playbackFailed": "Не вдалося завантажити жоден трек. Натисни «Грати», щоб спробувати ще раз.",
+    "trackNumber": "TRACK {{current}} / {{total}}",
+    "repeatFlag": {
+      "all": "REPEAT ALL",
+      "one": "REPEAT ONE",
+      "off": "REPEAT OFF"
+    },
+    "upNext": {
+      "track": "{{artist}} — {{title}}",
+      "repeat": "повтор: {{title}}",
+      "end": "кінець черги"
+    },
+    "osd": {
+      "volume": "VOL {{volume}}",
+      "mute": "MUTE"
+    },
+    "engraving": {
+      "power": "POWER",
+      "prev": "PREV",
+      "play": "PLAY",
+      "next": "NEXT",
+      "shuffle": "SHUFFLE",
+      "repeat": "REPEAT",
+      "random": "RANDOM",
+      "volume": "VOLUME",
+      "pushToMute": "PUSH TO MUTE",
+      "time": "TIME",
+      "elapsedTotal": "ELAPSED · TOTAL"
+    },
+    "magazine": {
+      "page": "MAGAZINE · P.{{page}}",
+      "pageUnknown": "MAGAZINE · P.—",
+      "pageCaption": "MAGAZINE · PAGE",
+      "open": "OPEN",
+      "openLabel": "Відкрити {{artist}} у журналі, сторінка {{page}}",
+      "notInMagazine": "{{artist}}: статті в журналі немає"
+    },
+    "controls": {
+      "seek": "Перемотування. Клік по смузі — перейти, Enter — плюс 10 секунд",
+      "seekValue": "{{elapsed}} з {{length}}",
+      "transport": "Керування відтворенням",
+      "power": "Живлення",
+      "previous": "Попередній трек",
+      "play": "Грати",
+      "pause": "Пауза",
+      "next": "Наступний трек",
+      "shuffle": "Перемішати",
+      "repeat": {
+        "all": "Повтор: уся черга",
+        "one": "Повтор: один трек",
+        "off": "Повтор: вимкнено"
+      },
+      "random": "Випадковий трек",
+      "volume": "Гучність",
+      "volumeDown": "Тихіше",
+      "volumeUp": "Гучніше",
+      "volumeKnob": "Гучність {{volume}} з {{max}}. Натисни, щоб вимкнути або увімкнути звук",
+      "volumeKnobMuted": "Гучність вимкнено. Натисни, щоб вимкнути або увімкнути звук",
+      "disc": "Диск: {{label}}. {{action}}"
+    },
+    "playlist": {
+      "label": "Плейлист",
+      "search": "Пошук у плейлисті",
+      "searchPlaceholder": "Гурт, пісня або альбом",
+      "clearSearch": "Очистити пошук",
+      "count_one": "{{count}} трек",
+      "count_few": "{{count}} треки",
+      "count_many": "{{count}} треків",
+      "count_other": "{{count}} треку",
+      "found": "знайдено {{count}} з {{total}}",
+      "empty": "Нічого не знайшлося. Спробуй іншу назву."
+    }
+  }
+}

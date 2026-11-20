@@ -1,0 +1,129 @@
+/* The px-sized stickers grow into the right edge of a narrow book; on a wide book every max() resolves to
+   the design's value. */
+.book .edge {
+  width: max(4.2cqw, 44px);
+}
+
+.book .edge-r {
+  top: max(5.2cqw, 1cqw + 50px);
+  bottom: max(3.8cqw, 48px);
+}
+
+.book .edge:disabled {
+  cursor: default;
+  background: transparent;
+}
+
+.book:has(.j-res) .edge-r {
+  pointer-events: none;
+}
+
+/* The curl's matrix() for the back face is computed around the top-left corner; the default centre origin
+   throws the flap outside the book on a diagonal fold. */
+.leaf.curl > .face-back {
+  transform-origin: 0 0;
+}
+
+.j-stk {
+  min-width: 44px;
+}
+
+.j-ball:disabled {
+  cursor: default;
+  opacity: 0.45;
+  transform: none;
+}
+
+.j-x {
+  position: relative;
+}
+
+.j-x::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
+/* The page clips anything past its edge, so the nav hit areas grow up and inward from the page corners. */
+.k-nav-b::before {
+  inset: auto;
+  bottom: -1cqw;
+  width: max(100% + 16px, 44px);
+  height: max(100% + 28px, 44px);
+}
+
+.k-nav-b:first-child::before {
+  left: -1.9cqw;
+}
+
+.k-nav-b:last-child::before {
+  right: -2.2cqw;
+}
+
+/* On a phone-sized book the previous-article hit area overlaps the listen button. */
+.k-foot {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.k-foot .j-listen {
+  pointer-events: auto;
+}
+
+/* The design's search pill is 26px tall, so the field reaches past it to a 44px hit area. */
+.j-pill .j-find-in {
+  align-self: center;
+  height: 44px;
+  margin-left: -0.9cqw;
+  padding-left: 0.9cqw;
+}
+
+.j-res button {
+  min-height: 44px !important;
+}
+
+/* The design removes the field's outline and gives the pill no focus state. */
+.j-pill:has(.j-find-in:focus-visible) {
+  outline: 2px solid var(--color-flag-red);
+  outline-offset: 2px;
+}
+
+.j-pill .j-find-in::placeholder {
+  color: #6b6b6b;
+}
+
+/* White text straight on the cover art drops under 3:1 on light covers. */
+.j-cv-fol,
+.j-cv-cred {
+  padding: 0.15em 0.4em;
+  border-radius: 0.3em;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+  text-shadow: none;
+}
+
+/* iOS Safari zooms the page into a focused field whose text is smaller than 16px. */
+@media (pointer: coarse) {
+  .j-pill .j-find-in {
+    font-size: max(1cqw, 16px);
+  }
+}
+
+/* The design's title wraps its last letter on a phone; the site's other cut-out headings shrink to 0.7 there. */
+@media (max-width: 640px) {
+  .mag-title > span {
+    zoom: 0.7;
+  }
+}
+
+/* The unlayered magazine-compat.css reverts margin and padding, which would beat a layered sr-only utility. */
+.mag-sr-only {
+  @apply sr-only;
+}
+
+.j-listen:focus-visible,
+.k-nav-b:focus-visible,
+.book .edge:focus-visible,
+.j-stk:focus-visible {
+  outline-color: var(--color-flag-red);
+}

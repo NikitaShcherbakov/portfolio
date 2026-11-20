@@ -1,0 +1,72 @@
+/* Reverts only what Tailwind preflight sets inside .mag-wrap: `all: revert` made style recalculation about
+   4x slower. Unlayered so it beats the layered preflight. */
+:where(.mag-wrap) {
+  font-family: 'PT Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  color: #ece4d6;
+  text-align: left;
+  tab-size: 8;
+
+  &,
+  :where(*:not(svg, svg *)),
+  :where(*:not(svg, svg *))::before,
+  :where(*:not(svg, svg *))::after {
+    box-sizing: revert;
+    margin: revert;
+    padding: revert;
+    border: revert;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: revert;
+    font-weight: revert;
+  }
+
+  :where(b, strong) {
+    font-weight: revert;
+  }
+
+  :where(small) {
+    font-size: revert;
+  }
+
+  :where(ol, ul, menu) {
+    list-style: revert;
+  }
+
+  :where(img) {
+    display: revert;
+    vertical-align: revert;
+    max-width: revert;
+    height: revert;
+  }
+
+  :where(button, input) {
+    font: revert;
+    font-feature-settings: revert;
+    font-variation-settings: revert;
+    letter-spacing: revert;
+    color: revert;
+    border-radius: revert;
+    background-color: revert;
+    opacity: revert;
+    appearance: revert;
+  }
+
+  :where(input)::placeholder {
+    opacity: revert;
+    color: revert;
+  }
+
+  :where(input)::-webkit-search-decoration {
+    appearance: revert;
+  }
+
+  :where(svg) {
+    display: inline;
+    vertical-align: baseline;
+    box-sizing: content-box;
+  }
+}

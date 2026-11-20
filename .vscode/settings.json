@@ -7,5 +7,9 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "tailwindCSS.experimental.configFile": "src/styles/index.css",
   "tailwindCSS.classFunctions": ["cn", "clsx"],
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "i18n-ally.localesPaths": ["src/i18n/locales"],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.sourceLanguage": "ru",
+  "i18n-ally.displayLanguage": "ru"
 }

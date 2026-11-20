@@ -1,0 +1,46 @@
+{
+  "bands": {
+    "Moby": {
+      "origin": "New York City, USA",
+      "body": "Moby started as the guitarist of the punk band Vatican Commandos, hit the UK top 10 in 1991 with Go, and found fame with Play, built on blues samples.",
+      "more": "Play sold more than 12 million copies and became the first album with every track licensed for film and advertising.",
+      "historyExtra": "18 (2002) topped the charts in twelve countries, and Extreme Ways played in all five Bourne films.",
+      "sound": "Downtempo and ambient electronica over old blues and gospel samples.",
+      "members": [
+        {
+          "name": "Moby",
+          "role": "vocals, guitar, bass, keyboards, drums"
+        }
+      ]
+    }
+  },
+  "songs": {
+    "moby-porcelain": {
+      "lead": "A song its own author thought too mushy reached the whole world: Porcelain became one of the big singles from Play.",
+      "trackStory": "Moby disliked his own vocal and had to be talked into putting the song on Play. In 2000 it reached UK No. 5 and played in The Beach.",
+      "stats": [
+        { "value": "1999", "label": "Play comes out" },
+        { "value": "12M", "label": "copies of Play sold worldwide" },
+        { "value": "#5", "label": "Porcelain on the UK chart" }
+      ]
+    },
+    "moby-flower": {
+      "lead": "A track left off Play ended up in a car-heist film and became the soundtrack of a fitness challenge.",
+      "trackStory": "Flower missed Play and came out in 2000 as a B-side on singles of that era, Honey among them. The same year it played in Gone in 60 Seconds.",
+      "stats": [
+        { "value": "2000", "label": "plays in Gone in 60 Seconds" },
+        { "value": "B-SIDE", "label": "from the Play sessions" },
+        { "value": "SILVER", "label": "BPI certification in the UK" }
+      ]
+    },
+    "moby-in-this-world": {
+      "lead": "The second track on 18 is built on a vocal sample of The Davis Sisters and topped the chart in Poland.",
+      "trackStory": "The third single from 18 came out in November 2002. In the video, aliens land in New York, but they are so tiny that nobody notices them.",
+      "stats": [
+        { "value": "2002", "label": "18 comes out" },
+        { "value": "#1", "label": "on the Polish chart" },
+        { "value": "4M+", "label": "copies of 18 sold" }
+      ]
+    }
+  }
+}

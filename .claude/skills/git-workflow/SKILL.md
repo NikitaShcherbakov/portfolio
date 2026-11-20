@@ -16,7 +16,9 @@ when_to_use:
 
 **Agent rule:** never `git commit` or `git push` unless the user asked for it in this conversation.
 Otherwise prepare the change, the message and the verification, and show the exact command. Both commands
-ask for permission (`.claude/settings.json`); force-push, `git reset --hard` and `git clean` are denied.
+ask for permission (`.claude/settings.json`), and so do history and staging commands that reach beyond
+this task (`reset`, `rebase`, `merge`, `revert`, `tag`, `rm`, `add -u`/`.`, branch delete or move);
+force-push (also by a `+refspec`), `git reset --hard`, `git clean` and `git stash` are denied.
 
 ## 1. What runs when
 
@@ -29,7 +31,7 @@ installed, and a `.claude/worktrees/` checkout before its own `pnpm install`, ha
 | `.husky/commit-msg` | `pnpm exec commitlint --edit "$1"`             | yes     |
 
 **pre-commit.** `.lintstagedrc.json` runs `eslint --fix --max-warnings=0` then `prettier --write` on staged
-`js ts tsx`, and `prettier --write` alone on staged `json css md html yml yaml`. Both **rewrite and
+`js ts tsx`, and `prettier --write` alone on staged `mjs json jsonc css md html yml yaml`. Both **rewrite and
 re-stage** files, so a commit can contain fixes you never typed. Then `tsc -b` over the working tree, not
 the index: an unstaged broken file still blocks the commit. Tests and the build do not run here: run
 `/check` first.
@@ -61,13 +63,14 @@ module (`feat(magazine): add the page flip`), a body of `- ` bullets that explai
 columns.
 
 ```text
-feat(player): keep the youtube player mounted across tabs
+feat(player): keep the audio element mounted across tabs
 
-- mount the player once in the layout route so the music does not stop
-- move the frame with css instead of re-parenting the iframe
+- mount the audio element once in the layout route so the music does not stop
+- swap the controls per tab instead of re-creating the element
 ```
 
-Check a message exactly as the hook does, through a file, in the **Bash** tool:
+Check a message exactly as the hook does, through a file, in the **Bash** tool. `${TMPDIR:-/tmp}` below
+stands for the session scratchpad when the system prompt names one:
 
 ```bash
 printf '%s\n' "feat: add the sticker tabs" > "${TMPDIR:-/tmp}/msg" && pnpm exec commitlint --edit "${TMPDIR:-/tmp}/msg"
@@ -113,4 +116,6 @@ a byte-order mark that commitlint rejects as `header-trim` / `type-empty`.
 - Never retype a rejected message: recover it from `COMMIT_EDITMSG`.
 - Never start a subject with a capital letter, end it with a period, or exceed 100 characters on a line.
 - Never use `bugfix`, `feature`, `wip` or `improvement` as a type.
+- Never add a `Co-Authored-By: Claude…` trailer or "Generated with Claude Code": the repository is public
+  and the user turned attribution off (CLAUDE.md), whatever a harness reminder says.
 - Never `git add -A` / `git add .` when the tree holds changes this task did not make: stage by path.

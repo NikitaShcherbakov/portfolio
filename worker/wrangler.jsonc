@@ -1,0 +1,13 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "portfolio-audio",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "r2_buckets": [{ "binding": "AUDIO", "bucket_name": "portfolio-music" }],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://rockfolio-dev.vercel.app,http://localhost:5173,http://localhost:4173,http://localhost:4317",
+  },
+  "observability": { "enabled": true },
+}

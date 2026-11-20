@@ -21,18 +21,19 @@ corrects the rest from the diff. Read the diff, not just the commit subjects.
 
 ## Preconditions
 
-- **Account.** The machine's `gh` has two accounts: `microgendx-dev` (work, the active one) and
-  `NikitaShcherbakov` (personal, owns this repository). Never switch the active account and never log out:
-  pass the personal token per command in the **Bash** tool:
+- **Account.** The machine's `gh` has two accounts: a work one (the active one) and `NikitaShcherbakov`
+  (personal, owns this repository). Never switch the active account and never log out: pass the personal
+  token in **every** `gh` command, in the **Bash** tool. Shell state does not survive between tool calls,
+  so an `export GH_TOKEN=…` in one call is gone in the next and `gh` silently falls back to the work
+  account. Every `gh …` below means this prefixed form:
 
   ```bash
-  export GH_TOKEN=$(gh auth token --user NikitaShcherbakov)
-  gh pr view --repo NikitaShcherbakov/portfolio ...
+  GH_TOKEN=$(gh auth token --user NikitaShcherbakov) gh pr view --repo NikitaShcherbakov/portfolio ...
   ```
 
   If `gh auth token --user NikitaShcherbakov` fails, stop and ask the user to run `gh auth login` in the VS
-  Code terminal (answer **No** to "Authenticate Git with your GitHub credentials?"), then
-  `gh auth switch --user microgendx-dev` afterwards.
+  Code terminal (answer **No** to "Authenticate Git with your GitHub credentials?"), then switch back to
+  their work account with `gh auth switch --user <work account>` afterwards.
 
 - **Pushed.** After `git fetch -q origin`, `git log --oneline origin/<branch>..HEAD` prints nothing.
   Uncommitted work is not in the pull request: say so instead of describing it. Push only when the user
@@ -99,7 +100,8 @@ screenshots to attach, and the merge itself.
 
 ## Must not
 
-- Must not switch `gh`'s active account, log out, or use the work account for this repository.
+- Must not switch `gh`'s active account, log out, or use the work account for this repository; never run a
+  `gh` command without the `GH_TOKEN=…` prefix.
 - Must not add Claude attribution (a `Co-Authored-By` line or "Generated with Claude Code") to a title, body
   or commit: the user turned it off for this public repository.
 - Must not invent a test result, screenshot or issue number.

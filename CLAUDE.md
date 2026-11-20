@@ -1,8 +1,8 @@
 # portfolio
 
-Personal portfolio site of Nikita Shcherbakov for recruiters (CV plus interactive features), styled as a 2000s rock bedroom: Union Jack header, fairy lights, a rock magazine with 3D page flips, an iPod-style player driven by YouTube, a chart. Tabs: Home (`/`), CV (`/cv`), Games (`/games`).
+Personal portfolio site of Nikita Shcherbakov for recruiters (CV plus interactive features), styled as a 2000s rock bedroom: Union Jack header, fairy lights, a rock magazine with 3D page flips, an iPod-style player with free tracks served from the project's own storage, a chart. Tabs: Home (`/`), CV (`/cv`), Games (`/games`).
 
-Talk to the user in Russian. Code, comments and commit messages stay in English. UI copy is Russian.
+Talk to the user in Russian. Code, comments and commit messages stay in English. UI copy is written in Russian (the default language) and translated into English and Ukrainian (the **i18n** skill).
 
 ## Stack
 
@@ -18,7 +18,7 @@ Talk to the user in Russian. Code, comments and commit messages stay in English.
 
 No backend, no auth, no API client. Do not add libraries "just in case": add a dependency only when a feature needs it.
 
-**The project starts empty.** Features are built step by step from designs the user sends. Planned when needed: React Router 7 (`react-router` package) for tabs, Zustand for the player state, Zod for content validation, `cn()` (`clsx` + `tailwind-merge` in `src/lib/utils.ts`) with the first conditional class. Propose each one when the feature needs it and install it only after the user agrees (`pnpm add` asks for permission); never a second library for a capability already chosen.
+**The project started empty.** Features are built step by step from designs the user sends. Chosen so far: `react-router` 8 for tabs, `i18next` + `react-i18next` for the ru/en/uk UI (`src/i18n/`), Zustand for the player state (`createSelectors` in `src/utils/`), Zod for content validation (`src/content/schemas.ts`), `cn()` (`clsx` + `tailwind-merge` in `src/lib/utils.ts`), `@tanstack/react-virtual` for the playlist, `@vercel/analytics` + `@vercel/speed-insights` for visits and Core Web Vitals, `eslint-plugin-import-x` (with `eslint-import-resolver-typescript`) for `no-cycle`. Propose any new one when the feature needs it and install it only after the user agrees (`pnpm add` asks for permission); never a second library for a capability already chosen.
 
 ### Does not exist — never reference
 
@@ -28,10 +28,10 @@ This repo started from a team template whose habits do not apply here:
 | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | `useApiClient`, axios, `@/services/open-api/*`, `extractErrorMessage`, TanStack Query       | nothing: no backend; data is `src/content/*.json`                 |
 | `TextField`, `CustomCheckbox`, `ButtonLoading`, `@/modules/common/components` form controls | plain elements styled with Tailwind; there are no forms yet       |
-| react-hook-form, a shadcn `<Form>`, `scrollToError`, validation-message constants           | not installed; Zod only for content validation, when added        |
+| react-hook-form, a shadcn `<Form>`, `scrollToError`, validation-message constants           | not installed; Zod is only for content validation                 |
 | `sonner`, `toast`                                                                           | not installed                                                     |
 | `lucide-react`, `@/assets/icons/*.svg?react`                                                | not installed (no svgr); inline SVG from the design, or `<img>`   |
-| `react-router-dom`, `<BrowserRouter>`                                                       | `react-router` 7, when routing lands                              |
+| `react-router-dom`, `<BrowserRouter>`                                                       | `react-router` (v8), routes in `src/router/`                      |
 | `export enum Routes`, any `enum`                                                            | an `as const` object (`erasableSyntaxOnly`; ESLint blocks `enum`) |
 | `AuthGuardTemplate`, `CanAccessTemplate`, roles                                             | no auth                                                           |
 | `interface` for props                                                                       | `type ComponentNameProps`                                         |
@@ -44,57 +44,60 @@ Knip runs in `pnpm check` and CI: unused files, exports and dependencies fail th
 ```bash
 pnpm dev             # http://localhost:5173
 pnpm check           # format + lint + typecheck + knip + test + build: run before saying "done"
+pnpm lint            # ESLint, zero warnings (pnpm lint:fix to autofix)
+pnpm typecheck       # tsc -b: src, root configs + e2e + scripts, worker
 pnpm knip            # unused files, exports, dependencies
 pnpm test:watch      # Vitest in watch mode
 pnpm test:coverage
 pnpm test:e2e        # Playwright, desktop + mobile (first time: pnpm exec playwright install chromium)
-pnpm format          # Prettier
+pnpm format          # Prettier, whole repo: only when the tree holds nothing but this task's changes
+pnpm sync:music      # music/ → MusicBrainz → covers → R2 → tracks.json (writes to R2: only when asked)
+pnpm worker:types    # regenerate worker/worker-configuration.d.ts after a wrangler.jsonc change
+pnpm worker:deploy   # deploy the audio Worker (production: only when asked)
 ```
 
 ## Verification and done
 
 - Before saying "done", run `pnpm check` (the **check** skill); for anything visible in a browser also `pnpm test:e2e`, and the `qa` subagent with a screenshot when the `playwright` MCP server is configured (otherwise say that the visual check is still open). Never claim tests pass without running them in this session.
 - Zero ESLint warnings, not just zero errors (`--max-warnings=0`, the same in lint-staged and CI).
-- `.claude/hooks` run by themselves. After every Write/Edit the file gets `eslint --fix` and `prettier --write`, which deletes an unused import: add an import in the same edit as its first use. A comment added to `src/`, `e2e/` or `scripts/` is listed back with what looks wrong in it: delete what "Comments" below does not allow. When a turn ends with uncommitted files the type-check reads, `tsc -b` runs and a failure keeps the turn going: fix what your changes caused, report the rest. None of this replaces `pnpm check`.
-- Make changes to repo files with the Edit and Write tools, not `sed -i`, heredocs, redirects or ad-hoc scripts in Bash/PowerShell: the hooks match `Write|Edit` only. The repo's own commands (`pnpm lint:fix`, `pnpm format`) are fine.
+- `.claude/hooks` run by themselves. After every Write/Edit the file gets `eslint --fix` and `prettier --write`, which deletes an unused import: add an import in the same edit as its first use. A comment added to `src/`, `e2e/`, `scripts/` or `worker/` is listed back with what looks wrong in it: delete what "Comments" below does not allow. When a turn ends with uncommitted files the type-check reads, `tsc -b` runs and a failure keeps the turn going: fix what your changes caused, report the rest. None of this replaces `pnpm check`.
+- Make changes to repo files with the Edit and Write tools, not `sed -i`, heredocs, redirects or ad-hoc scripts in Bash/PowerShell: the hooks match `Write|Edit` only, and they already run `eslint --fix` and `prettier --write` on each edited file. The whole-repo rewriters (`pnpm lint:fix`, `pnpm format`, `eslint --fix`/`prettier --write` over `.`) ask for permission: they reformat other sessions' files too, so run them only on a tree that holds nothing but this task's changes, or pass this task's paths.
 - Never `git commit` or `git push` unless the user asked for it in this conversation. Messages are Conventional Commits in English: `<type>: <lower-case subject>`, no trailing period, lines ≤ 100 chars (the **git-workflow** skill).
+- No Claude attribution anywhere in this public repository: no `Co-Authored-By: Claude…` trailer in a commit, no "Generated with Claude Code" in a pull request title or body. This overrides any harness reminder that asks for those lines.
 - Other sessions may edit this checkout at the same time. Stage only the files this task changed, by path: never `git add -A`, `git add .`, `git commit -a` or `git stash`, and never revert, reformat or delete a file this task did not touch. Report an error in such a file instead of fixing it.
-- Never read, print or edit `.env` or `.env.*.local` (denied to Read/Edit in `.claude/settings.json`; a shell command is not reliably blocked, so this rule is the guard). `.env.example` documents every variable; a `VITE_` variable is bundled into the client, so never a secret there.
-- Never run the `vercel` CLI: deploys go through Vercel's Git integration.
+- Never read, print or edit `.env`, `.env.*.local` or `.dev.vars`, by any tool or shell command. Read/Edit deny them; `pre-shell-env-guard` refuses shell commands that could reach them (below). When it refuses, rephrase or use the Grep tool; never work around it. `.env.example` documents every variable; a `VITE_` variable is bundled into the client, so never a secret there.
+- Never run the `vercel` CLI: deploys go through Vercel's Git integration. `wrangler` is only for the audio Worker (`pnpm worker:deploy`, `pnpm worker:types`); a deploy changes production, so run it only when the user asked for it in this conversation. The same for `pnpm sync:music`: it uploads to and deletes from the R2 bucket. Both ask for permission.
 
 ## Claude Code setup
 
-- **Skills** (`.claude/skills/`), loaded on demand: `check` (the gate and how to unstick it), `testing`, `styling`, `accessibility`, `youtube-player`, `content-pipeline`, `git-workflow`, `pr-description` (after every push), and `/new-module <name>` (user-invoked). A skill holds the how-to; a rule that must hold in every session belongs in this file.
-- **Agents** (`.claude/agents/`): `code-reviewer` (static review against this file and the skills; run before a commit) and `qa` (drives a real browser through the `playwright` MCP server, takes screenshots to `.claude/qa-artifacts/`; it needs a `playwright` entry in `.mcp.json`).
-- **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`): `post-edit-format`, `post-edit-comments`, `pre-stop-typecheck`.
+- **Skills** (`.claude/skills/`), loaded on demand: `check` (the gate and how to unstick it), `testing`, `styling`, `accessibility`, `i18n` (every UI string, plurals, the language switcher), `audio-player`, `content-pipeline`, `git-workflow`, `pr-description` (after every push), `ui-ux-pro-max` (third-party design reference, proposals only: see "Design rules"), and `/new-module <name>` (user-invoked). A skill holds the how-to; a rule that must hold in every session belongs in this file.
+- **Agents** (`.claude/agents/`): `code-reviewer` (static review against this file and the skills; run before a commit) and `qa` (builds the working tree, serves it on port 4317, drives a real browser through the `playwright` MCP server, takes screenshots to `.claude/qa-artifacts/`; it needs a `playwright` entry in `.mcp.json`). When a `qa` report starts with `LEFT RUNNING: port 4317, PID <pid>`, stop that process first, as `/qa-full` step 1 describes.
+- **Full QA cycle** (manual only): `/qa-full [url|local] [levels…]` tests the deployed Vercel site (default production; `local` builds and serves the working tree on port 4317) with the `qa-smoke`, `qa-functional`, `qa-integration`, `qa-visual`, `qa-a11y`, `qa-performance`, `qa-chaos` agents one at a time, then `qa-verifier`, and writes `.claude/qa-artifacts/<run-id>/report.md`. Never dispatch a `qa-*` level agent or `/qa-full` on your own: only when the user asks.
+- **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`):
+  - `pre-shell-env-guard` (Bash, PowerShell, Monitor): a best-effort net over the command text, not a sandbox. It refuses a command that names, globs or 8.3-short-names (`ENV~1.LOC`) a secrets file, even in an `echo` or a commit message; one that builds text from escapes, char codes or base64; and a recursive content search over the repo root, `worker/` or a folder above the repo (one limited to `src/`, `e2e/`, `scripts/` and similar passes).
+  - `pre-curl-allow` (Bash): auto-approves a read-only `curl` to the site, the `localhost` QA ports and the audio Worker, so background `qa-*` agents run without prompts; anything else still asks.
+  - `post-edit-format`, `post-edit-comments` (Write, Edit) and `pre-stop-typecheck` (Stop), described under "Verification and done".
 - Personal overrides go into `.claude/settings.local.json` (ignored by `.claude/.gitignore`).
 
 ## Project structure
 
-Current:
-
 ```bash
 src/
 ├── main.tsx          # entry: renders <App /> + global styles
-├── app/              # App root component
-├── styles/index.css  # Tailwind entry
-└── test/setup.ts     # Vitest + jest-dom setup
-e2e/                  # Playwright specs
-```
-
-Target layout as features land:
-
-```bash
-src/
 ├── app/              # App root, providers
-├── router/           # routes (exported for tests) + browser router
-├── pages/            # route-level components, thin wrappers
-├── modules/          # feature modules: common, player, magazine, ...
+├── router/           # `routes` paths (as const) + route objects + browser router
+├── pages/            # route-level components, thin wrappers (flat: cv-page.tsx, ...)
+├── modules/          # feature modules: common (layout, header, switchers), player; later magazine, chart, ...
 ├── content/          # *.json + Zod schemas; the only data source
-├── utils/            # app-wide helpers
-├── styles/           # Tailwind entry + project tokens
-└── test/             # setup and render helpers
-scripts/              # content pipeline; Node 24 runs .ts directly (type stripping, erasable syntax only)
+├── i18n/             # i18next setup, languages, locales/{ru,en,uk}.json
+├── lib/utils.ts      # cn()
+├── utils/            # app-wide helpers (createSelectors, storage, clamp)
+├── styles/           # Tailwind entry, theme tokens, shared scrapbook classes
+└── test/             # Vitest setup and helpers
+e2e/                  # Playwright specs
+scripts/              # music pipeline; Node 24 runs .ts directly (type stripping, erasable syntax only)
+worker/               # Cloudflare Worker that serves audio from the private R2 bucket
+vite-plugins/         # build-time checks and the Vercel emulation for vite preview (tsconfig.node.json)
 ```
 
 Feature module layout (create only the folders a module needs, each with an `index.ts` barrel):
@@ -109,9 +112,10 @@ modules/feature-name/
 └── index.ts
 ```
 
-- All public pages will be children of one layout route, `SiteTemplate` in `src/modules/common/`, that mounts the header, garland and player once, so music never stops on tab change.
-- `scripts/` is not wired into tsconfig, ESLint, Vitest and Knip yet: the first script brings that setup with it (the **content-pipeline** skill §1).
-- Route paths will live in one `as const` object (`routes.Home`, ...).
+- All public pages are children of one layout route, `SiteTemplate` in `src/modules/common/`, that mounts the header, the footer and the audio player once (the garland and the iPod dock join it when built), so music never stops on tab change.
+- `scripts/` is covered by `tsconfig.node.json` and ESLint's Node block (`console.info` allowed there); `worker/` has its own `tsconfig.json` with types generated by `pnpm worker:types` (`worker/worker-configuration.d.ts`, ignored by ESLint and Prettier). Script tests, when tests resume, need `scripts/**/*.test.ts` in the Vitest `unit` project.
+- Modules import each other only through their `index.ts` barrels and only one way, never in a cycle: `magazine` (and later `chart`) depend on `player`, `player` depends on no feature module. When a feature needs to show its control inside another (the magazine's MAGAZINE unit inside the deck), the owning module exports the component and the page passes it in as a slot prop (`<DeckPoster discControls={<DeckMagazineUnit />} />`).
+- Route paths live in one `as const` object, `routes` in `src/router/routes.ts` (`routes.Home`, ...); never a path literal elsewhere. `vercel.json` rewrites exactly those paths to `index.html`; any other path gets `404.html` (a copy of `index.html` written by the build) with status 404. The `vercel-config` plugin (`vite-plugins/`) fails the build when the rewrites and `routes` differ, when the CSP in `vercel.json` lacks the inline theme script's hash (it prints the right one) or a host of a content URL (`audioUrl` → `media-src`, other `*Url` → `img-src`), and makes `vite preview` (so `pnpm test:e2e`) send the same headers and 404s as Vercel. A new route, image host or third-party script means editing `vercel.json`.
 
 ## Coding standards
 
@@ -164,19 +168,29 @@ Order (auto-fixed by ESLint): external, `@/` aliases, relative, styles. Use `@/`
 
 ### Styling
 
-- Tailwind utilities; project tokens and shared classes go into a stylesheet imported by `src/styles/index.css`. Conditional classes via `cn()`, added with the first one. Details: the **styling** skill.
+- Tailwind utilities; project tokens and shared classes go into a stylesheet imported by `src/styles/index.css`. Conditional classes via `cn()` (`src/lib/utils.ts`). Details: the **styling** skill.
 - No CSS modules or styled-components. Inline `style` only for values computed at runtime (band theme colors, animation delays).
+- **Player exception:** `src/modules/player/styles/player.css` is the design's stylesheet, kept as delivered (never sort, dedupe or rewrite it into Tailwind: rule order is the result). `player-compat.css` before it is unlayered and reverts only what Tailwind preflight sets inside `.player-deck`/`.ipod-dock` (never `all: revert`: on every element it made style recalculation about 4× slower), so a Tailwind utility there would apply and fight the design: inside the player use the design's classes and the design's inline `style` positions, not utilities. Fixes to the design's CSS (hit areas, disabled states, breakpoints it was not checked at) go into `player-overrides.css`, imported after `player.css`. The design's phone breakpoint is inclusive: use the `phone:` variant, not `max-[640px]:`. The design handoff lives in `.design/player/` (ignored by git, ESLint and Prettier).
+- **Magazine exception:** the same rules for `src/modules/magazine/styles/`: `magazine.css` is the design's stylesheet (`.design/magazine/`, comments stripped, its inline sticker SVGs and paper JPEG moved to `src/modules/magazine/assets/deco/` so they leave the render-blocking CSS; Vite never inlines that folder back), `magazine-compat.css` before it reverts preflight inside `.mag-wrap`, fixes go into `magazine-overrides.css`; inside the magazine use the design's classes and inline styles. The leaf's inline `transform: rotateY(-180deg)` is load-bearing: CSS (`[style*="-180"]`) and the flip code read it.
 - Band colors are not tokens: they come from `bands.json → theme`.
 - shadcn/ui primitives are added on demand and only where they fit the look (Dialog, Tooltip); ask before the first one. Its `init` expects the `@/*` alias in the root `tsconfig.json` (today only `tsconfig.app.json` has it) and writes its own theme into `src/styles/index.css`, which must not replace the project's tokens; its components import `lucide-react`, which is not installed. Never restyle the design into shadcn defaults.
 
 ### Errors
 
 - Fail loudly: throw specific errors with clear messages. No silent fallbacks that hide a broken main flow.
-- `async/await` instead of `.then()` chains.
+- `async/await` instead of `.then()` chains. Wrap a rethrown error as `new Error(message, { cause })`.
+- Each kind of failure has one place:
+  - **broken content** (`src/content/*.json` against `contentSchema` in `schemas.ts`, cross-file links included) fails the build through the `content-validation` plugin in `vite.config.ts`, never the visitor's browser; a new content file or cross-file rule goes into `contentSchema`;
+  - **impossible state** (a missing element, an index out of range): `invariant(condition, message)` from `src/utils/invariant.ts`, never a hand-written `if (!x) throw`;
+  - **expected runtime failure** (network, media, autoplay, storage): handled where it happens and turned into store state and translated UI, as the player does with `failedTrackCount`;
+  - **unexpected render error**: caught by the route `errorElement` (`ErrorPage`; the layout with the player survives a page crash) or by `FeatureBoundary` from `@/modules/common` around each independent block (the magazine, the deck), so one feature crashing leaves the rest working.
+- Logging goes through `captureError(error, { source })` (`src/utils/capture-error.ts`), the only place in `src/` allowed to call `console` (ESLint enforces it); React's `onUncaughtError`/`onCaughtError` in `main.tsx` route there. It only logs for now (the user dropped Sentry, 2026-11-17); an error-tracking service, if one is chosen later, is wired in that one function.
+- Web Analytics and Speed Insights (`src/app/app.tsx`) mount only when `VITE_VERCEL_ENV` is set, which Vercel does on its deployments; locally their scripts do not exist.
+- A chunk missing after a deploy (`vite:preloadError`) reloads the page once (`src/utils/reload-on-stale-chunk.ts`), but only after a fresh `/` names a different entry script (a new deploy, not a network blip), nothing is playing (a reload would stop the music) and the cooldown flag could be written to `sessionStorage`; it then loads the path the visitor was navigating to (`getIntendedPath()` in `src/router/browser-router.ts`), not the one still shown; the failed import itself is never swallowed, so the route's `ErrorPage` or the language switch handles it as usual; failed `lazy()` chunks and loaders reach `captureError` through `RouterProvider`'s `onError`; every route except Home is `lazy` in `src/router/route-objects.tsx`, so it stays out of the main bundle.
 
 ### Comments
 
-The default is none: a comment is a claim no tool checks, and it goes stale silently. Write one only where a rule requires it (the `-- <why>` of an `eslint-disable`, the reason of a `@ts-expect-error` or of a deliberately silent `catch`), where the user asks for it, or where the code alone would lead the next reader to a wrong "fix": a browser or library quirk (the YouTube IFrame API, 3D transforms in Safari), a workaround, a value whose source is nowhere in the code. Such a comment says **why**, in one or two English lines, without "we" or "I", and states only what was verified in this session; if unsure, write none.
+The default is none: a comment is a claim no tool checks, and it goes stale silently. Write one only where a rule requires it (the `-- <why>` of an `eslint-disable`, the reason of a `@ts-expect-error` or of a deliberately silent `catch`), where the user asks for it, or where the code alone would lead the next reader to a wrong "fix": a browser or library quirk (media autoplay policy, 3D transforms in Safari), a workaround, a value whose source is nowhere in the code. Such a comment says **why**, in one or two English lines, without "we" or "I", and states only what was verified in this session; if unsure, write none.
 
 Never in a comment: what the code already says, history or the task ("now", "fixed", "as requested": that is the commit message's job), a pointer to other code ("see X"), commented-out code, an unasked `TODO`. An edit that makes a comment wrong fixes or deletes it in the same edit.
 
@@ -190,65 +204,76 @@ Change only what the task needs. Read related code before editing. No drive-by r
 | --------------------- | -------------------------------- | ---------------------------------------------------------------- | ----------------------------- |
 | Unit                  | Vitest (node)                    | stores, content, utils, scripts: pure logic                      | `*.test.ts` next to the code  |
 | Component/integration | Vitest + Testing Library (jsdom) | user behavior: render, click, check what the user sees           | `*.test.tsx` next to the code |
-| E2E                   | Playwright + axe                 | real browser only: 3D flips, YouTube iframe, mobile layout, a11y | `e2e/*.spec.ts`               |
+| E2E                   | Playwright + axe                 | real browser only: 3D flips, audio playback, mobile layout, a11y | `e2e/*.spec.ts`               |
 
 - The extension picks the environment: `*.test.ts` runs in node, `*.test.tsx` in jsdom. jsdom has no layout, CSS animations, `matchMedia`, `IntersectionObserver` or `scrollIntoView`: geometry and 3D are e2e. How to test around it: the **testing** skill.
 - Query by role and accessible name (`getByRole('button', { name: 'Играть' })`), interact via `userEvent`.
-- When routing lands, add a `renderApp(path)` helper in `src/test/` that renders the app in a memory router, for flows across pages.
+- Add a `renderApp(path)` helper in `src/test/` (memory router over the route objects in `src/router/`) with the first test that needs flows across pages; it does not exist yet.
 - Reset Zustand stores in `beforeEach` (`store.setState(initialState, true)`).
-- Every new component gets a Testing Library test; e2e only for what jsdom cannot check.
+- When tests are not paused (below), every new component gets a Testing Library test; e2e only for what jsdom cannot check.
+- **Paused since 2026-11-09, until the user lifts it:** write no new tests (`*.test.ts(x)`, e2e specs), and do not flag a missing one in review. The existing unit tests and `e2e/*.spec.ts` still run in `pnpm check` / `pnpm test:e2e`: keep them green, delete none without asking. `src/test/setup.ts`, `src/test/stub-match-media.ts` and `@testing-library/user-event` (ignored in `knip.json`) stay for when tests return.
 
 ## Design rules
 
 - **Designs come from the user**, component by component (prepared in a separate Claude Code session). Port the given markup, styles and sizes as is; do not invent a new style. Nothing design-related is stored in the repo.
-- **Magazine:**
-  - always open, no cover; spread `aspect-ratio: 3/2` with `container-type: inline-size`, **all sizes inside pages in `cqw`** so the magazine scales as a whole;
-  - sheets are `.leaf` elements rotating with `rotateY` around the left edge (`transform-origin: left center`, `backface-visibility: hidden`, 0.9s); the flipping sheet gets z = 100 during the animation;
-  - genre stickers stick out on the right from under the pages, the active one sticks out further; the yellow "Случайно" sticker opens a random band and plays its track;
-  - every section opens with a spread: genre cover on the left, band list on the right; bands inside a section are ordered by founding year;
-  - band spread: photo on the left (full-page poster, or a square cover "sleeve" over a blurred backdrop), article on the right: genre, name in the band font, lead, 3 big stats, dossier, 2 polaroids, "Слушать" button and favorite tracks;
-  - photos use the duotone filter (`.duo`: image `grayscale + multiply`, `::after` dark color with `lighten`, halftone `::before`);
-  - aged paper: `.aged`, `.coffee`, `.dogear`, staples `.staple`; the `.corner` page curls must not cover content (page numbers sit at the top).
-- Fonts: none are loaded yet. The first component that uses one adds a single Google Fonts `<link>` to `index.html` (Anton, Oswald, Caveat, PT Sans, PT Mono, Permanent Marker, Special Elite; only the weights in use). Band fonts (Black Ops One, Cinzel, Cinzel Decorative, Michroma, Rubik Wet Paint, Archivo Black) are added with the magazine.
+- **`ui-ux-pro-max` only proposes (user's decision).** It may suggest ideas for the header, footer, page background, the CV and Games tabs, the chart and other UI without a delivered design; nothing it suggests is applied until the user approves that specific proposal. The magazine and the player (`src/modules/magazine/`, `src/modules/player/`) keep their delivered designs, which win over the skill: never restyle them on its advice, and a change to shared styles must leave them visually unchanged.
+- **Magazine** (`src/modules/magazine/`, design `.design/magazine/SPEC.md`, its `reference.html` wins on any doubt):
+  - one spread per track in `tracks.json` (artists ordered by `sinceYear`, their songs in playlist order): the song's album cover on the left, an article on the song and its album on the right, with the artist's history, line-up and sound repeated. No playable music, no article. Language-neutral facts live in `src/content/bands.json` (artist, years, albums, photo, `songs[]` by `trackId`); the copy lives in one file per language, `src/content/band-copy/{ru,en,uk}.json` (`bands` keyed by artist, `songs` keyed by `trackId`, facts from MusicBrainz/Wikipedia), read by `src/content/band-copy.ts`: `ru` (the default language) is bundled, `en`/`uk` are lazy chunks; `main.tsx` waits up to 2.5 s for the current language's chunk before the first render, a late or failed chunk shows the `ru` copy (a failure is reported through `captureError`), and `useCurrentLanguage` subscribes to `band-copy.ts` (`useSyncExternalStore`) so the article re-renders when the chunk arrives; `useLanguage` loads a language's chunk before switching to it, does not switch (or store the choice) when it fails, and lets the last of several quick choices win; the build fails when a language misses a band or song, or has one that does not exist;
+  - always open, spread `aspect-ratio: 3/2` with `container-type: inline-size`, **all sizes inside pages in `cqw`**; left page the album cover, right page the article;
+  - below 1024px (`useIsReaderLayout`; the spread's body text would drop under 9px) the book is replaced by `MagazineReader`: one full-width column (user's decision), the cover over the article in normal flow (from a 600px column the cover turns 16:10 with the whole album over a blurred, enlarged copy of its own thumbnail (never cropped or stretched), from 860px the article sets in two columns), the same `CoverPage`/`ArticlePage` and store; the cover stays clean, search and "Наугад" head the article; sizes in `styles/magazine-reader.css` (ours, not the design's) as multiples of `--u` (1% of the reader, clamped); 44px edge zones along the column (the book's `.edge`; the tools, listen and nav rows sit above them) flip, the stickers go to the article header and into the "Слушать" row, no taller than the button (`ReaderDecoStickers`, mapped from the same `deco-layouts`); the store turns instantly there (no book mounted), and the turn is the "page follows the finger" carousel the user chose (`useReaderCarousel`): touch or mouse drags the column with the neighbouring page (`ReaderSheet`, inert) beside it on a track, a release past a quarter or a fling turns, anything else springs back, and every other turn (edges, nav, search, "Наугад", the MAGAZINE key) slides the same way; a turn never scrolls the page (user's decision) and `useKeepReaderFocus` keeps focus; every page is as tall as the longest article, measured by `ReaderSheetSizer` (all sheets in one grid cell off screen, `useElementHeight`), so a turn never changes the column's height and the "Слушать" row and nav sit at the same place on every page;
+  - pages turn with a page-curl (Web Animations, 1.1 s, `utils/curl-animation.ts` ported verbatim): `stores/magazine-store.ts` is a pure state machine (leaf, flight, curling leaf, the queue; no DOM), `hooks/use-curl-animation.ts` in `MagazineBook` runs each flight on the DOM (`utils/curl-flight.ts`) and reports `startCurl`/`landFlight`/`finishCurl` back; a click during a turn is queued, a jump over several bands is one curl, `prefers-reduced-motion` or no mounted book turns instantly;
+  - "Слушать" starts the spread's track in the player; "Наугад" only flips to a random spread and never touches the player (user's decision); the player's MAGAZINE key flips to the current track's spread and its LCD shows the page; search results show that same printed cover number, not SPEC §2's `leaf * 2` (user's decision).
+- Fonts: one Google Fonts `<link>` in `index.html`, only the families and weights in use; extend that link, never add a second. Loaded now: Caveat 700, Michroma, Oswald 600/700, PT Mono, PT Serif 700, Rubik Mono One, Russo One (player and cut-out headings); Bad Script, Bebas Neue, Permanent Marker, PT Sans Narrow 700, Source Serif 4 400/400i (magazine). Still to come when used: PT Sans 400/700 (the iPod dock).
+- All UI text, including aria-labels and the deck's English engravings, lives in `src/i18n/locales/{ru,en,uk}.json`; plurals use i18next `_one/_few/_many/_other` keys (every locale keeps all four so the key-parity type check holds). How: the **i18n** skill.
 - Accessibility: real `<button>`/`<a>`, `aria-label` on icon buttons, 4.5:1 contrast, hit areas ≥ 44px, honor `prefers-reduced-motion`. The axe e2e check must stay green.
 - Mobile is mandatory: check with the Playwright `mobile` project.
-- Performance: every `<img>` has `width`/`height` (no layout shift) and `loading="lazy"` unless it is on the first screen; band photos are WebP; Google Fonts load with `preconnect` and `display=swap`, and only the families and weights the design uses.
+- Performance: every `<img>` has `width`/`height` (no layout shift) and `loading="lazy"` unless it is on the first screen; covers are never drawn much smaller than their natural size in a long list (the playlist); Google Fonts load with `preconnect` and `display=swap`, and only the families and weights the design uses.
 
-## YouTube player constraints
+## Audio player constraints
 
-How to build the player within these rules (StrictMode, states, errors, Referer): the **youtube-player** skill.
+Final decision of the user, not to be reopened: music is free tracks the user downloads, played by an HTML `<audio>` element from the project's Cloudflare R2 bucket. No YouTube, no streaming services, no previews. How to build it (StrictMode, events, errors, preloading, tests): the **audio-player** skill.
 
-- Only the official YouTube IFrame Player API. No unofficial YouTube Music APIs, no cookies.
-- The video **must stay visible**, at least 200×200. Audio-only playback is against YouTube's terms.
-- One player instance in `SiteTemplate`. On Home it sits in the «смотрим клип» block; on other tabs the same element becomes a floating window via CSS. Never unmount it, or the music stops (cover it with an integration test asserting the player is the same DOM node after navigation).
-- Browsers block sound without a user gesture: first play only via the ▶ button.
-- Skip videos with `embeddable: false`; on player errors 101/150 go to the next track.
+- One `<audio>` element that plays (the detached, never-played next-track preloader in `utils/audio-preloader.ts` is the only other one), created once outside React's render (appended to `body`) and wired up by `SiteTemplate`; never unmount or re-create it on navigation, or the music stops (cover it with an integration test asserting the same DOM node after navigation).
+- Browsers block sound without a user gesture: the first `play()` runs inside the ▶ click handler; handle its rejected promise.
+- The deck, the iPod dock and the chart are the controls; time, duration and buffering come from the element's events, not from a simulated clock.
+- A track that fails to load (`error` event) is reported and skipped; stop after one full cycle of failures instead of looping.
+- Listen-only: the R2 bucket `portfolio-music` is private (no `r2.dev`, no custom domain). The `portfolio-audio` Worker (`worker/`, deployed with `pnpm worker:deploy`) is the only way in: it serves `GET`/`HEAD /audio/<id>.<hash8>.mp3` only to requests whose `Origin` is in `ALLOWED_ORIGINS` (`worker/wrangler.jsonc`: production, `localhost:5173/4173/4317`), with CORS for that origin and range requests (`206`, seeking). A typed URL or a download link sends no `Origin` and gets `403`. So the element needs `crossOrigin="anonymous"`, which makes it send `Origin`. A new site origin (custom domain, a Vercel preview) is added to `ALLOWED_ORIGINS` and redeployed. After a change to `wrangler.jsonc`, run `pnpm worker:types`.
 
-## Content pipeline (planned: `scripts/sync-music.ts`, run as `pnpm sync:music`)
+## Music pipeline (`scripts/sync-music.ts`, run as `pnpm sync:music`)
 
-The site only reads `src/content/*.json`. The script runs manually or on a GitHub Actions schedule, caches every stage and skips what is already done.
+The site only reads `src/content/*.json`. Audio lives in R2, never in git. The script caches every MusicBrainz response and cover lookup in `.cache/` (gitignored), so a rerun only asks about new tracks; `pnpm sync:music --force` drops that cache.
 
-1. ⏳ **Playlist** → `.cache/playlist.json`: video id, artist, title, embeddable.
-2. ⏳ **Facts**: MusicBrainz (origin, years, members with instruments, albums, label; **1 request/second**, User-Agent required) + TheAudioDB (photos, genre; key `123`, up to 30 requests/minute) → `.cache/artists/<slug>.json`.
-3. ⏳ **Photos**: download and compress to WebP (main ~800px, polaroids ~300px) → `public/img/bands/<slug>/`. If `public/img/override/<slug>/` exists, use it instead.
-4. ⏳ **Copy**: Claude Code processes batches of 20–30 bands: lead ≤ 180 chars, 3 stats **only from collected facts**, member roles (≤ 5). Flag doubtful matches for manual review.
-5. ⏳ **Build** `src/content/bands.json`, `tracks.json`; new bands get a section from tags, unclear cases are decided manually.
+**Fully automatic**: the user's only steps are dropping mp3 files into `music/` and running `pnpm sync:music`. Every match, choice and fallback is decided by the script with fixed rules and listed in the run report; nothing waits for a manual review.
 
-Never: scrape Pinterest, store YouTube cookies, invent facts, copy Wikipedia text (CC BY-SA: facts only, own wording). The MusicBrainz User-Agent names the app and the repository URL as contact, never a personal email without asking. Credit sources in the footer: «данные: MusicBrainz, TheAudioDB, Википедия». Rules and setup: the **content-pipeline** skill.
+**Images come only through APIs, as URLs**: never downloaded, converted, uploaded to R2 or committed (no WebP step, no `public/img/`, no cover from the mp3 tags).
+
+Now (for the player):
+
+1. ✅ **Files**: the user drops mp3 files into `music/` (gitignored); the script reads their tags (title, artist, album, year) and the decoded duration; `Artist - Title.mp3` when the tags lack them.
+2. ✅ **Artist and original album**: MusicBrainz finds the artist MBID through a recording search (normalized artist and title match), then walks the artist's own release groups oldest first (`Album` without `Compilation`/`Live`/`Soundtrack`/`Remix`/`Demo`…, then `Single`/`EP`) and takes the first whose earliest official release lists the song (normalized title, length within ±5 s). Search results list only a few releases per recording, so they cannot be trusted to contain the original album. **1 request/second**, User-Agent required. No match → the tag data stays, flagged in the report.
+3. ✅ **Album cover** of that exact release group, never a band photo: Cover Art Archive `release-group/<mbid>/front-500` (`front-250` for small sizes, `front-1200` for the magazine's full-page covers), stored as the `archive.org/download/…` URL its redirect points to: one network hop less on every first load, and the JSON index on archive.org is never needed → else the front of the earliest official release in the group → else the TheAudioDB album thumbnail found by release group MBID → else the UI placeholder.
+4. ✅ **Upload** new or changed audio to R2 (S3 API, keys `audio/<id>.<hash8>.mp3`, `immutable` caching) and delete objects of removed tracks.
+5. ✅ **Build** `src/content/tracks.json` (`id`, `title`, `artist`, `album`, `year`, `durationSec`, `audioUrl`, `coverUrl`, `coverThumbUrl`, `coverLargeUrl`), validated with Zod; `audioUrl` is the Worker URL (`audioBaseUrl` in `scripts/sync-music/config.ts`).
+
+Later (with the magazine): band facts looked up by the artist MBID from stage 2 (never by name, so there is nothing to disambiguate) from MusicBrainz (origin, years, members with instruments, albums, label) + TheAudioDB (genre, band photo URLs: main ~800px and polaroids ~300px, the closest size the API offers; key `123`, up to 30 requests/minute) + Wikipedia; Russian copy written by Claude Code in its own words only from collected facts (lead ≤ 180 chars, 3 stats, ≤ 5 members); `bands.json` plus `band-copy/{ru,en,uk}.json`; the section is chosen automatically from genre tags, with a default section when none fits.
+
+Never: invent facts, scrape Pinterest, commit audio, store or re-host covers and photos. The MusicBrainz User-Agent names the app and the repository URL as contact, never a personal email without asking. Secrets (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`) live in `.env.local`, without the `VITE_` prefix. Rules and setup: the **content-pipeline** skill.
 
 ## MVP plan
 
 One component at a time; after each, verify (`pnpm check`, `pnpm test:e2e`) and take a Playwright screenshot to compare with the design.
 
 - [x] Empty project: tooling, strict TS, ESLint, tests (Vitest + RTL, Playwright + axe), CI
-- [ ] Layout: header with flag and sticker tabs, garland, routes `/`, `/cv`, `/games`
-- [ ] Content: JSON + Zod schemas, player store
-- [ ] `Magazine`: spread, page flips, sections and stickers, "Случайно", duotone photos, typographic fallback poster when there is no photo
-- [ ] `IPod`: screen (cover, track, album, year, progress), click wheel (MENU, ⏮, ⏭, ▶❚❚, center), scrollable playlist in menu
-- [ ] `YouTubePlayer` wired to the store; `VideoFrame` on Home, floating window on other tabs
+- [x] Layout: `SiteTemplate` with header, sticker tabs, footer with contacts, language and theme switchers, routes `/`, `/cv`, `/games` and a 404 page
+- [ ] Header decoration: Union Jack flag and fairy-light garland
+- [x] Content: `tracks.json` + Zod schema, player store (`src/modules/player/stores/player-store.ts`)
+- [x] `StereoDeck` (STEREO 2000 deck on Home, design in `.design/player/`): screen, transport, volume, TIME, disc, MAGAZINE unit (⏏ opens the track's spread, disabled for a track without an article), virtualized playlist with search; album covers from `coverUrl`/`coverThumbUrl` with the initials placeholder as fallback
+- [x] `Magazine` (ROCK WALL design): a spread per player track, page-curl flips with a click queue, search, "Наугад", "Слушать", the player's MAGAZINE key; 3 Moby articles in ru/en/uk
+- [x] `AudioPlayer`: one `<audio>` (`utils/audio-element.ts`, appended to `body` once) mounted by `SiteTemplate`; the store calls it inside the click handlers and its events (`timeupdate`, `waiting`/`playing`, `play`/`pause` from outside the deck such as unplugged headphones or OS media keys, `ended`, `error`) drive the store; Media Session metadata, `playbackState` and handlers. The last 30 s of a playing track preload the next one in a detached second `Audio` (`utils/audio-preloader.ts`, never played; the playing element stays the only one), so the switch reads from the HTTP cache. The store persists the track (by id, never by index), position, volume, mute, shuffle and repeat in `localStorage` (`utils/player-persistence.ts`: Zod-checked and clamped on restore, an unknown track id falls back to the first track); a restored position starts playback where it stopped. The power key resumes on power-on only if the music was playing at power-off; a paused deck stays paused (user's decision). Still to come: the iPod dock (`.ipod-dock`, SPEC §5) on other tabs
+- [x] Music pipeline stages 1–5, fully automatic: `music/` → MusicBrainz original album → its cover URL → R2 → `tracks.json`
 - [ ] `RockChart`: top 6, linked to the player
-- [ ] Deploy to Vercel
-- [ ] Content pipeline stages 2–5
+- [x] Deploy to Vercel: production `https://rockfolio-dev.vercel.app` is built from `main` by the Git integration
+- [ ] Band facts, band photo URLs, magazine copy and `bands.json` (together with the magazine)
 - [ ] CV tab (same look: paper, tape, cut-out letters)
 - [ ] Games tab (CD cases, js-dos for shareware, own mini games)
 

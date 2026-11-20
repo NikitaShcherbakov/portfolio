@@ -1,0 +1,27 @@
+@layer components {
+  .poster {
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-poster);
+  }
+
+  .kraft {
+    background-color: var(--color-kraft);
+    background-image:
+      radial-gradient(var(--color-kraft-grain) 1px, transparent 1.4px),
+      linear-gradient(160deg, var(--color-kraft-light), var(--color-kraft-dark));
+    background-size:
+      6px 6px,
+      100% 100%;
+  }
+
+  .tape {
+    position: absolute;
+    top: -10px;
+    z-index: 3;
+    width: 92px;
+    height: 26px;
+    background: var(--color-tape);
+    box-shadow: var(--shadow-tape);
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "site": {
+    "name": "Nikita Shcherbakov",
+    "pageTitle": "{{page}} — {{name}}",
+    "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "cv": "CV",
+    "games": "Games"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "system": "System theme"
+  },
+  "footer": {
+    "contacts": "Contacts",
+    "email": "Email",
+    "phone": "Phone",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "newTab": "(opens in a new tab)"
+  },
+  "pages": {
+    "notFound": {
+      "title": "Page not found",
+      "backHome": "Back to home"
+    },
+    "home": {
+      "music": "Music"
+    }
+  },
+  "errors": {
+    "pageTitle": "Something broke",
+    "pageText": "This page failed to load. Reload it or go back to the home page.",
+    "sectionText": "This section failed to load. The rest of the page still works.",
+    "reload": "Reload the page",
+    "backHome": "Back to home"
+  },
+  "magazine": {
+    "title": "Magazine",
+    "flipBackward": "Turn the page back",
+    "flipForward": "Turn the page forward",
+    "cover": {
+      "alt": "Cover of the album {{album}}",
+      "credit": "COVER · {{album}} · {{year}}"
+    },
+    "photo": {
+      "bandAlt": "Photo of {{name}}",
+      "coverAlt": "Cover of {{album}}"
+    },
+    "search": {
+      "sticker": "FIND",
+      "open": "Find a band or a song",
+      "close": "Close search",
+      "input": "Find a band or a song in the magazine",
+      "placeholder": "band or song",
+      "results": "Articles found",
+      "caption": "Meanwhile, in the magazine…",
+      "page": "p. {{page}}!",
+      "empty": "Bam! Nothing found…",
+      "found": "Articles found: {{count}}"
+    },
+    "random": {
+      "sticker": "RANDOM",
+      "label": "Random: open a random article"
+    },
+    "article": {
+      "kicker": "{{origin}} · since {{year}}",
+      "song": "Song of the issue",
+      "songMeta": "album {{album}} · {{year}} · {{length}}",
+      "trackStory": "The story of the song.",
+      "historyBand": "The story of the band.",
+      "historySolo": "The story of the artist.",
+      "members": "Line-up.",
+      "label": "Label: {{label}}.",
+      "sound": "Sound.",
+      "dates": "Dates.",
+      "foundedBand": "the band is formed",
+      "foundedSolo": "career begins",
+      "album": "album {{title}}"
+    },
+    "listen": {
+      "caption": "LISTEN IN THE PLAYER",
+      "label": "Listen in the player {{song}} — {{name}}"
+    },
+    "nav": {
+      "previous": "Previous article: {{name}}",
+      "next": "Next in the magazine: {{name}}",
+      "restart": "Back to the start of the magazine: {{name}}",
+      "counter": "Magazine · {{current}} / {{total}}"
+    },
+    "notes": {
+      "soHot": "🔥 so hot",
+      "listen": "→ listen!",
+      "hit": "★ hit!",
+      "rockOn": "ROCK ON!"
+    }
+  },
+  "player": {
+    "deck": {
+      "brand": "STEREO 2000",
+      "model": "NS-CD1",
+      "tagline": "HIGH FIDELITY",
+      "hello": "HELLO",
+      "disc": "DISC",
+      "standby": "STANDBY",
+      "shuffleFlag": "SHUFFLE",
+      "nextKey": "NEXT ▸",
+      "captionMain": "COMPACT DISC",
+      "captionTail": " · DIGITAL MUSIC SYSTEM",
+      "lineOut": "LINE OUT",
+      "left": "L",
+      "right": "R",
+      "serial": "S/N NS-CD1-0001",
+      "phones": "PHONES",
+      "nowSpinning": "NOW SPINNING",
+      "source": "PLAYLIST",
+      "list": "LIST",
+      "listLabel": "LIST — playlist"
+    },
+    "status": {
+      "playing": "▶ PLAYING",
+      "paused": "❚❚ PAUSED",
+      "standby": "■ STANDBY",
+      "loading": "◌ LOADING",
+      "noSignal": "✕ NO SIGNAL"
+    },
+    "playbackFailed": "None of the tracks could be loaded. Press Play to try again.",
+    "trackNumber": "TRACK {{current}} / {{total}}",
+    "repeatFlag": {
+      "all": "REPEAT ALL",
+      "one": "REPEAT ONE",
+      "off": "REPEAT OFF"
+    },
+    "upNext": {
+      "track": "{{artist}} — {{title}}",
+      "repeat": "repeat: {{title}}",
+      "end": "end of queue"
+    },
+    "osd": {
+      "volume": "VOL {{volume}}",
+      "mute": "MUTE"
+    },
+    "engraving": {
+      "power": "POWER",
+      "prev": "PREV",
+      "play": "PLAY",
+      "next": "NEXT",
+      "shuffle": "SHUFFLE",
+      "repeat": "REPEAT",
+      "random": "RANDOM",
+      "volume": "VOLUME",
+      "pushToMute": "PUSH TO MUTE",
+      "time": "TIME",
+      "elapsedTotal": "ELAPSED · TOTAL"
+    },
+    "magazine": {
+      "page": "MAGAZINE · P.{{page}}",
+      "pageUnknown": "MAGAZINE · P.—",
+      "pageCaption": "MAGAZINE · PAGE",
+      "open": "OPEN",
+      "openLabel": "Open {{artist}} in the magazine, page {{page}}",
+      "notInMagazine": "{{artist}}: no article in the magazine"
+    },
+    "controls": {
+      "seek": "Seek. Click the bar to jump, Enter for plus 10 seconds",
+      "seekValue": "{{elapsed}} of {{length}}",
+      "transport": "Playback controls",
+      "power": "Power",
+      "previous": "Previous track",
+      "play": "Play",
+      "pause": "Pause",
+      "next": "Next track",
+      "shuffle": "Shuffle",
+      "repeat": {
+        "all": "Repeat: whole queue",
+        "one": "Repeat: one track",
+        "off": "Repeat: off"
+      },
+      "random": "Random track",
+      "volume": "Volume",
+      "volumeDown": "Quieter",
+      "volumeUp": "Louder",
+      "volumeKnob": "Volume {{volume}} of {{max}}. Press to mute or unmute",
+      "volumeKnobMuted": "Volume muted. Press to mute or unmute",
+      "disc": "Disc: {{label}}. {{action}}"
+    },
+    "playlist": {
+      "label": "Playlist",
+      "search": "Search the playlist",
+      "searchPlaceholder": "Band, song or album",
+      "clearSearch": "Clear search",
+      "count_one": "{{count}} track",
+      "count_few": "{{count}} tracks",
+      "count_many": "{{count}} tracks",
+      "count_other": "{{count}} tracks",
+      "found": "{{count}} of {{total}} found",
+      "empty": "Nothing found. Try another title."
+    }
+  }
+}

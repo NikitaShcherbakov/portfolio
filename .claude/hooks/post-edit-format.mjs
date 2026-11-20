@@ -1,6 +1,8 @@
-// PostToolUse (Write|Edit) hook: autofix the just-touched file, the same way lint-staged does.
-// ts/tsx/js/jsx/mjs/cjs -> eslint --fix --max-warnings=0, then prettier --write.
-// json/md/yml/yaml/css/html (except pnpm-lock.yaml) -> prettier --write.
+// PostToolUse (Write|Edit) hook: autofix the just-touched file with the same tools and bar as
+// lint-staged (--max-warnings=0). ts/tsx/js/jsx/mjs/cjs -> eslint --fix, then prettier --write; that is
+// wider than .lintstagedrc.json (js/ts/tsx), but the extra extensions occur only under .claude/, which
+// ESLint ignores, so in practice they get prettier alone, as lint-staged gives .mjs.
+// json/jsonc/md/yml/yaml/css/html (except pnpm-lock.yaml) -> prettier --write.
 // Scoped to the one edited file on purpose: a hook that reformats files the tool call never
 // touched turns every edit into an unreviewable diff. Files outside the project (the session
 // scratchpad in the OS temp dir) and in node_modules are left alone.
@@ -36,7 +38,7 @@ const PRETTIER_TIMEOUT_MS = 60_000;
 const REPORT_LIMIT = 8_000;
 
 const scriptPattern = /\.(ts|tsx|js|jsx|mjs|cjs)$/;
-const prettierOnlyPattern = /\.(json|md|yml|yaml|css|html)$/;
+const prettierOnlyPattern = /\.(json|jsonc|md|yml|yaml|css|html)$/;
 
 // Resolve from the project, so the hook runs the project's own pinned eslint/prettier.
 const requireFromProject = createRequire(join(projectDir, 'package.json'));
